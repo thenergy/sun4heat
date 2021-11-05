@@ -1,0 +1,41 @@
+
+Install Anaconda
+Repo:
+https://repo.continuum.io/archive/index.html
+
+Type
+> wget https://repo.continuum.io/archive/Anaconda2-2019.10-Linux-x86_64.sh
+bash Anaconda2-2019.10-Linux-x86_64.sh
+
+
+> conda install -c pyviz holoviews bokeh
+> conda install scipy
+> conda install -c pyviz geoviews
+
+-------------------------------------------------------------------------
+Log in
+
+- Revisar botón "Connect", que aparece en la página de la consola
+Por ejemplo
+
+> ssh -i "bokeh_example.pem" ubuntu@ec2-52-15-165-40.us-east-2.compute.amazonaws.com
+
+-------------------------------------------------------------------------
+Subir archivos
+https://docs.aws.amazon.com/transfer/latest/userguide/getting-started-use-the-service.html
+
+Por ejemplo, para conectarse
+
+> sftp -i ../key/bokeh_example.pem ubuntu@ec2-52-15-165-40.us-east-2.compute.amazonaws.com
+
+Luego
+
+> put "file"
+
+-------------------------------------------------------------------------
+Correr visualizacion
+bokeh serve emisiones --allow-websocket-origin=18.220.149.168:5020 --port 5020 &
+
+Matar proceso
+
+kill -9 ID_PROC

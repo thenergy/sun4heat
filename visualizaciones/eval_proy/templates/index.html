@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="shortcut icon" type="image/x-icon" href="http://www.comitesolar.cl/wp-content/themes/gobcl-wp-master/img/favicon.ico">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>Mercado</title>
+
+    {{ bokeh_css }}
+    {{ bokeh_js }}
+    <style media="screen">
+      {% include 'main.css' %}
+    </style>
+
+  </head>
+
+  <body>
+
+
+
+    <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-comiteSolar">
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSI" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+
+      <div class="collapse navbar-collapse" id="navbarSI">
+          <ul class="nav navbar-nav ml-auto">
+
+            <li class="nav-item">
+              <a class="nav-link" href="#inicio">Inicio <span class="sr-only">(current)</span></a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="#info_si">Información</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="#gris_vis">Otras Visualizaciones</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="#mapavis">Mapa</a>
+            </li>
+
+          </ul>
+
+      </div>
+    </nav>
+
+
+
+    <!-- Titulo y menu -->
+    <section id="inicio" class="cs_sistemaInfo">
+      <div class="jumbotron">
+
+        <div class="container">
+          <div class="row">
+
+              <div class="col-md-5">
+                <h2 class="cs_titulo">Información de mercado, energía solar térmica</h2>
+              </div>
+
+              <div class="col-md-2">
+
+              </div>
+
+              <div class="col-md-5">
+
+                <p class="sist_descripcion">
+                El mercado térmico tiene un gran potencial...
+
+                  </p>
+
+              </div>
+
+          </div>
+        </div>
+
+
+      </div>
+    </section>
+
+    <!-- White -->
+
+
+    <!--Gray-->
+    <section id="gris_vis" class="si_aboutVis">
+
+      <div class="container">
+        <h3 class="titulo_seccion">
+          <svg class="linea_izq" height="10" width="300">
+            <line x1="0" y1="5" x2="300" y2="5" style="stroke:#fff; stroke-width:3" />
+          </svg> Otras visualizaciones</h3>
+
+          <!--Op A-->
+          <div class="row justify-content-center">
+            <div class="col-lg-12">
+              <p>En esta sección se muestra información que no está relacionada a un punto específico del mapa.</p>
+
+            </div>
+
+            <div class="col-lg-12">
+              <div class="agrupar_visualizaciones">
+                <div class="row justify-content-center">
+                  <div class="col-8 col-sm-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Mercado de minerales</h5>
+                        <p class="card-text"> A continuación se puede ver la cantidad de cobre procesada por empresa. Para el cobre se tiene información de consumo de energía específico por proceso. Además se ve la producción de minerales como molibdeno, hierro y oro, junto con producción anual de la minería no metálica. Datos de:</p>
+                                                
+                         <a href=https://www.mineriaabierta.cl/estadisticas/ class="btn btn-siVis">Minería Abierta</a>
+
+                        <!-- <a href="http://localhost:5500/dash_gen_tec" class="btn btn-siVis align-self-end">Ir al recurso</a> -->
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-8 col-sm-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Precios de energía</h5>
+                        <p class="card-text">La siguiente visualización agrupa información relativa al precio de la energía térmica en Chile. Datos de:</p>
+                        <!-- <a href="http://localhost:5502/dash_plantas_chile" class="btn btn-siVis">Ir al recurso</a> -->
+                        <a href="http://energiaabierta.cl/hidrocarburos/" class="btn btn-siVis">Energía Abierta</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-8 col-sm-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Importaciones de colectores solares térmicos</h5>
+                        <p class="card-text">La siguiente visualización muestra las importaciones de colectores solares térmicos desde el año 2007 al 2018. Datos de:</p>
+                        <!-- <a href="http://localhost:5502/dash_plantas_chile" class="btn btn-siVis">Ir al recurso</a> -->
+                        <a href="http://datos.gob.cl/dataset/registros-de-importacion-2018" class="btn btn-siVis">Datos aduanas</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-8 col-sm-4">
+                    <div class="card">
+                      <div class="card-body">
+                        <h5 class="card-title">Matriz de seguimiento de proyectos</h5>
+                        <p class="card-text">El avance en cada proyecto puede verse en la siguiente matriz</p>
+                        <!-- <a href="http://localhost:5502/dash_plantas_chile" class="btn btn-siVis">Ir al recurso</a> -->
+                        <a href="" class="btn btn-siVis">Matriz seguimiento</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <!--Fin op A-->
+
+      </div>
+    </section>
+
+    <!-- SECCION QUE CONTIENE EL MAPA -->
+    <section id="mapavis" class="container">
+        <!-- Visualizaciones -->
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="titulo_seccion">
+              <svg class="linea_izq" height="10" width="300">
+                <line x1="0" y1="5" x2="300" y2="5" style="stroke:#20206D;stroke-width:3" />
+              </svg>Mapa</h3>
+          </div>
+            <div class="col-md-12">
+              {{ plot_div|indent(8) }}
+            </div>
+          </div>
+        </div>
+      </section>
+  </div>
+
+
+    <!--  Ups! celular en vertical  -->
+    <div class="cel_vertical oculto">
+      <img src="mapa_dev/static/svg/celu.svg" alt="Tu smartphone está en posición vertical">
+      <h5>Para acceder a las visualizaciones pon en posición horizontal tu smartphone</h5>
+      <button id="vertical_ocultar" type="button" class="btn btn-outline-light">Volver</button>
+    </div>
+
+   <!-- Optional JavaScript -->
+   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  {{ plot_script|indent(8) }}
+
+
+  </body>
+</html>
