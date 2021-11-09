@@ -27,7 +27,8 @@ STAMEN_TERRAIN_RETINA, STAMEN_TONER, STAMEN_TONER_BACKGROUND,\
 STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
 # Donde instalar. Versión local y versión en servidor
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
+# path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
 # path = '/home/ubuntu/sun4heat/'
 
 # Lista con nombre de los "tiles" 
@@ -95,8 +96,7 @@ def FiltEquip(df,mkt):
         eqp_ft = ['IN']
         
     elif mkt == 'Mercado Solar':
-        eqp_ft = ['IN','CF','CA']
-        
+        eqp_ft = ['IN','CF','CA']      
         
     elif mkt == 'Mercado H2':
         eqp_ft = ['IN','CF','CA','PC','PS']
@@ -177,45 +177,55 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 ########################################################################################  
 # crear dataframe (df) indus
 indus = ReadIndus()
+
 # crear lista de contaminantes
-ctms = list(indus.tipo_contaminante.unique())
+ctms = list(indus.tipo_contaminante.unique()) #saca uno de cada contaminante
+
 # definir contaminante inicial a analizar y filtrar df indus
 ctm = 'Dióxido de carbono (CO2)'
 indus = indus[indus.tipo_contaminante == ctm]
+
 # filtrar df indus según equipo a analizar
-indus = IDequipo(indus)
+indus = IDequipo(indus) #IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
+
 # lista de equipos a analizar
 eqp_ft = ['CA', 'IN', 'PC', 'CF', 'PS', 'GE']
-indus = indus[indus.equipo.isin(eqp_ft)]
-
+indus = indus[indus.equipo.isin(eqp_ft)] #cruzar eqp_ft con indus.equipo
 mkt = 'Mercado Solar'
-indus_tmp = FiltEquip(indus,mkt)
+indus_tmp = FiltEquip(indus,mkt) #deja unicamente los equipos del mercado a analizar
 
 # definir el mínimo de emisiones a analizar en las empresas
 min_ton = 1000
 max_ton = 0
-indus_ft = IndusFilt(indus_tmp,min_ton,max_ton)
+indus_ft = IndusFilt(indus_tmp,min_ton,max_ton) #agrupa por ID  (suma toneladas y n° de equipos que tiene)
 
 # definir máximo de empresas a analizar
 max_empr= 1000
+    
 # definir categoría 
 catg = ['Industria manufacturera','Extracción de minerales']
-indus_ft = FiltCatg(indus_ft,catg,max_empr)
+indus_ft = FiltCatg(indus_ft,catg,max_empr) #Cruza la base agrupada y con la categoría de actividad
+
 # convertir latitud y longitud
-indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
+indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud") #crea plano columnas (x,y) en función de lat y long
+
 # definir tamaño y color del marcador en el mapa
 pt_size = np.log(indus_ft.ton_emision)
 indus_ft['pt_size'] = pt_size
 indus_ft['clr'] = indus_ft.rubro.map(clr)
 
+
+#Definir nuevo ID por fuente de emisión
 indus['f_ind'] = indus.fuente_emision
 indus = indus.set_index('f_ind')
 
 indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
+
 # leer archivo de combustibles y juntar df indus
 cmb_indus = ReadComb()
 indus_cmb = indus.join(cmb_indus)
+
 ######################################################################################## 
 # crear un ColumnDataSource (ds)
 source_indus = ColumnDataSource(data=indus_ft)
@@ -231,13 +241,14 @@ columns = [
 
 # iniciar tabla con columnas y fuente de datos ds source_indus
 data_table = DataTable(columns=columns, source=source_indus,width=1400, height=900,
-                       editable=True)
+                        editable=True)
+
 ########################################################################################  
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
 p1 = Figure(plot_width=800, plot_height=900,tools=["pan,wheel_zoom,box_zoom,reset,save"],
-           x_axis_type="mercator", y_axis_type="mercator",
-           x_range=(-9000000,-6000000),y_range=(-6000000,-1200000))
+            x_axis_type="mercator", y_axis_type="mercator",
+            x_range=(-9000000,-6000000),y_range=(-6000000,-1200000))
 p1.add_tile(tile_provider)
 
 # graficar marcadores de industria y definir info a desplegar con "hover"
@@ -246,7 +257,8 @@ p1.legend.click_policy="hide"
 p1.add_tools(HoverTool(renderers=[sct], tooltips=[('Nombre: ', '@nombre'),
       ('Emisiones (ton/año): ', '@ton_emision{0.0}'),
       ('Rubro: ', '@rubro')]))
-###################
+##################
+
 # iniciar tabla específica de empresa
 empr1 = indus_ft['nombre'].iloc[0]
 
@@ -277,8 +289,12 @@ columns_empr = [
         ]
 
 data_tableEmpr = DataTable(columns=columns_empr, source=source_empr,width=1400, height=200,
-                       editable=True)
-###################
+                        editable=True)
+
+
+#####################################################################################
+
+
 # crear los menus
 wdt = 250
 
@@ -306,7 +322,10 @@ buttCalcUpdate = Button(label="Filtrar", button_type="success",width=wdt)
 dropDownTiles = Select(value='ESRI_IMAGERY',title='Tipo mapa',options=tiles)
 
 dropDownCat = Select(value='rubro',title='Categoría',options=['rubro','combustible'])
-###############################################################################################
+
+buttExportCSV = Button(label="Exportar a CSV", button_type="success", width=wdt)
+
+##############################################################################################
 # definir coordenadas del mapa específico de una empresa
 lat = df_empr.y
 lon = df_empr.x
@@ -314,21 +333,21 @@ lon = df_empr.x
 offSet = 600
 ymin = lat.iloc[0] - offSet
 ymax = lat.iloc[0] + offSet
-yrng = Range1d()
+yrng = Range1d() #?
 yrng.start = ymin
 yrng.end=ymax
 
 xmin = lon.iloc[0] - offSet
 xmax = lon.iloc[0] + offSet
-xrng = Range1d()
+xrng = Range1d() #?
 xrng.start = xmin
 xrng.end=xmax
 
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
 p = Figure(plot_width=700, plot_height=700,tools=["pan,wheel_zoom,box_zoom,reset,save"],
-           x_axis_type="mercator", y_axis_type="mercator",
-           x_range=xrng,y_range=yrng)
+            x_axis_type="mercator", y_axis_type="mercator",
+            x_range=xrng,y_range=yrng)
 p.add_tile(tile_provider)
 
 source = ColumnDataSource(
@@ -367,9 +386,8 @@ def function_source(attr, old, new):
         pass
 
 # crear funcion para cambiar mapa y tabla general
+
 def UpdateTable():
-    
-    
     
     indus = ReadIndus()
     ctm = dropDownCtms.value
@@ -395,25 +413,66 @@ def UpdateTable():
     latN = float(latNorte.value)
     latS = float(latSur.value)
     indus_ft = FiltRegion(indus_ft,rn,latN,latS)
+    
     indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
     pt_size = np.log(indus_ft.ton_emision)
     indus_ft['pt_size'] = pt_size
     indus_ft['clr'] = indus_ft.rubro.map(clr)
     
     source_indus.data = indus_ft
-    
-    indus_ft.to_csv(path + 'visualizaciones/mapa_emisiones/industria.csv', encoding="utf-8-sig",sep=',',decimal='.')
-    
+       
     tl = get_provider(dropDownTiles.value)
-    p1.renderers = [x for x in p1.renderers if not str(x).startswith('TileRenderer')]
-    tile_renderer = TileRenderer(tile_source=tl)
+    p1.renderers = [x for x in p1.renderers if not str(x).startswith('TileRenderer')] #?
+    tile_renderer = TileRenderer(tile_source=tl) #?
     p1.renderers.insert(0, tile_renderer)
     
     
     
-buttCalcUpdate.on_click(UpdateTable)
+buttCalcUpdate.on_click(UpdateTable) #botón actualizar tabla
+
 source_indus.selected.on_change('indices', function_source)
-##############
+
+#Botón exportar empresa especifica a csv
+def ExportToCSV():
+    
+    indus = ReadIndus()
+    ctm = dropDownCtms.value
+    indus = indus[indus.tipo_contaminante == ctm]
+    
+    indus = IDequipo(indus)
+    eqp_ft = ['CA', 'IN', 'PC', 'CF', 'PS', 'GE']
+    indus = indus[indus.equipo.isin(eqp_ft)]
+    
+    mkt = dropdownEquip.value
+    indus_tmp = FiltEquip(indus,mkt)
+
+
+    min_ton = float(minTon.value)
+    max_ton = float(maxTon.value)
+    indus_ft = IndusFilt(indus_tmp,min_ton,max_ton)
+    
+    max_empr= int(maxEmpr.value)
+    catg = multi_choice.value
+    indus_ft = FiltCatg(indus_ft,catg,max_empr)
+    
+    rn = dropdownRegion.value
+    latN = float(latNorte.value)
+    latS = float(latSur.value)
+    indus_ft = FiltRegion(indus_ft,rn,latN,latS)
+    
+    indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
+    pt_size = np.log(indus_ft.ton_emision)
+    indus_ft['pt_size'] = pt_size
+    indus_ft['clr'] = indus_ft.rubro.map(clr)
+    
+
+    
+    indus_ft.to_csv(path + 'visualizaciones/mapa_emisiones/empresas_filtradas.csv', encoding="utf-8-sig",sep='.',decimal=',')
+    indus_ft.to_excel(path + 'visualizaciones/mapa_emisiones/empresas_filtradas.xlsx', encoding="utf-8-sig")   
+
+buttExportCSV.on_click(ExportToCSV)    
+
+#############################################
 
 
 spc = 50
@@ -422,7 +481,7 @@ layout = column(
         row(maxEmpr,multi_choice),
         row(dropdownRegion,latNorte,latSur),
         row(dropDownTiles,dropDownCat),
-        buttCalcUpdate,        
+        row(buttCalcUpdate,buttExportCSV),       
         
         Spacer(height=spc-20),
         row(p1,data_table),
@@ -431,3 +490,4 @@ layout = column(
         p)
 ############################################
 curdoc().add_root(layout)
+
