@@ -27,9 +27,10 @@ STAMEN_TERRAIN_RETINA, STAMEN_TONER, STAMEN_TONER_BACKGROUND,\
 STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
 # Donde instalar. Versión local y versión en servidor
-path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
+#path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
 # path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
 # path = '/home/ubuntu/sun4heat/'
+path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
 
 # Lista con nombre de los "tiles" 
 tiles = ['CARTODBPOSITRON', 'CARTODBPOSITRON_RETINA', 'STAMEN_TERRAIN',
