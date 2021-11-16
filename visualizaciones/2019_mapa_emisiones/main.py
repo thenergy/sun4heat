@@ -27,8 +27,8 @@ STAMEN_TERRAIN_RETINA, STAMEN_TONER, STAMEN_TONER_BACKGROUND,\
 STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
 # Donde instalar. Versión local y versión en servidor
-path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
-# path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
+# path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
 # path = '/home/ubuntu/sun4heat/'
 
 # Lista con nombre de los "tiles" 
@@ -52,6 +52,26 @@ clr = dict(zip(cats,Category20[20]))
 
 # leer archivo "emisiones_aire_2018_cart.csv'" 
 def ReadIndus():
+    '''
+    Esta función lee csv 'emisiones_aire_año_cart.csv' y entrega un DF.
+    
+    Parameters
+    ----------
+        header
+            Encabezados del DF.
+    
+    Returns
+    -------
+    indus: Data Frame
+        DF con los headers expuestos abajo.
+    
+    Headers DataFrame
+    -----------------
+        'raz_social', 'nombre', 'ID', 'rubro', 'ciiu4', 'fuente_emision', 
+        'tipo_contaminante', 'ton_emision', 'anho', 'region', 'provincia', 
+        'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
+        
+    '''
     header = ['raz_social','nombre','ID','rubro','ciiu4','fuente_emision','tipo_contaminante',
           'ton_emision','anho','region','provincia','comuna','huso','coord_norte','coord_este','Longitud','Latitud']
 
@@ -63,6 +83,15 @@ def ReadIndus():
 
 # leer archivo "info_combustibles.csv", calcular métricas (consumo anual, promedio, desviación estandar)
 def ReadComb():
+    '''
+    Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
+
+    Returns
+    -------
+    cmb : DataFrame
+        DF con métricas de consumo anual, promedio y desviación estandar calculadas.
+
+    '''
     cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
     cmb['f_index'] = cmb.fuente
     cmb = cmb.set_index('f_index')
@@ -70,15 +99,30 @@ def ReadComb():
     cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
     cmb['promedio'] = cmb.con_anual/12
     cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
-                       (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
-                       (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
-                       (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2 
+                        (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
+                        (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
+                        (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2 
    
     cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
     return cmb
 
 # extraer primeras 2 letras de la columna fuente_emision
 def IDequipo(df):
+    '''
+    Esta función extrae las dos primeras letras de la columna fuente_emisión del 
+    DF proveniente del CSV emisiones_aire_año (función ReadIndus).
+
+    Parameters
+    ----------
+    df : Data Frame
+        Se entrega el DataFrame del CSV emisiones_aire_año.
+
+    Returns
+    -------
+    df : Mismo DF del parámetro pero con nueva columna el cual 
+        representa el equipo utilizado (primeras dos letras de la fuente).
+
+    '''
     clds = []
     for cld in df.fuente_emision:    
         clds.append(cld[0:2])
@@ -88,6 +132,31 @@ def IDequipo(df):
 
 # filtrar según el equipo o mercado a analizar
 def FiltEquip(df,mkt):
+    '''
+    Función que filtra los equipos del mercado según la DF entregada (emisiones_aire_año_cart.csv).
+    
+    Equipos / Mercado
+    -----------------
+        Caldera Calefacción ('CA')
+        Caldera Industrial ('IN')
+        Mercado Solar ('IN', 'CF', 'CA')
+        Mercado H2 ('IN','CF','CA','PC','PS')
+        Generación Eléctrica ('GE')
+        Todo ('CA', 'IN', 'PC', 'CF', 'PS', 'GE')
+
+    Parameters
+    ----------
+    df : DataFrame
+        Corresponde al DF de emisiones.
+    mkt : String
+        Corresponde al equipo o mercado a analizar.
+
+    Returns
+    -------
+    df : Data Frame
+        DF con los filtros aplicados.
+
+    '''
     
     if mkt == 'Caldera Calefacción (CA)':
         eqp_ft = ['CA']
@@ -113,6 +182,26 @@ def FiltEquip(df,mkt):
 
 # agrupar 
 def IndusFilt(df,min_ton,max_ton):    
+    '''
+    Función que filtra el DF entregado (emisiones_aire_año_cart.csv) según un rango de toneladas (min_ton, max_ton). 
+    También agrupa según el ID, sumando las columnas de ton_emision y n_equip, agregando columna de max_emision.
+    
+    Parameters
+    ----------
+    df : DataFrame
+        DF de industrias.
+    min_ton : Float
+        Cantidad mínima de toneladas de emisiones a filtrar.
+    max_ton : Float
+        Cantidad máxima de toneladas de emisiones a filtrar.
+
+    Returns
+    -------
+    df : DataFrame
+        Nueva agrupación de datos por ID y sumando ton_emision y n_equip
+        
+
+    '''
     df['n_equip'] = 1
     df = df.sort_values('ton_emision', ascending=False).drop_duplicates('fuente_emision')
     
@@ -148,6 +237,44 @@ def IndusFilt(df,min_ton,max_ton):
 
 # filtrar por categorias
 def FiltCatg(df,catg,max_empr):
+    '''
+    Función que filtra según las categorias presentes en 'emisiones_aire_año_cart.csv'.
+    
+    Categorias
+    ----------
+            'Otras actividades'
+            'Producción de alimentos'
+            'Industria agropecuaria y silvicultura'
+            'Gestor de residuos'
+            'Transporte'
+            'Industria manufacturera'
+            'Extracción de minerales'   
+            'Producción de metal'
+            'Municipio'
+            'Construcción e inmobiliarias'
+            'Generación de energía'
+            'Comercio'            
+            'Pesca'
+            'Producción química'
+            'Suministro y tratamiento de aguas'
+            'Industria del papel y celulosa'
+            'Combustibles'
+
+    Parameters
+    ----------
+    df : DataFrame
+        DF en donde se filtra la categoría correspondiente.
+    catg : List
+        Lista de strings que contiene las categorías a filtrar.
+    max_empr : int
+        Por ahora ninguna función.
+
+    Returns
+    -------
+    df : DataFrame
+        DF con la categoría filtrada.
+
+    '''
 
     df['catg'] = df.rubro.map(cats)    
     df = df[df.rubro.isin(catg)]
@@ -156,6 +283,26 @@ def FiltCatg(df,catg,max_empr):
 
 # filtrar por region
 def FiltRegion(df,rgn,latNor,latSur):
+    '''
+    Función que filtra por región o según rango de latitud.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Base de datos 'emisiones_aire_año_cart.csv'.
+    rgn : string
+        Region a filtrar.
+    latNor : float
+        Latitud norte.
+    latSur : float
+        Latitud sur.
+
+    Returns
+    -------
+    df_filt : DataFrame.
+        DF con el filtro de región/latitud realizados.       
+    '''
+    
     if rgn == 'Todas':
         df_filt = df
     elif rgn == 'Rango latitud':
@@ -167,15 +314,33 @@ def FiltRegion(df,rgn,latNor,latSur):
 
 # conversion de escala de latitud y longitud    
 def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
+    '''
+    Función que convierte las escalas de longitud en una variable 'x' y latitud
+    en una variable 'y', generando nuevas columnas 'x' 'y' en el DF entregado.
 
-      k = 6378137
-      df["x"] = df[lon] * (k * np.pi/180.0)
-      df["y"] = np.log(np.tan((90 + df[lat]) * np.pi/360.0)) * k
+    Parameters
+    ----------
+    df : DataFrame
+        DF en el que se generará las variables 'x', 'y' ('emisiones_aire_año_cart.csv').
+    lon : Column
+        Pertenece a la columna "Longitud" del DF.
+    lat : Column
+        Pertenece a la columna "Latitud" del DF.
 
-      return df
+    Returns
+    -------
+    df : DataFrame
+        DF con las nuevas columnas 'x', 'y' generadas.
+
+    '''
+    k = 6378137
+    df["x"] = df[lon] * (k * np.pi/180.0)
+    df["y"] = np.log(np.tan((90 + df[lat]) * np.pi/360.0)) * k
+
+    return df
   
 ########################################################################################  
-# crear dataframe (df) indus
+##crear dataframe (df) indus
 indus = ReadIndus()
 
 # crear lista de contaminantes
@@ -222,7 +387,7 @@ indus = indus.set_index('f_ind')
 indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
 
-# leer archivo de combustibles y juntar df indus
+##leer archivo de combustibles y juntar df indus
 cmb_indus = ReadComb()
 indus_cmb = indus.join(cmb_indus)
 
@@ -323,7 +488,7 @@ dropDownTiles = Select(value='ESRI_IMAGERY',title='Tipo mapa',options=tiles)
 
 dropDownCat = Select(value='rubro',title='Categoría',options=['rubro','combustible'])
 
-buttExportCSV = Button(label="Exportar a CSV", button_type="success", width=wdt)
+buttExportCSV_Excel= Button(label="Exportar a CSV y Excel", button_type="success", width=wdt)
 
 ##############################################################################################
 # definir coordenadas del mapa específico de una empresa
@@ -361,6 +526,23 @@ p.circle(x="lon", y="lat", size=10, fill_color="blue", fill_alpha=0.8, source=so
 ###################
 # crear funcion para cambiar mapa de empresa específica (cambio al clickear empresa en tabla superior)
 def function_source(attr, old, new):
+    '''
+    Función que permite cambiar el mapa de la empresa específica (la cual cambia al clickear empresa en la tabla superior)
+
+    Parameters
+    ----------
+    attr : TYPE
+        DESCRIPTION.
+    old : TYPE
+        DESCRIPTION.
+    new : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    '''
     try:
         selected_index = source_indus.selected.indices[0]
         name_selected = source_indus.data['nombre'][selected_index]
@@ -388,6 +570,15 @@ def function_source(attr, old, new):
 # crear funcion para cambiar mapa y tabla general
 
 def UpdateTable():
+    '''
+    Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
+    aplicando todos los filtros colocados.
+
+    Returns
+    -------
+    None.
+
+    '''
     
     indus = ReadIndus()
     ctm = dropDownCtms.value
@@ -433,7 +624,16 @@ buttCalcUpdate.on_click(UpdateTable) #botón actualizar tabla
 source_indus.selected.on_change('indices', function_source)
 
 #Botón exportar empresa especifica a csv
-def ExportToCSV():
+def ExportToCSV_Excel():
+    '''
+    Fución que utiliza todos los filtros puestos en la página, los almacena en un DF para ser llamado a un boton
+    el cual entregue un CSV y un Excel.
+
+    Returns
+    -------
+    None.
+
+    '''
     
     indus = ReadIndus()
     ctm = dropDownCtms.value
@@ -470,7 +670,7 @@ def ExportToCSV():
     indus_ft.to_csv(path + 'visualizaciones/mapa_emisiones/empresas_filtradas.csv', encoding="utf-8-sig",sep='.',decimal=',')
     indus_ft.to_excel(path + 'visualizaciones/mapa_emisiones/empresas_filtradas.xlsx', encoding="utf-8-sig")   
 
-buttExportCSV.on_click(ExportToCSV)    
+buttExportCSV_Excel.on_click(ExportToCSV_Excel)    
 
 #############################################
 
@@ -481,7 +681,7 @@ layout = column(
         row(maxEmpr,multi_choice),
         row(dropdownRegion,latNorte,latSur),
         row(dropDownTiles,dropDownCat),
-        row(buttCalcUpdate,buttExportCSV),       
+        row(buttCalcUpdate,buttExportCSV_Excel),       
         
         Spacer(height=spc-20),
         row(p1,data_table),
