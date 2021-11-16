@@ -90,6 +90,7 @@ def ReadComb():
     -------
     cmb : DataFrame
         DF con métricas de consumo anual, promedio y desviación estandar calculadas.
+        
 
     '''
     cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
