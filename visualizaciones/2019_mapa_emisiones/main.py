@@ -34,9 +34,20 @@ STAMEN_TERRAIN_RETINA, STAMEN_TONER, STAMEN_TONER_BACKGROUND,\
 STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
 # Donde instalar. Versión local y versión en servidor
+<<<<<<< HEAD
 path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
 # path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+=======
+<<<<<<< HEAD
+#path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
+# path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
+=======
+# path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+>>>>>>> 350a39b9ca7a3f4b215e4f8551be09387d69b24d
+>>>>>>> main
 # path = '/home/ubuntu/sun4heat/'
+path = '/Users/fcuevas/Documents/Trabajo/thenergy/test_repo/sun4heat/'
 
 # Lista con nombre de los "tiles" 
 tiles = ['CARTODBPOSITRON', 'CARTODBPOSITRON_RETINA', 'STAMEN_TERRAIN',
@@ -720,10 +731,12 @@ def ExportToCSV_Excel():
     indus_ft['pt_size'] = pt_size
     indus_ft['clr'] = indus_ft.rubro.map(clr)
     
-
+    print ("Antes de filtrar")
     
-    indus_ft.to_csv(path + 'visualizaciones/mapa_emisiones/empresas_filtradas.csv', encoding="utf-8-sig",sep='.',decimal=',')
-    indus_ft.to_excel(path + 'visualizaciones/mapa_emisiones/empresas_filtradas.xlsx', encoding="utf-8-sig")   
+    indus_ft.to_csv(path + 'visualizaciones/2019_mapa_emisiones/empresas_filtradas.csv', encoding="utf-8-sig",sep='.',decimal=',')
+    indus_ft.to_excel(path + 'visualizaciones/2019_mapa_emisiones/empresas_filtradas.xlsx', encoding="utf-8-sig")   
+
+    print ("Despues de filtrar")
 
 buttExportCSV_Excel.on_click(ExportToCSV_Excel)    
 
