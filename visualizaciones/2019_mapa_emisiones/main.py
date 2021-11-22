@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Nov 16 13:41:53 2021
+
+@author: diieg
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -13,6 +19,7 @@ import pandas as pd
 
 ## librerías de Bokeh
 from bokeh.plotting import Figure
+# from pyproj import Proj, transform
 
 from bokeh.models import ColumnDataSource, TableColumn, DataTable, TextInput, Select, NumberFormatter, Range1d, HoverTool, TileRenderer, MultiChoice
 from bokeh.io import curdoc
@@ -27,8 +34,8 @@ STAMEN_TERRAIN_RETINA, STAMEN_TONER, STAMEN_TONER_BACKGROUND,\
 STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
 # Donde instalar. Versión local y versión en servidor
-# path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
-path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+# path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
 # path = '/home/ubuntu/sun4heat/'
 
 # Lista con nombre de los "tiles" 
@@ -37,20 +44,39 @@ tiles = ['CARTODBPOSITRON', 'CARTODBPOSITRON_RETINA', 'STAMEN_TERRAIN',
 'STAMEN_TONER_LABELS', 'OSM', 'WIKIMEDIA', 'ESRI_IMAGERY']
 
 # definición de categorías según columna del archivo "emisiones_aire_2018_cart.csv"
-cats = {'Otras actividades':1, 
-            'Producción de alimentos':2,
-            'Industria agropecuaria y silvicultura':3, 
-            'Gestor de residuos':4,
-            'Transporte':5, 'Industria manufacturera':6, 'Extracción de minerales':7,   
-           'Producción de metal':8, 'Municipio':9, 'Construcción e inmobiliarias':10,
-           'Generación de energía':11, 'Comercio':12, 'Pesca':13, 'Producción química':14,
-           'Suministro y tratamiento de aguas':15,
-           'Industria del papel y celulosa':16, 'Combustibles':17}
+# cats = {'Otras actividades':1, 
+#             'Producción de alimentos':2,
+#             'Industria agropecuaria y silvicultura':3, 
+#             'Gestor de residuos':4,
+#             'Transporte':5, 'Industria manufacturera':6, 'Extracción de minerales':7,   
+#            'Producción de metal':8, 'Municipio':9, 'Construcción e inmobiliarias':10,
+#            'Generación de energía':11, 'Comercio':12, 'Pesca':13, 'Producción química':14,
+#            'Suministro y tratamiento de aguas':15,
+#            'Industria del papel y celulosa':16, 'Combustibles':17}
+
+cats = {'Captación, tratamiento y distribución de agua':1,
+        'Comercio mayorista':2,
+        'Comercio minorista':3,
+        'Fundiciones de cobre':4,
+        'Gestores de residuos':5,
+        'Industria de la madera y Silvicultura':6,
+        'Industria del papel y celulosa':7,
+        'Industria química, del plástico y caucho':8,
+        'Minería':9,
+        'Otras actividades':10,
+        'Otras centrales de generación eléctrica':11,
+        'Otras industrias manufactureras':12,
+        'Pesca y Acuicultura':13,
+        'Plantas de tratamiento de aguas servidas':14,
+        'Producción agropecuaria':15,
+        'Producción de cemento, cal y yeso':16,
+        'Refinería de petróleo':17,
+        'Termoeléctricas':18,
+        'Ventas y reparaciones de vehículos automotores':19}
 
 # paleta de colores para los gráficos
 clr = dict(zip(cats,Category20[20]))
-
-# leer archivo "emisiones_aire_2018_cart.csv'" 
+# leer archivo "ckan_ruea_2019_v1" 
 def ReadIndus():
     '''
     Esta función lee csv 'emisiones_aire_año_cart.csv' y entrega un DF.
@@ -72,40 +98,49 @@ def ReadIndus():
         'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
         
     '''
-    header = ['raz_social','nombre','ID','rubro','ciiu4','fuente_emision','tipo_contaminante',
-          'ton_emision','anho','region','provincia','comuna','huso','coord_norte','coord_este','Longitud','Latitud']
+    header = ['raz_social','ID','nombre','rubro','ciiu6','ciiu4','region','provincia','comuna','coord_este','coord_norte',
+              'huso','fuente_emision','nombre_fuente','tipo_emision','combustible','origen','tipo_contaminante','ton_emision',
+              'Longitud','Latitud']
 
-    indus = pd.read_csv(path + 'datos/RETC/emisiones_aire_2018_cart.csv', encoding="utf-8",names=header,skiprows=1,sep=',',decimal='.')
+    # header = ['Razón Social','ID Establecimiento VU','Nombre Establecimiento','Rubro RETC','CIIU6',
+    #           'CIIU4','Región','Provincia','Comuna','Coordenada Este','Coordenada Norte','Huso',
+    #           'Fuente','Nombre Fuente','Tipo de Emisión','Combustible','Origen','Contaminante',
+    #             'Emisión (Toneladas)']
+    
+    # indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
+    indus = pd.read_csv(path + 'datos/RETC/indus_ll.csv', names=header, encoding="utf-8-sig",skiprows=1,sep=';',decimal=',')
+
+    
+    
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
     indus = indus.dropna()
     
     return indus
 
-# leer archivo "info_combustibles.csv", calcular métricas (consumo anual, promedio, desviación estandar)
-def ReadComb():
-    '''
-    Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
+# def ReadComb():
+#     '''
+#     Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
 
-    Returns
-    -------
-    cmb : DataFrame
-        DF con métricas de consumo anual, promedio y desviación estandar calculadas.
+#     Returns
+#     -------
+#     cmb : DataFrame
+#         DF con métricas de consumo anual, promedio y desviación estandar calculadas.
         
 
-    '''
-    cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
-    cmb['f_index'] = cmb.fuente
-    cmb = cmb.set_index('f_index')
-    cmb = cmb[cmb.estado == 'Activa']
-    cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
-    cmb['promedio'] = cmb.con_anual/12
-    cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
-                        (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
-                        (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
-                        (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2 
+#     '''
+#     cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
+#     cmb['f_index'] = cmb.fuente
+#     cmb = cmb.set_index('f_index')
+#     cmb = cmb[cmb.estado == 'Activa']
+#     cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
+#     cmb['promedio'] = cmb.con_anual/12
+#     cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
+#                         (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
+#                         (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
+#                         (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2 
    
-    cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
-    return cmb
+#     cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
+#     return cmb
 
 # extraer primeras 2 letras de la columna fuente_emision
 def IDequipo(df):
@@ -312,6 +347,25 @@ def FiltRegion(df,rgn,latNor,latSur):
         df_filt = df[df.region == rgn]
         
     return df_filt
+# # Convertir UTM a wgs84
+# def convert_UTM_to_WGS84(coord_este, coord_norte, huso):
+#     outProj = Proj(init='epsg:4326')
+#     lt = []
+#     lg = []
+#     for coord_este, coord_norte, huso in zip(indus.coord_este, indus.coord_norte, indus.huso):
+#         if huso == 18:
+#             inProj = Proj(init='epsg:32718')
+#         elif huso == 19:
+#             inProj = Proj(init='epsg:32719')
+#         elif huso == 12:
+#             inProj = Proj(init='epsg:32712')
+    
+#         x2,y2 = transform(inProj,outProj,coord_este,coord_norte)
+#         lg.append(x2)
+#         lt.append(y2)
+        
+#     indus['Longitud'] = lg
+#     indus['Latitud'] = lt
 
 # conversion de escala de latitud y longitud    
 def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
@@ -340,8 +394,8 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 
     return df
   
-########################################################################################  
-##crear dataframe (df) indus
+# ########################################################################################  
+#crear dataframe (df) indus
 indus = ReadIndus()
 
 # crear lista de contaminantes
@@ -369,7 +423,7 @@ indus_ft = IndusFilt(indus_tmp,min_ton,max_ton) #agrupa por ID  (suma toneladas 
 max_empr= 1000
     
 # definir categoría 
-catg = ['Industria manufacturera','Extracción de minerales']
+catg = ['Minería']
 indus_ft = FiltCatg(indus_ft,catg,max_empr) #Cruza la base agrupada y con la categoría de actividad
 
 # convertir latitud y longitud
@@ -388,9 +442,9 @@ indus = indus.set_index('f_ind')
 indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
 
-##leer archivo de combustibles y juntar df indus
-cmb_indus = ReadComb()
-indus_cmb = indus.join(cmb_indus)
+# ##leer archivo de combustibles y juntar df indus
+# cmb_indus = ReadComb()
+# indus_cmb = indus.join(cmb_indus)
 
 ######################################################################################## 
 # crear un ColumnDataSource (ds)
@@ -422,13 +476,13 @@ sct = p1.scatter(x="x", y="y", size='pt_size', fill_color="clr", fill_alpha=0.8,
 p1.legend.click_policy="hide"
 p1.add_tools(HoverTool(renderers=[sct], tooltips=[('Nombre: ', '@nombre'),
       ('Emisiones (ton/año): ', '@ton_emision{0.0}'),
-      ('Rubro: ', '@rubro')]))
-##################
+        ('Rubro: ', '@rubro')]))
+##########################################################################
 
 # iniciar tabla específica de empresa
 empr1 = indus_ft['nombre'].iloc[0]
 
-df_empr = indus_cmb[indus_cmb.nombre == empr1]
+df_empr = indus_ft[indus_ft.nombre == empr1]
 source_empr = ColumnDataSource(data=df_empr)
 
 columns_empr = [
@@ -436,22 +490,22 @@ columns_empr = [
         TableColumn(field="fuente_emision", title="Fuente emisión",width=25),
         TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)",width=25, formatter=NumberFormatter(format="0.0")),
         TableColumn(field="combustible", title="Combustible",width=25),
-        TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
-        TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="ene", title="Enero",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="feb", title="Febrero",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="mar", title="Marzo",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="abr", title="Abril",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="may", title="Mayo",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="jun", title="Junio",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="jul", title="Julio",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="ago", title="Agosto",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="sep", title="Septiembre",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="oct", title="Octubre",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="nov", title="Noviembre",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="dic", title="Diciembre",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="promedio", title="Promedio",width=25, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="desv_std", title="Desv Std",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
+        # TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="ene", title="Enero",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="feb", title="Febrero",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="mar", title="Marzo",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="abr", title="Abril",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="may", title="Mayo",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="jun", title="Junio",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="jul", title="Julio",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="ago", title="Agosto",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="sep", title="Septiembre",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="oct", title="Octubre",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="nov", title="Noviembre",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="dic", title="Diciembre",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="promedio", title="Promedio",width=25, formatter=NumberFormatter(format="0.0")),
+        # TableColumn(field="desv_std", title="Desv Std",width=25, formatter=NumberFormatter(format="0.0")),
         ]
 
 data_tableEmpr = DataTable(columns=columns_empr, source=source_empr,width=1400, height=200,
@@ -548,7 +602,7 @@ def function_source(attr, old, new):
         selected_index = source_indus.selected.indices[0]
         name_selected = source_indus.data['nombre'][selected_index]
         
-        df_empr = indus_cmb[indus_cmb.nombre == name_selected]
+        df_empr = indus[indus.nombre == name_selected]
         source_empr.data = df_empr
         
         lat = df_empr.y
@@ -627,7 +681,7 @@ source_indus.selected.on_change('indices', function_source)
 #Botón exportar empresa especifica a csv
 def ExportToCSV_Excel():
     '''
-    Fución que utiliza todos los filtros puestos en la página, los almacena en un DF para ser llamado a un boton
+    Fución que utiliza todos los filtros puestos en la página, los almacena en un DF para ser llamado por un boton
     el cual entregue un CSV y un Excel.
 
     Returns
