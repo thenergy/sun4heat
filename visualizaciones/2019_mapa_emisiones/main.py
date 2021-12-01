@@ -34,20 +34,20 @@ STAMEN_TERRAIN_RETINA, STAMEN_TONER, STAMEN_TONER_BACKGROUND,\
 STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
 # Donde instalar. Versión local y versión en servidor
-<<<<<<< HEAD
-path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+#<<<<<<< HEAD
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones'
 # path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
-=======
-<<<<<<< HEAD
+#=======
+#<<<<<<< HEAD
 #path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
 # path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
-=======
+#=======
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
-path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
->>>>>>> 350a39b9ca7a3f4b215e4f8551be09387d69b24d
->>>>>>> main
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones'
+#>>>>>>> 350a39b9ca7a3f4b215e4f8551be09387d69b24d
+#>>>>>>> main
 # path = '/home/ubuntu/sun4heat/'
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/test_repo/sun4heat/'
+# path = '/Users/fcuevas/Documents/Trabajo/thenergy/test_repo/sun4heat/'
 
 # Lista con nombre de los "tiles" 
 tiles = ['CARTODBPOSITRON', 'CARTODBPOSITRON_RETINA', 'STAMEN_TERRAIN',

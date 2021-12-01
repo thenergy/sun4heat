@@ -5,15 +5,15 @@ Created on Fri Nov 19 16:28:00 2021
 @author: diieg
 """
 
-# path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
-import numpy as np
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+
 import pandas as pd
-import pyproj
+
 from pyproj import Proj, transform
 import warnings
 warnings.filterwarnings('ignore')
 
-path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+#path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
 
 def ReadIndus():
 

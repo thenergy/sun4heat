@@ -13,7 +13,9 @@ import os
 from PySSC import PySSC
 
 
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+
 #path = '/home/ubuntu/sun4heat/'
 
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
@@ -31,7 +33,23 @@ cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'
        'Sunoptimo':                {'n0':0.824,'a1':2.905,'a2':0.00300,'color':'black'}}
 
 def CopyRadFile(lugar,data):
-    """ Copia archivo de radiación formato SAM a carpeta temporal, cambia nombre a TMY_SAM.CSV """
+    '''
+    Para un lugar en especifico, copia archivo de radiación formato SAM 
+    a carpeta temporal, cambia nombre a TMY_lugar_SAM.CSV 
+
+    Parameters
+    ----------
+    lugar : str
+        Lugar en donde se copiara el archivo formato SAM.
+    data : str
+        DESCRIPTION.
+
+    Returns
+    -------
+    df_temp : TYPE
+        DESCRIPTION.
+
+    '''
     
     if data == 'Explorador Solar':
         path_file = path + 'datos/radiacion_solar/expl_solar/TMY_' + lugar + '_SAM.csv'
@@ -53,7 +71,7 @@ def CopyRadFile(lugar,data):
         path_meteo = path + 'datos/radiacion_solar/meteonorm/TMY_' + lugar + '.csv'
         
         shutil.copy(path_file,path_tmp)
-        os.rename(path_tmp + '/TMY_' + lugar + '_SAM.csv',path_SAM)
+        os.rename(path_tmp + '/TMY_' + S + '_SAM.csv',path_SAM)
                 
         header = ['year','month','day','hour','hour_real','ghi','dhi','ght','dht','dni','temp']
         df_temp = pd.read_csv(path_meteo,sep=';',names=header)
@@ -64,6 +82,38 @@ def CopyRadFile(lugar,data):
 
 
 def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
+    '''
+    Realiza la simulación en SAM en función de los parámetros establecidos, obteniendo
+    las variables de interes.
+    
+    Variables de interes
+    --------------------
+    'flow', 'poa', 'trans', 'pump', 'Qaux', 'Qproc', 'Qdel', 'Qloss', 'Qtrans', 'Qusef'
+    'Tcold', 'Thot', 'Tmains', 'Ttank', 'Tdel', 'Vcold', 'Vhot'
+
+    Parameters
+    ----------
+    df_temp : DataFrame
+        DF .
+    tilt : int
+        Inclinación campo solar.
+    azim : int
+        Azimuth.
+    Col : str
+        Tipo de colector.
+    area : int
+        Área del colector.
+    vol : int
+        Volumen almacenamiento.
+    sto_loss : int
+        Porcentaje pérdidas del almacenamiento.
+
+    Returns
+    -------
+    df_temp : DataFrame
+        DF con las variables de interes calculadas a través de simulación.
+
+    '''
     
     FRta = cst[Col]['n0']
     FRUL = cst[Col]['a1']
@@ -76,8 +126,11 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
     print ('SSC Build Information = ', ssc.build_info().decode("utf - 8"))
     ssc.module_exec_set_print(0)
     dataSam = ssc.data_create()
-    ssc.data_set_string( dataSam, b'solar_resource_file', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
-    ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
+    ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
+    ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
+
+    # sc.data_set_string( dataSam, b'solar_resource_file', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
+    # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
     # ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/ubuntu/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/ubuntu/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
     ssc.data_set_number( dataSam, b'system_capacity', 773.8553466796875 )
@@ -109,10 +162,11 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
     ssc.data_set_number( dataSam, b'pump_power', 45 )
     ssc.data_set_number( dataSam, b'pump_eff', 0.85000002384185791 )
     ssc.data_set_number( dataSam, b'use_custom_mains', 1 )
-    ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
+    ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
+    # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
     # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/ubuntu/visualizaciones/swh_calc/custom_mains.csv');
     ssc.data_set_number( dataSam, b'use_custom_set', 1 )
-    ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/custom_set.csv');
+    ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_set.csv');
     # ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/ubuntu/sun4heat/visualizaciones/swh_calc/custom_set.csv');
     ssc.data_set_number( dataSam, b'adjust:constant', 0 )
     module = ssc.module_create(b'swh')  
@@ -202,18 +256,72 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
     return df_temp
 
 def SetTMains(df_temp,Tmains):
+    '''
+    Setea la temperatura de salida del proceso como temperatura promedio a cada hora
+    por un año.
+    
+    Exporta los datos a csv.
+
+    Parameters
+    ----------
+    df_temp : DataFrame
+        DF a setear la temperatura promedio.
+    Tmains : int 
+        Temperatura promedio (del tanque (?) == temp salida proceso).
+
+    Returns
+    -------
+    None.
+
+    '''
     df_temp = pd.DataFrame(np.arange(0,8760,1),columns=["demanda"])
     df_temp.index = pd.date_range(start='2018-01-01 00:00', end='2018-12-31 23:00', freq='H')
     df_temp['Tmains'] = Tmains
     df_temp['Tmains'].to_csv(path + "visualizaciones/swh_calc/custom_mains.csv", index=False, header=False)
     
 def SetTSet(df_temp,Tset):
+    '''
+    Setema la temperatura de entrada del flujo al proceso.
+
+    Parameters
+    ----------
+    df_temp : DataFrame
+        DESCRIPTION.
+    Tset : int
+        Temperatura de entrada al proceso.
+
+    Returns
+    -------
+    None.
+
+    '''
     df_temp = pd.DataFrame(np.arange(0,8760,1),columns=["demanda"])
     df_temp.index = pd.date_range(start='2018-01-01 00:00', end='2018-12-31 23:00', freq='H')
     df_temp['Tset'] = Tset
     df_temp['Tset'].to_csv(path + "visualizaciones/swh_calc/custom_set.csv", index=False, header=False)
 
 def SetTurno(df_temp,turno, m_proc):
+    '''
+    Establece el nivel de demanda en función del turno.
+    
+    Este nivel de demanda se multiplica con el flujo de agua del proceso, obteniendo
+    el flujo de demanda por turno.
+
+    Parameters
+    ----------
+    df_temp : DataFrame
+        DESCRIPTION.
+    turno : str
+        Turnos (pueden estar en función de turnos típicos o especiales por empresa).
+    m_proc : int
+        flujo de agua.
+
+    Returns
+    -------
+    df_temp : TDataFrame
+        DESCRIPTION.
+
+    '''
     df_temp = pd.DataFrame(np.arange(0,8760,1),columns=["demanda"])
     df_temp.index = pd.date_range(start='2018-01-01 00:00', end='2018-12-31 23:00', freq='H')
     if turno == '24/7':

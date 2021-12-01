@@ -10,7 +10,9 @@ import numpy as np
 
 from funciones import flat_list
 
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+
 #path = '/home/ubuntu/sun4heat/'
 
 def TableCapex(aCol,costCol_m2,costInst_m2, cost_storage, vol, land_prep, fact_uso, cont, fit, fee, 
@@ -64,6 +66,42 @@ def TableOpex(aCol,costCol_m2,SF_refresh,PM,consElectrico,costElectrico,nLimp,co
 #table_eval,flujo_acum,vals_econ,eje_anho = TableEval(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,
 #                                                                              impuesto,tasa_equi,dif_infl,anho_contr,val_depr,anho_depr,inSol)
 def TableEval(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,anho_contr,val_depr,anho_depr,inSol):
+    '''
+    
+
+    Parameters
+    ----------
+    Capex : TYPE
+        DESCRIPTION.
+    OPEX : TYPE
+        DESCRIPTION.
+    tasa_deuda : TYPE
+        DESCRIPTION.
+    pago_deuda : TYPE
+        DESCRIPTION.
+    perc_deuda : TYPE
+        DESCRIPTION.
+    impuesto : TYPE
+        DESCRIPTION.
+    tasa_equi : TYPE
+        DESCRIPTION.
+    dif_infl : TYPE
+        DESCRIPTION.
+    anho_contr : TYPE
+        DESCRIPTION.
+    val_depr : TYPE
+        DESCRIPTION.
+    anho_depr : TYPE
+        DESCRIPTION.
+    inSol : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    '''
+    
 #    print ("funcion eval")
     # monto de la deuda
     deuda = perc_deuda/100 * Capex
@@ -647,7 +685,7 @@ import multiprocessing
 from joblib import Parallel, delayed
 
 def MonteCarloParallel(df,pry,indice,lcoh,indSol,anho_contr,anho_proy,effHeater,factInd,N_iter = 2, inicSolar = 2022):
-    tot_periods = anho_contr*12
+    tot_periods = anho_contr*12z
     rng = pd.date_range('2022',periods=tot_periods,freq='M')
     
     df_month = pd.DataFrame(index=rng)

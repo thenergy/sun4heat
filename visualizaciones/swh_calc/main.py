@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Aug 13 15:33:06 2019
+Created on Tue Aug 13 15:33:06 2019     
 
 @author: fcuevas
 """
 import sys
 sys.path
-sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+#sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+sys.path.append('/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts')
 
 import numpy as np
 import pandas as pd
@@ -24,25 +25,26 @@ from bokeh.transform import factor_cmap
 from bokeh.models.widgets import Select, TextInput, Button, PreText
 
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
-       'Sunmark HT-SolarBoost':    {'n0':0.850,'a1':2.300,'a2':0.02900,'color':'green'},
-       'Chromagen':                {'n0':0.722,'a1':3.390,'a2':0.01400,'color':'blue'},
-       'Ecopanel':                 {'n0':0.640,'a1':3.549,'a2':0.02567,'color':'black'},
-       'Shüco':                    {'n0':0.806,'a1':3.882,'a2':0.00900,'color':'orange'},
-       'Termic':                   {'n0':0.725,'a1':3.359,'a2':0.01500,'color':'magenta'},
-       'GreenOneTec GK_SG':        {'n0':0.857,'a1':3.083,'a2':0.01300,'color':'olive'},
-       'GreenOneTec GK_DG':        {'n0':0.814,'a1':2.102,'a2':0.01600,'color':'olive'},
-       'Bosch':                    {'n0':0.802,'a1':3.833,'a2':0.01500,'color':'cyan'},
-       'Viessman':                 {'n0':0.819,'a1':4.342,'a2':0.03600,'color':'slategray'},
-       'Piscina':                  {'n0':0.850,'a1':18.00,'a2':0.00000,'color':'slategray'},
-       'Savosolar':                {'n0':0.874,'a1':3.160,'a2':0.00980,'color':'black'},
-       'Sunoptimo':                {'n0':0.824,'a1':2.905,'a2':0.00300,'color':'black'}}
-###################################
+      'Sunmark HT-SolarBoost':    {'n0':0.850,'a1':2.300,'a2':0.02900,'color':'green'},
+      'Chromagen':                {'n0':0.722,'a1':3.390,'a2':0.01400,'color':'blue'},
+      'Ecopanel':                 {'n0':0.640,'a1':3.549,'a2':0.02567,'color':'black'},
+      'Shüco':                    {'n0':0.806,'a1':3.882,'a2':0.00900,'color':'orange'},
+      'Termic':                   {'n0':0.725,'a1':3.359,'a2':0.01500,'color':'magenta'},
+      'GreenOneTec GK_SG':        {'n0':0.857,'a1':3.083,'a2':0.01300,'color':'olive'},
+      'GreenOneTec GK_DG':        {'n0':0.814,'a1':2.102,'a2':0.01600,'color':'olive'},
+      'Bosch':                    {'n0':0.802,'a1':3.833,'a2':0.01500,'color':'cyan'},
+      'Viessman':                 {'n0':0.819,'a1':4.342,'a2':0.03600,'color':'slategray'},
+      'Piscina':                  {'n0':0.850,'a1':18.00,'a2':0.00000,'color':'slategray'},
+      'Savosolar':                {'n0':0.874,'a1':3.160,'a2':0.00980,'color':'black'},
+      'Sunoptimo':                {'n0':0.824,'a1':2.905,'a2':0.00300,'color':'black'}}
+##################################
 # RADIACION
 ###################################
-ciudades = pd.read_csv('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
+ciudades = pd.read_csv('/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
 lugar = 'SanVicente'
 data_lugar = ciudades[ciudades.Ciudad == lugar]
 ghi_sg = data_lugar.GHI_SG.iloc[0]
@@ -54,9 +56,12 @@ table_rad['GHI Solargis (kWh/m2/año)'] = ghi_sg
 rad_month, x_month = RadMonth(df)
 
 source_rad = ColumnDataSource(data=dict(x=x_month, rad=rad_month))
+
+
 ###################################
 # APORTE SISTEMA SOLAR
 ###################################
+
 #Propiedades del agua
 # densidad (kg/m3)
 dens_w = 1000
@@ -112,7 +117,9 @@ indFuel = 2.4
 
 #Turno
 turno = 'Agrosuper Sanit'
+
 ##########################
+
 # Colector
 Col = 'GreenOneTec GK_SG'
 #Area de colector
@@ -132,9 +139,7 @@ vol = 180
 # Porcentaje pérdidas del almacenamiento
 sto_loss=10
 
-
-
-# Indexaciçon del precio solar
+# Indexacion del precio solar
 indSol = 2
 
 # costo colector (US$/m2)
@@ -153,7 +158,8 @@ CAPEX = CPX+ FIT + fee
 percOpex = 1.5
 
 OPEX = CPX * percOpex/100
-#############
+
+###################################
 SetTurno(df,turno, flow_p)
 SetTMains(df,Tout_p)
 SetTSet(df,Tin_p)
@@ -173,9 +179,12 @@ totSol = enerSol.sum()
 totProc = enerProc.sum()
 totHeater = enerAux.sum()
 solFrac = totSol/totProc
+
+
+###############################
+# INFORMACION EVALUACION ECONOMICA
 #################################
-# INFORMACION EVALUACION
-#################################
+
 # años del contrato
 anho_contr = 20
 # años evaluación proyecto
@@ -246,6 +255,7 @@ columns = [
 ]
 
 data_table = DataTable(columns=columns, source=source_flujo,width=700, height=480)
+
 #################################
 cProy,table_proy = TableProy(lcoh,solFrac,totSol,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
 anhoProyect = np.arange(0,anho_proy+1,1)
@@ -253,7 +263,7 @@ an=pd.date_range('2021-01',freq='A',periods=len(cProy))
 cProy.index = an
 source_proy = ColumnDataSource(data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST))
 
-#################################################################################################                    
+################################################################################################                    
 TOOLS="hover,crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,save"
 
 fill=0.2
@@ -263,29 +273,31 @@ plot_h = 450
 
 #################################
 ciudad_nombre=list(ciudades.Ciudad)
-dropdownData = Select(value='SanVicente', title="Lugar",options=ciudad_nombre) 
+dropdownData = Select(value=lugar, title="Lugar",options=ciudad_nombre) 
 
 solData=['Meteonorm','Explorador Solar']
 dropdownSolData = Select(value='Explorador Solar', title="Dato radiación",options=solData) 
 incl = TextInput(value=str(tilt), title="Inclinación:")
 orie = TextInput(value=str(azim), title="Orientación:")
 buttCalcRad = Button(label="Calcular", button_type="success",width=100)
-#######
+########################
+# INFO GRAF RADIACIÓN
+########################
 rads = ['GHI','POA']
 palette = ["green", "blue"]
 p_rad = Figure(tools=TOOLS, plot_width=plot_w, plot_height=plot_h, title="Recurso solar en " + lugar,
             y_axis_label= "Radiación (kWh/m2/mes)", x_range=FactorRange(*x_month))
 p_rad.vbar(x='x', top='rad', source = source_rad, width=0.45,
-       fill_color=factor_cmap('x', palette=palette, factors=rads, start=1, end=2),
-       line_color=factor_cmap('x', palette=palette, factors=rads, start=1, end=2))
+      fill_color=factor_cmap('x', palette=palette, factors=rads, start=1, end=2),
+      line_color=factor_cmap('x', palette=palette, factors=rads, start=1, end=2))
 p_rad.xaxis.major_label_orientation = 1
 p_rad.select_one(HoverTool).tooltips = [
-     ('Radiación (kWh/mes): ', '@rad{0.0}')]
+    ('Radiación (kWh/mes): ', '@rad{0.0}')]
 p_rad.select_one(HoverTool).mode='vline'
 infoRad = PreText(text=str(table_rad), width=600)
 #################################
-
-#################################
+#INFO VARIABLES e AL GRAFICO BALANCE DE ENERGÍA
+##################################
 Tin_proc = TextInput(value=str(Tin_p), title="Tin proceso:")
 Tout_proc = TextInput(value=str(Tout_p), title="Tout proceso:")        
 flow_proc = TextInput(value=str(flow_p), title="Flujo proceso (m3/hr):")
@@ -310,8 +322,9 @@ vol_sto = TextInput(value=str(vol), title="Volumen acumulación (m3):")
 loss_sto= TextInput(value=str(sto_loss), title="Pérdidas almacenamiento (%):")
 
 buttCalcEnergy = Button(label="Calcular", button_type="success",width=100)
-#######
-#######
+############################
+#GRAFICO BALANCE DE ENERGÍA 
+############################
 ener = ['Proceso','Caldera','Solar']
 ener_month, x_month = SystemMonth(df)
 source_ener = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
@@ -320,12 +333,12 @@ palette = ["red", "black","orange"]
 p_month = Figure(tools=TOOLS, x_range=FactorRange(*x_month),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
             y_axis_label="Energía (MWh/mes)")
 p_month.vbar(x='x', top='ener', width=1.0, source=source_ener, 
-       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
-       line_color='white')
+      fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
+      line_color='white')
 p_month.xaxis.major_label_orientation = 1
 
 p_month.select_one(HoverTool).tooltips = [
-     ('Energía (MWh/mes)', '@ener{0.0}')]
+    ('Energía (MWh/mes)', '@ener{0.0}')]
 p_month.select_one(HoverTool).mode='vline'
 
 
@@ -337,7 +350,7 @@ cols_balance = [
         TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
 table_bal = DataTable(columns=cols_balance, source=source_bal,width=600, height=450,
-                       editable=True)
+                      editable=True)
 ###################################################
 #fs_mes = enerSol/enerProc*100
 #source_fs = ColumnDataSource(data=dict(x=meses,y=fs_mes))
@@ -350,7 +363,9 @@ table_bal = DataTable(columns=cols_balance, source=source_bal,width=600, height=
 infoEner = PreText(text=str(table_ener), width=550)
 infoFuel = PreText(text=str(table_fuel), width=480)
 infoSteam = PreText(text=str(table_steam), width=480)
-#################################
+#######################
+#DATOS TABLA ECONÓMICA
+#######################
 wdt = 250
 CCol = TextInput(value=str(costCol_m2), title="Costo SST (US$/m2):",width=wdt)
 fitm2 = TextInput(value=str(FIT_m2), title="Envío, seguro e impuesto (US$/m2)",width=wdt)
@@ -380,6 +395,8 @@ plot_w = 700
 plot_h = 360
 
 ###############################################
+#GRÁFICO COSTO DE ENERGÍA (NO FUNCIONA)
+###############################################
 p1 = Figure(tools=TOOLS,title="Costo de energía", x_axis_label="Fecha", y_axis_label= "Costo (US$/MWh)", 
             plot_width=plot_w, plot_height=plot_h)
 
@@ -389,9 +406,11 @@ line2_p1 = p1.line(x='date',y='costSol',source=source_cost,color='green',legend_
 p1.xaxis.formatter=DatetimeTickFormatter(hours = ['%d/%m %H:00'],days = ['%F'])
 p1.legend.click_policy="hide"
 p1.add_tools(HoverTool(renderers=[line1_p1], tooltips=[('Fecha: ', '@date{%F}'),
-     ('Costo combustible (US$/MWh): ', '@costFuel{0.0}'),
-     ('Costo solar (US$/MWh): ', '@costSol{0.0}')],mode='vline',formatters={'@date':'datetime'}))
-###############################################
+    ('Costo combustible (US$/MWh): ', '@costFuel{0.0}'),
+    ('Costo solar (US$/MWh): ', '@costSol{0.0}')],mode='vline',formatters={'@date':'datetime'}))
+###########################
+#GRÁFICO COSTO DE PROYECTOS
+###########################
 p2 = Figure(tools=TOOLS,title="Costo proyectos", x_axis_label="Fecha", y_axis_label= "Pago (kUS$/año)", 
             plot_width=plot_w, plot_height=plot_h, x_range=p1.x_range)
 
@@ -403,10 +422,10 @@ line4_p2 = p2.line(x='x1',y='CFoss',source=source_proy,color='black',line_width=
 p2.xaxis.formatter=DatetimeTickFormatter(hours = ['%d/%m %H:00'],days = ['%F'])
 p2.legend.click_policy="hide"
 p2.add_tools(HoverTool(renderers=[line1_p2], tooltips=[('Fecha: ', '@x1{%F}'),
-     ('Pago fósil con SST (kUS$): ', '@CFuel{0.0}'),
-     ('Pago energía solar (kUS$): ', '@CSol{0.0}'),
-     ('Pago total con SST (kUS$): ', '@CSST{0.0}'),
-     ('Pago sin SST (kUS$): ', '@CFoss{0.0}')],mode='vline',formatters={'@x1':'datetime'}))
+    ('Pago fósil con SST (kUS$): ', '@CFuel{0.0}'),
+    ('Pago energía solar (kUS$): ', '@CSol{0.0}'),
+    ('Pago total con SST (kUS$): ', '@CSST{0.0}'),
+    ('Pago sin SST (kUS$): ', '@CFoss{0.0}')],mode='vline',formatters={'@x1':'datetime'}))
 ###############################################
 ###############################################
 
@@ -416,11 +435,11 @@ from funciones_econ import RandomWalk, EnerConvProy, ProyMonth, MonteCarloParall
 
 # https://www.engineeringtoolbox.com/energy-content-d_868.html
 indicadores = {'Mont Belvieu'   : {'std_unit':'gal',    'PCI':91330,    'abrev':'mont'},
-               'Brent'          : {'std_unit':'barrel', 'PCI':5800000,'abrev':'brent'},
-               'WTI'            : {'std_unit':'barrel', 'PCI':5800000,  'abrev':'wti'},
-               'Henry Hub'      : {'std_unit':'MMBtu', 'PCI':1e6,         'abrev':'hhub'},
-               'GLP ENAP'       : {'std_unit':'ton',    'PCI':12956008,        'abrev':'glp'},
-               'DSL ENAP'       : {'std_unit':'m3',     'PCI':35960000,        'abrev':'dsl'}}
+              'Brent'          : {'std_unit':'barrel', 'PCI':5800000,'abrev':'brent'},
+              'WTI'            : {'std_unit':'barrel', 'PCI':5800000,  'abrev':'wti'},
+              'Henry Hub'      : {'std_unit':'MMBtu', 'PCI':1e6,         'abrev':'hhub'},
+              'GLP ENAP'       : {'std_unit':'ton',    'PCI':12956008,        'abrev':'glp'},
+              'DSL ENAP'       : {'std_unit':'m3',     'PCI':35960000,        'abrev':'dsl'}}
 
 # GLP   264.17*0.537*91330
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/Combustibles/indicadores'
@@ -454,8 +473,11 @@ enp_dsl = pd.read_csv(path + '/datos/Combustibles/dsl_enap.csv',date_parser=['Da
 enp_dsl.set_index('Date',inplace=True)
 enp_dsl = enp_dsl.rename(columns={'Diesel_m3':'std_unit'})
 enp_dsl.index = pd.to_datetime(enp_dsl.index)
-############
+
+
+########################################################
 # Botón para correr el random walk del índice a analizar
+########################################################
 indice = 'Mont Belvieu'
 buttCalcWalk = Button(label="Random", button_type="success")
 ind = Select(value=indice, title='Indicador', options=list(indicadores.keys()))
@@ -463,6 +485,7 @@ ind = Select(value=indice, title='Indicador', options=list(indicadores.keys()))
 # Factor a sumar en caso de Chile
 factInd = 0
 fctInd = TextInput(value=str(factInd), title="Valor a agregar Chile (+)",width=wdt)
+
 ############
 # Definir el índice a analizar
 df = mont
@@ -472,7 +495,9 @@ rnd_walk = RandomWalk(df,indice,30)
 # Conversión energética desde la unidad estandar a MWh y MMBtu
 rnd_walk = EnerConvProy(rnd_walk,indice,'Semanal','proy')
 source_rnd = ColumnDataSource(data=rnd_walk)
-####################################################################
+####################
+#GRÁFICO RANDOMWALK
+####################
 p3 = Figure(tools=TOOLS,title="", x_axis_label="Fecha", y_axis_label= "Precio (USD/unidad standar)", 
             plot_width=plot_w+450, plot_height=plot_h+100)
 line1_p3 = p3.line('Date','std_unit',color='black',source=source_rnd, legend_label='Indice')
@@ -480,20 +505,22 @@ line2_p3 = p3.line('Date','proy',color='green',source=source_rnd, legend_label='
 p3.xaxis.formatter=DatetimeTickFormatter()
 
 p3.add_tools(HoverTool(renderers=[line1_p3], tooltips=[('Fecha: ', '@Date{%F}'),
-     ('Costo histórico (US$/unidad): ', '@std_unit{0.00}'),
-     ('Costo histórico (US$/MMBtu): ', '@MMBtu{0.00}'),
-     ('Costo histórico (US$/MWh): ', '@MWh{0.00}')],mode='vline',formatters={'@Date':'datetime'}))
+    ('Costo histórico (US$/unidad): ', '@std_unit{0.00}'),
+    ('Costo histórico (US$/MMBtu): ', '@MMBtu{0.00}'),
+    ('Costo histórico (US$/MWh): ', '@MWh{0.00}')],mode='vline',formatters={'@Date':'datetime'}))
 p3.add_tools(HoverTool(renderers=[line2_p3], tooltips=[('Fecha: ', '@Date{%F}'),
-     ('Costo proyectado (US$/unidad): ', '@proy{0.00}'),
-     ('Costo proyectado (US$/MMBtu): ', '@MMBtu_proy{0.00}'),
-     ('Costo proyectado (US$/MWh): ', '@MWh_proy{0.00}')],mode='vline',formatters={'@Date':'datetime'}))
+    ('Costo proyectado (US$/unidad): ', '@proy{0.00}'),
+    ('Costo proyectado (US$/MMBtu): ', '@MMBtu_proy{0.00}'),
+    ('Costo proyectado (US$/MWh): ', '@MWh_proy{0.00}')],mode='vline',formatters={'@Date':'datetime'}))
 #####################################################################
 
 df_month, table_proy2 = ProyMonth(rnd_walk,'gen',indice,lcoh,indSol,anho_contr,anho_proy,effHeater,factInd,inicSolar = 2022)
 
 sourceMonth = ColumnDataSource(data=df_month)
 
-###############################################
+######################################################################
+#GÁFRICO COMPARACIÓN PRECIO ENERGÍA POR COSTO DE COMBUSTIBLES VS SOLAR
+######################################################################
 p4 = Figure(tools=TOOLS,title="Precio energía", x_axis_label="Fecha", y_axis_label= "Precio (USD/MWh)", 
             plot_width=plot_w, plot_height=plot_h)
 line1_p4 = p4.line('Date','MWh_cl',color='black',source=sourceMonth, legend_label='Fósil')
@@ -501,9 +528,11 @@ line2_p4 = p4.line('Date','precioSol',color='green',source=sourceMonth, legend_l
 p4.xaxis.formatter=DatetimeTickFormatter()
 p4.legend.click_policy="hide"
 p4.add_tools(HoverTool(renderers=[line1_p4], tooltips=[('Fecha: ', '@Date{%F}'),
-     ('Costo combustible (US$/MWh): ', '@MWh_cl{0.0}'),
-     ('Costo solar (US$/MWh): ', '@precioSol{0.0}')],mode='vline',formatters={'@Date':'datetime'}))
-###############################################
+    ('Costo combustible (US$/MWh): ', '@MWh_cl{0.0}'),
+    ('Costo solar (US$/MWh): ', '@precioSol{0.0}')],mode='vline',formatters={'@Date':'datetime'}))
+#############################################
+#GRÁFICO COMPARACIÓN COSTOS PROYECTOS Y PAGOS
+#############################################
 p5 = Figure(tools=TOOLS,title="Costo proyectos", x_axis_label="Fecha", y_axis_label= "Pago (kUS$/año)", 
             plot_width=plot_w, plot_height=plot_h)
 
@@ -514,10 +543,10 @@ line4_p5 = p5.line(x='Date',y='convPay',source=sourceMonth,color='black',line_wi
 p5.xaxis.formatter=DatetimeTickFormatter()
 p5.legend.click_policy="hide"
 p5.add_tools(HoverTool(renderers=[line1_p5], tooltips=[('Fecha: ', '@Date{%F}'),
-     ('Pago fósil con SST (kUS$): ', '@fossPay{0.0}'),
-     ('Pago energía solar (kUS$): ', '@solPay{0.0}'),
-     ('Pago total con SST (kUS$): ', '@totPay{0.0}'),
-     ('Pago sin SST (kUS$): ', '@convPay{0.0}')],mode='vline',formatters={'@Date':'datetime'}))
+    ('Pago fósil con SST (kUS$): ', '@fossPay{0.0}'),
+    ('Pago energía solar (kUS$): ', '@solPay{0.0}'),
+    ('Pago total con SST (kUS$): ', '@totPay{0.0}'),
+    ('Pago sin SST (kUS$): ', '@convPay{0.0}')],mode='vline',formatters={'@Date':'datetime'}))
 ###############################################    
 
 infoProy2 = PreText(text=str(table_proy2), width=320)
@@ -535,25 +564,50 @@ hist_df["interval"] = ["%d to %d" % (left, right) for left,
 
 src_hist = ColumnDataSource(hist_df)
 
+################################
+#HISTOGRAMA INDICADOR POR ÍNDICE
+################################
+
 p6 = Figure(title='Histograma, ' + str(N_iter) + ', indicador ' + indice,
-             tools=TOOLS,plot_width=plot_w, plot_height=plot_h+200) #, background_fill_color="#fafafa"
+            tools=TOOLS,plot_width=plot_w, plot_height=plot_h+200) #, background_fill_color="#fafafa"
 p6.quad(top='column', bottom=0, left='left', right='right',
-           fill_color="navy", line_color="white", alpha=0.5, source=src_hist)
+          fill_color="navy", line_color="white", alpha=0.5, source=src_hist)
 
 
 x_data, y_data = cdf(ahr1)
 src_cdf = ColumnDataSource(data=dict(x=x_data,y=y_data))
+##############
+#HISTOGRAMA???
+##############
 p7 = Figure(tools=TOOLS,title = 'Histograma, ' + str(N_iter) + ', indicador ' + indice,
             plot_width=plot_w, plot_height=plot_h+200) #, background_fill_color="#fafafa"
 p7.line('x','y',source=src_cdf)         
-   
+  
 
 buttCalcMC = Button(label="Monte Carlo", button_type="success")
 n_esc = TextInput(value=str(N_iter), title="Número de escenarios",width=wdt)
 
 #################################
 #################################
+
 def CalcRad():
+    '''
+    Actualiza la simulación de radiación según los filtros de lugar,
+    datos solares, inclinación y orientación establecidos.
+    
+    Variables a definir
+    --------------------
+    lugar: Lugar a evaluar.
+    dataSol: De donde se obtienen los datos solares (ej: explorador solar).
+    tilt: Inclinación campo solar.
+    azim: Azimuth.
+    
+    Returns
+    -------
+    df : DataFrame
+        DF con los filtros aplicados.
+
+    '''
     ######################
     lugar = dropdownData.value
     dataSol = dropdownSolData.value
@@ -562,7 +616,6 @@ def CalcRad():
         
     df = CopyRadFile(lugar,dataSol) 
     df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss)
-    
     
     rad_month, x_month = RadMonth(df)
     new_data=dict(x=x_month, rad=rad_month)
@@ -574,10 +627,45 @@ def CalcRad():
     table_rad['GHI Solargis (kWh/m2/año)'] = ghi_sg
     
     infoRad.text = str(table_rad)
-    
+   
     return df
 
 def CalcSystem():
+    '''
+    A través de la simulación en SAM hecha por CallSWH calcula la 
+    energía en función del sistema y variables seleccionadas.
+    
+    Variables a definir.
+    ----------------------
+    tilt:Inclinación campo solar.
+    azim: Azimuth.
+    
+    Tin_p: Temperatura de entrada al proceso.
+    Tout_p: Temperatura de salida del proceso.
+    
+    flow_p: Flujo de agua en el proceso.
+    p_steam: Presión de vapor.
+    
+    T_cond: Temperatura de condensado.
+    cond: % de condensación del vapor.
+    
+    Col: Colector.
+    aCol: Área de colector.
+    
+    Vol: Volumen de almacenamiento.    
+    sto_loss: % Pérdida de almacenamiento.    
+    
+    turno: Turno de trabajo de la empresa.
+    
+    effHeater: Eficiencia Caldera.
+    fuel: Combustible.
+    
+    
+    Returns
+    -------
+    None.
+
+    '''
     df   = CalcRad()
     tilt = float(incl.value)
     azim = float(orie.value)
@@ -598,7 +686,7 @@ def CalcSystem():
     aCol = float(areaCol.value)
     vol  = float(vol_sto.value)
     sto_loss = float(loss_sto.value)
-     
+    
     SetTurno(df,turno, flow_p)
     SetTMains(df,Tout_p)
     SetTSet(df,Tin_p)
@@ -633,6 +721,14 @@ def CalcSystem():
 
     #############################
 def CalcEcon():
+    '''
+    
+
+    Returns
+    -------
+    None.
+
+    '''
     
     FIT_m2 = float(fitm2.value) 
     perc_fee = float(percFee.value)
@@ -667,7 +763,7 @@ def CalcEcon():
     anho_proy = int(anhoProy.value)
     anho_depr = int(anhoDepr.value)
     pago_deuda = int(pagoDeuda.value)
-     
+    
     perc_deuda = float(percDeuda.value)
     tasa_deuda = float(tasaDeuda.value)
     tasa_equi = float(tasaEqui.value)
@@ -757,6 +853,7 @@ def CreateWalk():
     infoProy2.text = str(table_proy2)
 
 def RunMC():
+    
     lcoh = CalcEcon()
     
     N_iter = int(n_esc.value)
@@ -802,7 +899,7 @@ def RunMC():
 buttCalcRad.on_click(CalcRad)
 buttCalcEnergy.on_click(CalcSystem)
 
-##############
+#############
 spc = 50
 layout = column(Spacer(height=spc),
                 row(dropdownData,dropdownSolData),
@@ -837,8 +934,8 @@ layout = column(Spacer(height=spc),
                 row(buttCalcWalk,ind,fctInd),
                 p3,
                 row(p4,p5,infoProy2),
-                 
-                 
+                
+                
                 Spacer(height=spc),
                 row(buttCalcMC,n_esc),
                 row(p6,p7)  )

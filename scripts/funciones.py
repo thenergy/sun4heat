@@ -24,7 +24,10 @@ dens_w = 1000
 cp_w = 4.18 
 
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+
+#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+
 #path = '/home/ubuntu/sun4heat/'
 
 ################################### COLECTORES SOLARES ###################################
@@ -66,7 +69,20 @@ combs = {'Diesel':        {'PCI_kg' : 11.83, 'dens':0.846,'dens_real':99999,'f_e
 
 
 def TableRad(df_tmp):
-    """ """
+    '''
+    Genera una tabla con la suma de la  irradiancia horizontal directa  (GHI) y
+    la irradiancia directa en un panel (POA)
+    Parameters
+    ----------
+    df_tmp : DataFrame
+        DESCRIPTION.
+
+    Returns
+    -------
+    table_rad : Series
+        DESCRIPTION.
+
+    ''' 
     table_rad = pd.Series()
     table_rad['GHI (kWh/m2/año): '] = "{:10.1f}".format(df_tmp.ghi.sum()/1000)
     table_rad['POA (kWh/m2/año): '] = "{:10.1f}".format(df_tmp.poa.sum()/1000)    
@@ -76,13 +92,36 @@ def TableRad(df_tmp):
     
 
 def Col_eff_val(Col, Tmean, Tamb, GHI):
+    '''
+    Calcula la eficiencia del colector bajo el modelo de regresión :
+    
+    Ef = Ef_o - a_1 * DeltaT/G - a_2 * DeltaT**2/G
+    
+
+    Parameters
+    ----------
+    Col : str
+        Tipo de colector.
+    Tmean : int
+        Temperatura media del estanque.
+    Tamb : int
+        Temperatura del ambiente.
+    GHI : int64.
+        Radiación global horizontal.
+
+    Returns
+    -------
+    eff : float
+        Eficiencia del colector utilizado.
+
+    '''
     eff = cst[Col]['n0'] - cst[Col]['a1']*(Tmean - Tamb)/GHI - cst[Col]['a2']*(Tmean - Tamb)**2/GHI
     return eff
 
 
 def Vector(val,contrato,infl):
     n = contrato+1
-    vct = np.zeros(n).reshape(n,1)
+    vct = np.zeros(n).reshape(n,1) #??
     anhos = np.arange(1,n)
     for anho in anhos:
         if anho == 1:
@@ -93,6 +132,20 @@ def Vector(val,contrato,infl):
     return vct
 ###################################
 def flat_list(lt):
+    '''
+    
+
+    Parameters
+    ----------
+    lt : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    flat_list : TYPE
+        DESCRIPTION.
+
+    '''
     flat_list = []
     for sublist in lt:
         for item in sublist:
@@ -103,6 +156,23 @@ def flat_list(lt):
 
 
 def RadMonth(df_temp):
+    '''
+    Agrupa/suma por/la irradiancia horizontal directa  (GHI) y
+    la irradiancia directa en un panel (POA)
+ 
+    Parameters
+    ----------
+    df_temp : DataFrame
+        DESCRIPTION.
+
+    Returns
+    -------
+    rad_month : list
+        Radiación mensual.
+    x_month : list
+        mes y proceso
+
+    '''
     rads = ['GHI','POA']
     rad_months_ghi = df_temp['ghi'].groupby(df_temp.index.month).sum()/1000
     rad_months_poa = df_temp['poa'].groupby(df_temp.index.month).sum()/1000
@@ -116,6 +186,28 @@ def RadMonth(df_temp):
 
 
 def BalanceMonth(df_temp):
+   '''
+    Los datos obtenidos por hora los suma y convierte en datos mensuales.
+
+    Parameters
+    ----------
+    df_temp : DataFrame
+        DESCRIPTION.
+
+    Returns
+    -------
+    enerProc : Series
+        Calor utilizado en el proceso en una hora.
+    enerAux : Series
+        Energía extra necesitada (no cubiarta por sistema solar).
+    enerSol : Series
+        DESCRIPTION.
+    enerPeak : Series
+        DESCRIPTION.
+    enerDis : TYPE
+        DESCRIPTION.
+
+    '''
     
     enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
     
@@ -161,6 +253,30 @@ def SystemMonth(df_temp):
 
 
 def TableEner(df_temp,flow_p, Tout_h, Tin_h,eff_heater,Col):
+    '''
+    Genera una tabla (Pandas Serie) que contiene información respecto
+    a la caldera, sistema solar y balance de energía 
+
+    Parameters
+    ----------
+    df_temp : TYPE
+        DESCRIPTION.
+    flow_p : TYPE
+        DESCRIPTION.
+    Tout_h : TYPE
+        DESCRIPTION.
+    Tin_h : TYPE
+        DESCRIPTION.
+    eff_heater : TYPE
+        DESCRIPTION.
+    Col : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    '''
     
     heater_pow = flow_p*dens_w*(Tout_h - Tin_h)*cp_w/3600
     #Temperatura media del colector
