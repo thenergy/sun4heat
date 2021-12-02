@@ -17,6 +17,48 @@ path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 
 def TableCapex(aCol,costCol_m2,costInst_m2, cost_storage, vol, land_prep, fact_uso, cont, fit, fee, 
                table_inst, cHH_mec, cHH_mec_help, cHH_elec, cHH_elec_help):
+    '''
+    Calcula el CAPEX de la inversión.
+
+    Parameters
+    ----------
+    aCol : int
+        Área del colector.
+    costCol_m2 : float
+        Costo del colector por m**2
+    costInst_m2 : float
+        Costo de la isntalación por m**2.
+    cost_storage : float
+        Costo por almacenamiento.
+    vol : int
+        Volumen del almacenador.
+    land_prep : TYPE
+        DESCRIPTION.
+    fact_uso : TYPE
+        DESCRIPTION.
+    cont : TYPE
+        DESCRIPTION.
+    fit : TYPE
+        DESCRIPTION.
+    fee : TYPE
+        DESCRIPTION.
+    table_inst : TYPE
+        DESCRIPTION.
+    cHH_mec : TYPE
+        DESCRIPTION.
+    cHH_mec_help : TYPE
+        DESCRIPTION.
+    cHH_elec : TYPE
+        DESCRIPTION.
+    cHH_elec_help : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    table_capex : TYPE
+        DESCRIPTION.
+
+    '''
     #Mano obra local (US$/m2)
     manObra = table_inst.mecanico.sum() * cHH_mec + table_inst.mecanico.sum() * cHH_mec_help + \
     table_inst.electrico.sum() * cHH_elec + table_inst.electrico.sum() * cHH_elec_help
@@ -43,6 +85,47 @@ def TableCapex(aCol,costCol_m2,costInst_m2, cost_storage, vol, land_prep, fact_u
  
 def TableOpex(aCol,costCol_m2,SF_refresh,PM,consElectrico,costElectrico,nLimp,costLimp,nOper,salOper,
               aguaLimp,aguaCost,nInspect,cInspect,monitoreo):
+    '''
+    
+
+    Parameters
+    ----------
+    aCol : int
+        Área colector.
+    costCol_m2 : float
+        Costo del colector por m**2.
+    SF_refresh : TYPE
+        DESCRIPTION.
+    PM : TYPE
+        DESCRIPTION.
+    consElectrico : TYPE
+        DESCRIPTION.
+    costElectrico : TYPE
+        DESCRIPTION.
+    nLimp : TYPE
+        DESCRIPTION.
+    costLimp : TYPE
+        DESCRIPTION.
+    nOper : TYPE
+        DESCRIPTION.
+    salOper : TYPE
+        DESCRIPTION.
+    aguaLimp : TYPE
+        DESCRIPTION.
+    aguaCost : TYPE
+        DESCRIPTION.
+    nInspect : TYPE
+        DESCRIPTION.
+    cInspect : TYPE
+        DESCRIPTION.
+    monitoreo : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    '''
     costCol = costCol_m2*aCol
     #Solar Field maintenance
     SFM = SF_refresh + PM
@@ -157,6 +240,51 @@ def TableEval(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
 
 def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
               anho_contr,anho_proy,val_depr,anho_depr,enerYield,indSol,indFuel,CFuel):
+    '''
+    
+
+    Parameters
+    ----------
+    Capex : TYPE
+        DESCRIPTION.
+    OPEX : TYPE
+        DESCRIPTION.
+    tasa_deuda : TYPE
+        DESCRIPTION.
+    pago_deuda : TYPE
+        DESCRIPTION.
+    perc_deuda : TYPE
+        DESCRIPTION.
+    impuesto : int
+        Porcentaje de impuesto.
+    tasa_equi : TYPE
+        DESCRIPTION.
+    dif_infl : TYPE
+        DESCRIPTION.
+    infl_cl : TYPE
+        DESCRIPTION.
+    anho_contr : TYPE
+        DESCRIPTION.
+    anho_proy : TYPE
+        DESCRIPTION.
+    val_depr : TYPE
+        DESCRIPTION.
+    anho_depr : TYPE
+        DESCRIPTION.
+    enerYield : TYPE
+        DESCRIPTION.
+    indSol : TYPE
+        DESCRIPTION.
+    indFuel : TYPE
+        DESCRIPTION.
+    CFuel : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    '''
 #    print ("funcion eval")
     # monto de la deuda
     deuda = perc_deuda/100 * Capex
@@ -166,8 +294,7 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
     pg = Pago(tasa_deuda/100,pago_deuda,deuda)
     #wacc chile
     wacc_cl = perc_deuda/100 * tasa_deuda/100 * (1-impuesto/100) + perc_equi/100 * tasa_equi/100
-#    wacc_us = (1+wacc_cl)*dif_infl - 1
-    
+#    wacc_us = (1+wacc_cl)*dif_infl - 1 
 #    print (wacc_cl,wacc_us)
     
     inversion = np.zeros(anho_contr+1).reshape(anho_contr+1,1) 
@@ -685,7 +812,7 @@ import multiprocessing
 from joblib import Parallel, delayed
 
 def MonteCarloParallel(df,pry,indice,lcoh,indSol,anho_contr,anho_proy,effHeater,factInd,N_iter = 2, inicSolar = 2022):
-    tot_periods = anho_contr*12z
+    tot_periods = anho_contr*12
     rng = pd.date_range('2022',periods=tot_periods,freq='M')
     
     df_month = pd.DataFrame(index=rng)

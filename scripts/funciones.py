@@ -185,8 +185,8 @@ def RadMonth(df_temp):
     return rad_month,x_month
 
 
-def BalanceMonth(df_temp):
-   '''
+def BalanceMonth(df_temp):   
+    '''
     Los datos obtenidos por hora los suma y convierte en datos mensuales.
 
     Parameters
@@ -208,8 +208,8 @@ def BalanceMonth(df_temp):
         DESCRIPTION.
 
     '''
-    
     enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
+    enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000 
     
     enerProc= df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
     
@@ -236,7 +236,7 @@ def BalanceMonth(df_temp):
     bal_month.to_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
     
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
-
+ 
 def SystemMonth(df_temp):
     ener = ['Proceso','Caldera','Solar']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
