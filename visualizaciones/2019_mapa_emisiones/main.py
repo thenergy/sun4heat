@@ -35,7 +35,7 @@ STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
 # Donde instalar. Versión local y versión en servidor
 #<<<<<<< HEAD
-path = '/home/ubuntu/Thenergy/diego/sun4heat'
+path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 # path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
 #=======
 #<<<<<<< HEAD
