@@ -8,7 +8,8 @@ Created on Tue Aug 13 15:33:06 2019
 import sys
 sys.path
 #sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
-sys.path.append('/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts')
+#sys.path.append('/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts')
+sys.path.append('/home/ubuntu/Thenergy/diego/sun4heat')
 
 import numpy as np
 import pandas as pd
@@ -26,7 +27,7 @@ from bokeh.models.widgets import Select, TextInput, Button, PreText
 
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
       'Sunmark HT-SolarBoost':    {'n0':0.850,'a1':2.300,'a2':0.02900,'color':'green'},
@@ -44,7 +45,8 @@ cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'
 ##################################
 # RADIACION
 ###################################
-ciudades = pd.read_csv('/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
+#ciudades = pd.read_csv('/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
+ciudades = pd.read_csv('/home/ubuntu/Thenergy/diego/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
 lugar = 'SanVicente'
 data_lugar = ciudades[ciudades.Ciudad == lugar]
 ghi_sg = data_lugar.GHI_SG.iloc[0]

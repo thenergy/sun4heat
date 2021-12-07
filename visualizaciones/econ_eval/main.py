@@ -8,7 +8,8 @@ Created on Tue Aug 13 15:33:06 2019
 import sys
 sys.path
 #sys.path.append('/home/ubuntu/sun4heat/scripts')
-sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+#sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+sys.path.append('/home/ubuntu/Thenergy/diego/sun4heat/scripts')
 
 import numpy as np
 import pandas as pd

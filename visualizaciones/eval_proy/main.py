@@ -8,7 +8,8 @@ Created on Tue Aug 13 15:33:06 2019
 import sys
 sys.path
 #sys.path.append('/home/ubuntu/sun4heat/scripts')
-sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+#sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+sys.path.append('/home/ubuntu/Thenergy/diego/sun4heat/scripts')
 
 import numpy as np
 import pandas as pd
@@ -375,7 +376,9 @@ indicadores = {'Mont Belvieu'   : {'std_unit':'gal',    'PCI':91330,    'abrev':
                'DSL ENAP'       : {'std_unit':'m3',     'PCI':35960000,        'abrev':'dsl'}}
 
 # GLP   264.17*0.537*91330
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/Combustibles'
+#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/Combustibles'
+path = '/home/ubuntu/Thenergy/diego/sun4heat/datos/Combustibles'
+
 ################################################
 # Lista histórica de precios de combustibles, según la EIA
 

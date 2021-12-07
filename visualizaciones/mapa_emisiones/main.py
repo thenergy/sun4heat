@@ -23,7 +23,8 @@ from bokeh.tile_providers import get_provider, CARTODBPOSITRON, CARTODBPOSITRON_
 STAMEN_TERRAIN_RETINA, STAMEN_TONER, STAMEN_TONER_BACKGROUND,\
 STAMEN_TONER_LABELS, OSM, WIKIMEDIA, ESRI_IMAGERY
 
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 # path = '/home/ubuntu/sun4heat/'
 
 tiles = ['CARTODBPOSITRON', 'CARTODBPOSITRON_RETINA', 'STAMEN_TERRAIN',

@@ -8,7 +8,8 @@ Created on Mon Aug 10 12:00:42 2020
 import sys
 sys.path
 #sys.path.append('/home/ubuntu/sun4heat/scripts')
-sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+#sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+sys.path.append('/home/ubuntu/Thenergy/diego/sun4heat/scripts')
 
 import pandas as pd
 import numpy as np
@@ -24,7 +25,8 @@ from bokeh.io import curdoc
 
 months = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/Combustibles'
+#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/Combustibles'
+path = '/home/ubuntu/Thenergy/diego/sun4heat/datos/Combustibles'
 
 # https://www.engineeringtoolbox.com/energy-content-d_868.html
 indicadores = {'Mont Belvieu'   : {'std_unit':'gal',    'PCI':91330,    'abrev':'mont'},
