@@ -11,9 +11,8 @@ import numpy as np
 from funciones import flat_list
 
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
-
-#path = '/home/ubuntu/sun4heat/'
+#path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 
 def TableCapex(aCol,costCol_m2,costInst_m2, cost_storage, vol, land_prep, fact_uso, cont, fit, fee, 
                table_inst, cHH_mec, cHH_mec_help, cHH_elec, cHH_elec_help):

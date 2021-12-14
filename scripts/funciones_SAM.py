@@ -14,9 +14,8 @@ from PySSC import PySSC
 
 
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
-
-#path = '/home/ubuntu/sun4heat/'
+#path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
        'Sunmark HT-SolarBoost':    {'n0':0.850,'a1':2.300,'a2':0.02900,'color':'green'},
