@@ -127,7 +127,6 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
     dataSam = ssc.data_create()
     #ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/ubuntu/Thenergy/diego/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
-    /home/ubuntu/Thenergy/diego/sun4heat
     #ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
     ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/ubuntu/Thenergy/diego/sun4heat/visualizaciones/swh_calc/scaled_draw.csv')
 
