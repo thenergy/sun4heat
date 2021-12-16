@@ -38,15 +38,18 @@ def ReadIndus():
         'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
         
     '''
-    header = ['raz_social','ID','nombre','rubro','ciiu6','ciiu4','region','provincia','comuna','coord_este','coord_norte',
-              'huso','fuente_emision','nombre_fuente','tipo_emision','combustible','origen','tipo_contaminante','ton_emision']
+    header = ['codigo_VU', 	'raz_social',	'establecimiento',	'rubro', 'RETC', 'CIIU6', 'CIIU4', 'region', 'provincia', 'comuna',
+              'coord_este', 'coord_norte', 'Huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
+              'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
+              'ton_emision', 'ORIGEN']
+
 
     # header = ['Razón Social','ID Establecimiento VU','Nombre Establecimiento','Rubro RETC','CIIU6',
     #           'CIIU4','Región','Provincia','Comuna','Coordenada Este','Coordenada Norte','Huso',
     #           'Fuente','Nombre Fuente','Tipo de Emisión','Combustible','Origen','Contaminante',
     #             'Emisión (Toneladas)']
     
-    indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
+    indus = pd.read_excel(path + 'datos/RETC/2019_vfinal_v3.xlsx', names=header)
     
     
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')

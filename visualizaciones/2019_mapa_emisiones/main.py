@@ -882,11 +882,9 @@ def ExportToCSV_Excel():
     print("Despues de filtrar")
 
     ####################################
-buttondownload = Button(label="Download", button_type="success")
-buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(join(dirname(
-                                    "/home/ubuntu/Thenergy/diego/sun4heat/scripts"), 'download.js')).read()))
-
-
+# buttondownload = Button(label="Download", button_type="success")
+# buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(join(dirname(
+#                                     "/home/ubuntu/Thenergy/diego/sun4heat/scripts"), 'download.js')).read()))
 
 buttExportCSV_Excel.on_click(ExportToCSV_Excel)
 #############################################
@@ -901,7 +899,7 @@ layout = column(
     row(maxEmpr, multi_choice),
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles, dropDownCat),
-    row(buttCalcUpdate, buttExportCSV_Excel, buttondownload),
+    row(buttCalcUpdate, buttExportCSV_Excel),
     Spacer(height=spc - 20),
     row(p1, data_table),
     Spacer(height=spc + 30),
