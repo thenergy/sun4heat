@@ -561,7 +561,7 @@ data_table = DataTable(
     columns=columns, source=source_indus, width=1400, height=900, editable=True
 )
 ########################################################################################
-callbacks = CustomJS(args=dict(source=source_indus), code="""
+js_download = """
             var data = source.data;
             var filetext = 'nombre,raz_social,ton_emision,region,rubro,ciiu4\\n';
             
@@ -590,10 +590,11 @@ callbacks = CustomJS(args=dict(source=source_indus), code="""
             	link.dispatchEvent(new MouseEvent('click'))
             }
             
-            """,
-)
+            """
 
-buttdownload = Button.js_on_event(label='Descargar', button_type='success', callback=callbacks)
+
+#buttdownload.callback = Button(label='Descargar', button_type='success', callback=callbacks)
+buttdownload = CustomJS(args=dict(source=source_indus), code=js_download)
 ########################################################################################
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
@@ -927,7 +928,7 @@ layout = column(
     row(maxEmpr, multi_choice),
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles, dropDownCat),
-    row(buttCalcUpdate, buttExportCSV_Excel),
+    row(buttCalcUpdate, buttExportCSV_Excel, buttdownload),
     Spacer(height=spc - 20),
     row(p1, data_table),
     Spacer(height=spc + 30),
