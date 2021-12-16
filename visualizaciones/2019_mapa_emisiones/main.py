@@ -56,6 +56,8 @@ from bokeh.tile_providers import (
     ESRI_IMAGERY,
 )
 
+#Libreria para descargar csv
+from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
 path = "/home/ubuntu/Thenergy/diego/sun4heat/"
@@ -881,8 +883,8 @@ def ExportToCSV_Excel():
 
     ####################################
 buttondownload = Button(label="Download", button_type="success")
-buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(path + 
-                    "/home/ubuntu/Thenergy/diego/sun4heat/scripts", "download.js")).read())
+buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(join(dirname(
+                                    "/home/ubuntu/Thenergy/diego/sun4heat/scripts"), 'download.js')).read()))
 
 
 
