@@ -593,7 +593,7 @@ callbacks = CustomJS(args=dict(source=source_indus), code="""
             """,
 )
 
-buttdownload = Button(label='Descargar', button_type='success', callbacks=callbacks)
+buttdownload = Button.js_on_event(label='Descargar', button_type='success', callback=callbacks)
 ########################################################################################
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
