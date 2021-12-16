@@ -21,7 +21,7 @@ import pandas as pd
 from bokeh.plotting import Figure
 # from pyproj import Proj, transform
 
-from bokeh.models import ColumnDataSource, TableColumn, DataTable, TextInput, Select, NumberFormatter, Range1d, HoverTool, TileRenderer, MultiChoice
+from bokeh.models import ColumnDataSource, TableColumn, DataTable, TextInput, Select, NumberFormatter, Range1d, HoverTool, TileRenderer, MultiChoice, CustomJS
 from bokeh.io import curdoc
 from bokeh.layouts import column, row, Spacer
 from bokeh.models.widgets import Button
@@ -473,6 +473,37 @@ columns = [
 # iniciar tabla con columnas y fuente de datos ds source_indus
 data_table = DataTable(columns=columns, source=source_indus,width=1400, height=900,
                         editable=True)
+########################################################################################
+callback = CustomJS(args=dict(source=source_indus), code="""
+            var data = source.get('data');
+            var filetext = 'x,y\n';
+            for (i=0; i < data['x'].length; i++) {
+                var currRow = [data['x'][i].toString(),
+                               data['y'][i].toString().concat('\n')];
+
+                var joined = currRow.join();
+                filetext = filetext.concat(joined);
+            }
+
+            var filename = 'data.csv';
+            var blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
+
+            //addresses IE
+            if (navigator.msSaveBlob) {
+                navigator.msSaveBlob(blob, filename);
+            }
+
+            else {
+                var link = document.createElement("a");
+                link = document.createElement('a')
+                link.href = URL.createObjectURL(blob);
+                link.download = filename
+                link.target = "_blank";
+                link.style.visibility = 'hidden';
+                link.dispatchEvent(new MouseEvent('click'))
+            }
+        """)
+buttdownload = Button(label='Descargar', button_type='success', callback=callback)
 
 ########################################################################################  
 # iniciar mapa
@@ -737,8 +768,12 @@ def ExportToCSV_Excel():
     indus_ft.to_excel(path + 'visualizaciones/2019_mapa_emisiones/empresas_filtradas.xlsx', encoding="utf-8-sig")   
 
     print ("Despues de filtrar")
+    
+    ####################################
 
-buttExportCSV_Excel.on_click(ExportToCSV_Excel)    
+#buttExportCSV_Excel.on_click(ExportToCSV_Excel)    
+#############################################
+
 
 #############################################
 
@@ -749,7 +784,7 @@ layout = column(
         row(maxEmpr,multi_choice),
         row(dropdownRegion,latNorte,latSur),
         row(dropDownTiles,dropDownCat),
-        row(buttCalcUpdate,buttExportCSV_Excel),       
+        row(buttCalcUpdate,buttExportCSV_Excel, buttdownload),       
         
         Spacer(height=spc-20),
         row(p1,data_table),
