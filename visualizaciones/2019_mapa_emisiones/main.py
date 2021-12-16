@@ -503,12 +503,11 @@ callbacks = CustomJS(args=dict(source=source_indus), code="""
             	link.dispatchEvent(new MouseEvent('click'))
             }
             
-            console.log('hola')
             """)
 
 
-buttdownload = Button(label='Descargar', button_type='success', callback=callbacks)
-
+print(callbacks)
+#buttdownload = Button(label='Descargar', button_type='success', callback=callbacks)
 ########################################################################################  
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
