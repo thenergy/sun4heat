@@ -474,70 +474,37 @@ columns = [
 data_table = DataTable(columns=columns, source=source_indus,width=1400, height=900,
                         editable=True)
 ########################################################################################
-js_download = """
-    
-    var csv = source_indus.get(‘data’);
-    
-    var filetext = ‘nombre,raz_social,ton_emision,region,rubro,ciiu4\n’;
-    
-    for (i=0; i < csv[‘raz_social’].length; i++) {
-    
-    var currRow = [csv[‘nombre’][i].toString(),
-    
-    csv[‘raz_social’][i].toString(),
-    
-    csv[‘ton_emision’][i].toString(),
-    
-    csv[‘region’][i].toString(),
-    
-    csv[‘rubro’][i].toString(),
-    
-    csv[‘ciiu4’][i].toString().concat(’\n’)];
-    
-    var joined = currRow.join();
-    
-    filetext = filetext.concat(joined);
-    
-    }
-    
-    var filename = ‘results.csv’;
-    
-    var blob = new Blob([filetext], { type: ‘text/csv;charset=utf-8;’ });
-    
-    if (navigator.msSaveBlob) { // IE 10+
-    
-    navigator.msSaveBlob(blob, filename);
-    
-    } else {
-    
-    var link = document.createElement(“a”);
-    
-    if (link.download !== undefined) { // feature detection
-    
-    // Browsers that support HTML5 download attribute
-    
-    var url = URL.createObjectURL(blob);
-    
-    link.setAttribute(“href”, url);
-    
-    link.setAttribute(“download”, filename);
-    
-    link.style.visibility = ‘hidden’;
-    
-    document.body.appendChild(link);
-    
-    link.click();
-    
-    document.body.removeChild(link);
-    
-    }
-
-}"""
-
-buttondownload.callback = CustomJS(args=dict(source=indus_ft), code=js_download)
+callback = CustomJS(args=dict(source=source_indus), code="""
+            var data = source.data;
+            var filetext = 'nombre,raz_social,ton_emision,region,rubro,ciiu4\\n';
+            
+            for (i=0; i < data['x'].length; i++) {
+            	var currRow = [data['x'][i].toString(), data['y'][i].toString().concat('\\n')];
+            	var joined = currRow.join();
+            	filetext = filetext.concat(joined);
+            }	
+            
+            var filename = 'data.csv';
+            var blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
+            
+            //addresses IE
+            if (navigator.msSaveBlob) {
+            	navigator.msSaveBlob(blob, filename);
+            }
+            
+            else {
+            	var link = document.createElement("a");
+            	link = document.createElement('a')
+            	link.href = URL.createObjectURL(blob);
+            	link.download = filename
+            	link.target = "_blank";
+            	link.style.visibility = 'hidden';
+            	link.dispatchEvent(new MouseEvent('click'))
+            }
+            """)
 
 
-# buttdownload = Button(label='Descargar', button_type='success', callback=callback)
+buttdownload = Button(label='Descargar', button_type='success', callback=callback)
 
 ########################################################################################  
 # iniciar mapa
