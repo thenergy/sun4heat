@@ -474,7 +474,7 @@ columns = [
 data_table = DataTable(columns=columns, source=source_indus,width=1400, height=900,
                         editable=True)
 ########################################################################################
-callback = CustomJS(args=dict(source=source_indus), code="""
+callbacks = CustomJS(args=dict(source=source_indus), code="""
             var data = source.data;
             var filetext = 'nombre,raz_social,ton_emision,region,rubro,ciiu4\\n';
             
@@ -503,11 +503,11 @@ callback = CustomJS(args=dict(source=source_indus), code="""
             	link.dispatchEvent(new MouseEvent('click'))
             }
             
-            console.log(currRow)
+            console.log('hola')
             """)
 
 
-buttdownload = Button(label='Descargar', button_type='success', callback=callback)
+buttdownload = Button(label='Descargar', button_type='success', callback=callbacks)
 
 ########################################################################################  
 # iniciar mapa
