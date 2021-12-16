@@ -561,43 +561,7 @@ data_table = DataTable(
     columns=columns, source=source_indus, width=1400, height=900, editable=True
 )
 ########################################################################################
-js_download = """
-            var data = source.data;
-            var filetext = 'nombre,raz_social,ton_emision,region,rubro,ciiu4\\n';
-            
-            for (i=0; i < data['raz_social'].length; i++) {
-            	var currRow = [data['nombre'][i].toString(), data['raz_social'][i].toString(), data['ton_emision'][i].toString(),
-                            data['region'][i].toString(), data['rubro'][i].toString(), data['ciiu4'][i].toString().concat('\\n')];
-            	var joined = currRow.join();
-            	filetext = filetext.concat(joined);
-            }	
-            
-            var filename = 'data.csv';
-            var blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
-            
-            addresses IE
-            if (navigator.msSaveBlob) {
-            	navigator.msSaveBlob(blob, filename);
-            }
-            
-            else {
-            	var link = document.createElement("a");
-            	link = document.createElement('a')
-            	link.href = URL.createObjectURL(blob);
-            	link.download = filename
-            	link.target = "_blank";
-            	link.style.visibility = 'hidden';
-            	link.dispatchEvent(new MouseEvent('click'))
-            }
-            
-            """
 
-buttondownload = Button(label="Download", button_type="success")
-buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(indus_ft, "download.js")).read())
-
-
-#buttdownload.callback = Button(label='Descargar', button_type='success', callback=callbacks)
-#buttdownload = CustomJS(args=dict(source=source_indus), code=js_download)
 ########################################################################################
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
@@ -916,6 +880,10 @@ def ExportToCSV_Excel():
     print("Despues de filtrar")
 
     ####################################
+buttondownload = Button(label="Download", button_type="success")
+buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(path + 
+                    "visualizaciones/2019_mapa_emisiones/empresas_filtradas.xlsx", "download.js")).read())
+
 
 
 buttExportCSV_Excel.on_click(ExportToCSV_Excel)
