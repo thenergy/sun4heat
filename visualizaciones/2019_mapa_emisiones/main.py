@@ -931,7 +931,7 @@ layout = column(
     row(maxEmpr, multi_choice),
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles, dropDownCat),
-    row(buttCalcUpdate, buttExportCSV_Excel, buttondownload),
+    row(buttCalcUpdate, buttExportCSV_Excel),
     Spacer(height=spc - 20),
     row(p1, data_table),
     Spacer(height=spc + 30),
