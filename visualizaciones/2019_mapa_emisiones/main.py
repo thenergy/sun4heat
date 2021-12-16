@@ -488,7 +488,7 @@ callbacks = CustomJS(args=dict(source=source_indus), code="""
             var filename = 'data.csv';
             var blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
             
-            //addresses IE
+            addresses IE
             if (navigator.msSaveBlob) {
             	navigator.msSaveBlob(blob, filename);
             }
@@ -787,7 +787,7 @@ layout = column(
         row(maxEmpr,multi_choice),
         row(dropdownRegion,latNorte,latSur),
         row(dropDownTiles,dropDownCat),
-        row(buttCalcUpdate,buttExportCSV_Excel, buttondownload),       
+        row(buttCalcUpdate,buttExportCSV_Excel),       
         
         Spacer(height=spc-20),
         row(p1,data_table),
