@@ -38,7 +38,7 @@ def ReadIndus():
         'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
         
     '''
-    header = ['codigo_VU', 	'raz_social',	'nombre' #establecimiento
+    header = ['ID', 	'raz_social',	'nombre' #establecimiento
               ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
               'coord_este', 'coord_norte', 'huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
               'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
