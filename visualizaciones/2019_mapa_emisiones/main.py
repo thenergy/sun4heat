@@ -138,36 +138,18 @@ def ReadIndus():
     indus: Data Frame
         DF con los headers expuestos abajo.
     
-    Headers DataFrame
+    Headers DataFrame (ANTIGUO, FALTA ACTUALIZAR)
     -----------------
         'raz_social', 'nombre', 'ID', 'rubro', 'ciiu4', 'fuente_emision', 
         'tipo_contaminante', 'ton_emision', 'anho', 'region', 'provincia', 
         'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
         
     """
-    header = [
-        "raz_social",
-        "ID",
-        "nombre",
-        "rubro",
-        "ciiu6",
-        "ciiu4",
-        "region",
-        "provincia",
-        "comuna",
-        "coord_este",
-        "coord_norte",
-        "huso",
-        "fuente_emision",
-        "nombre_fuente",
-        "tipo_emision",
-        "combustible",
-        "origen",
-        "tipo_contaminante",
-        "ton_emision",
-        "Longitud",
-        "Latitud",
-    ]
+    header = ['codigo_VU', 	'raz_social',	'nombre' #establecimiento
+              ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
+              'coord_este', 'coord_norte', 'huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
+              'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
+              'ton_emision', 'ORIGEN']
 
     # header = ['Razón Social','ID Establecimiento VU','Nombre Establecimiento','Rubro RETC','CIIU6',
     #           'CIIU4','Región','Provincia','Comuna','Coordenada Este','Coordenada Norte','Huso',
@@ -487,7 +469,7 @@ indus = ReadIndus()
 ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
 
 # definir contaminante inicial a analizar y filtrar df indus
-ctm = "Dióxido de carbono (CO2)"
+ctm = "Carbon dioxide"
 indus = indus[indus.tipo_contaminante == ctm]
 
 # filtrar df indus según equipo a analizar
