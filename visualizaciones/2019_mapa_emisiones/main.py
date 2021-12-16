@@ -592,9 +592,12 @@ js_download = """
             
             """
 
+buttondownload = Button(label="Download", button_type="success")
+buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(indus_ft, "download.js")).read())
+
 
 #buttdownload.callback = Button(label='Descargar', button_type='success', callback=callbacks)
-buttdownload = CustomJS(args=dict(source=source_indus), code=js_download)
+#buttdownload = CustomJS(args=dict(source=source_indus), code=js_download)
 ########################################################################################
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
