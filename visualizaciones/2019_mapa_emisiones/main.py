@@ -479,7 +479,8 @@ callback = CustomJS(args=dict(source=source_indus), code="""
             var filetext = 'nombre,raz_social,ton_emision,region,rubro,ciiu4\\n';
             
             for (i=0; i < data['x'].length; i++) {
-            	var currRow = [data['x'][i].toString(), data['y'][i].toString().concat('\\n')];
+            	var currRow = [data['nombre'][i].toString(), data['raz_social'][i].toString(), data['ton_emision'][i].toString(),
+                            data['region'][i].toString(), data['rubro'][i].toString(), data['ciiu4'][i].toString().concat('\\n')];
             	var joined = currRow.join();
             	filetext = filetext.concat(joined);
             }	
@@ -487,7 +488,7 @@ callback = CustomJS(args=dict(source=source_indus), code="""
             var filename = 'data.csv';
             var blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
             
-            //addresses IE
+            addresses IE
             if (navigator.msSaveBlob) {
             	navigator.msSaveBlob(blob, filename);
             }
