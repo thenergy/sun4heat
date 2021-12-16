@@ -38,8 +38,8 @@ def ReadIndus():
         'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
         
     '''
-    header = ['codigo_VU', 	'raz_social',	'establecimiento',	'rubro', 'CIIU6', 'CIIU4', 'region', 'provincia', 'comuna',
-              'coord_este', 'coord_norte', 'Huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
+    header = ['codigo_VU', 	'raz_social',	'establecimiento',	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
+              'coord_este', 'coord_norte', 'huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
               'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
               'ton_emision', 'ORIGEN']
 
@@ -50,9 +50,14 @@ def ReadIndus():
     #             'Emisión (Toneladas)']
     
     indus = pd.read_excel(path + 'datos/RETC/2019_vfinal_v3.xlsx', names=header)
+   
     
     
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
+    indus.coord_este = pd.to_numeric(indus.coord_este, errors='coerce')
+    indus.coord_norte = pd.to_numeric(indus.coord_norte, errors='coerce')
+    indus.huso = pd.to_numeric(indus.huso, errors='coerce')
+    
     indus = indus.dropna()
     
     return indus
