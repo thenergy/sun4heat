@@ -474,36 +474,37 @@ columns = [
 data_table = DataTable(columns=columns, source=source_indus,width=1400, height=900,
                         editable=True)
 ########################################################################################
-callback = CustomJS(args=dict(source=source_indus), code="""
-            var data = source.get('data');
-            var filetext = 'x,y\n';
-            for (i=0; i < data['x'].length; i++) {
-                var currRow = [data['x'][i].toString(),
-                               data['y'][i].toString().concat('\n')];
+# callback = CustomJS(args=dict(source=source_indus), code=
+#             """
+#             var data = source.get('data');
+#             var filetext = 'x,y\n';
+#             for (i=0; i < data['x'].length; i++) {
+#                 var currRow = [data['x'][i].toString(),
+#                                data['y'][i].toString().concat('\n')];
 
-                var joined = currRow.join();
-                filetext = filetext.concat(joined);
-            }
+#                 var joined = currRow.join();
+#                 filetext = filetext.concat(joined);
+#             }
 
-            var filename = 'data.csv';
-            var blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
+#             var filename = 'data.csv';
+#             var blob = new Blob([filetext], { type: 'text/csv;charset=utf-8;' });
 
-            //addresses IE
-            if (navigator.msSaveBlob) {
-                navigator.msSaveBlob(blob, filename);
-            }
+#             //addresses IE
+#             if (navigator.msSaveBlob) {
+#                 navigator.msSaveBlob(blob, filename);
+#             }
 
-            else {
-                var link = document.createElement("a");
-                link = document.createElement('a')
-                link.href = URL.createObjectURL(blob);
-                link.download = filename
-                link.target = "_blank";
-                link.style.visibility = 'hidden';
-                link.dispatchEvent(new MouseEvent('click'))
-            }
-        """)
-buttdownload = Button(label='Descargar', button_type='success', callback=callback)
+#             else {
+#                 var link = document.createElement("a");
+#                 link = document.createElement('a')
+#                 link.href = URL.createObjectURL(blob);
+#                 link.download = filename
+#                 link.target = "_blank";
+#                 link.style.visibility = 'hidden';
+#                 link.dispatchEvent(new MouseEvent('click'))
+#             }
+#         """)
+# buttdownload = Button(label='Descargar', button_type='success', callback=callback)
 
 ########################################################################################  
 # iniciar mapa
