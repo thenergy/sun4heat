@@ -534,7 +534,7 @@ js_download = """
 
 }"""
 
-buttondownload.callback = CustomJS(args=dict(source=indus_ft), code=js_download)
+buttondownload = CustomJS(args=dict(source=indus_ft), code=js_download)
 
 
 # buttdownload = Button(label='Descargar', button_type='success', callback=callback)
