@@ -771,7 +771,7 @@ def ExportToCSV_Excel():
     
     ####################################
 
-#buttExportCSV_Excel.on_click(ExportToCSV_Excel)    
+buttExportCSV_Excel.on_click(ExportToCSV_Excel)    
 #############################################
 
 
@@ -784,7 +784,7 @@ layout = column(
         row(maxEmpr,multi_choice),
         row(dropdownRegion,latNorte,latSur),
         row(dropDownTiles,dropDownCat),
-        row(buttCalcUpdate,buttExportCSV_Excel, buttdownload),       
+        row(buttCalcUpdate,buttExportCSV_Excel, buttdownload ),       
         
         Spacer(height=spc-20),
         row(p1,data_table),
