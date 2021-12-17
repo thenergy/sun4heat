@@ -60,8 +60,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
