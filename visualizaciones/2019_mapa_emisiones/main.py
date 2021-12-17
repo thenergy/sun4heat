@@ -149,7 +149,7 @@ def ReadIndus():
               ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
               'coord_este', 'coord_norte', 'huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
               'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
-              'ton_emision', 'ORIGEN']
+              'ton_emision', 'ORIGEN', 'Longitud', 'Latitud']
 
     # header = ['Razón Social','ID Establecimiento VU','Nombre Establecimiento','Rubro RETC','CIIU6',
     #           'CIIU4','Región','Provincia','Comuna','Coordenada Este','Coordenada Norte','Huso',
@@ -160,8 +160,7 @@ def ReadIndus():
     indus = pd.read_excel(
         path + "datos/RETC/indus_ll.xlsx",
         names=header,
-        encoding="utf-8-sig",
-        skiprows=1,
+        encoding="utf-8-sig"
     )
 
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
