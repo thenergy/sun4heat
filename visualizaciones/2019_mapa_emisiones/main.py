@@ -60,8 +60,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -501,7 +501,7 @@ indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)  # agrupa por ID  (suma tonela
 max_empr = 1000
 
 # definir categoría
-catg = ["Otras Actividades"]
+catg = ["Minería"]
 indus_ft = FiltCatg(indus_ft, catg, max_empr)  # Cruza la base agrupada y con la categoría de actividad
 
 # convertir latitud y longitud
