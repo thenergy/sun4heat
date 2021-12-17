@@ -40,7 +40,7 @@ def ReadIndus():
     '''
     header = ['ID', 	'raz_social',	'nombre' #establecimiento
               ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
-              'coord_este', 'coord_norte', 'huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
+              'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
               'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
               'ton_emision', 'ORIGEN']
 
@@ -91,7 +91,7 @@ def UTM2WGS84(indus):
 indus = ReadIndus()
 indus = UTM2WGS84(indus)
 # indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal=',')
-indus.to_excel(path + 'datos/RETC/indus_ll.xlsx', encoding="utf-8-sig")   
+indus.to_excel(path + 'datos/RETC/indus_ll.xlsx', index = False)   
     
     
     
