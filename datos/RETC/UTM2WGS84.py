@@ -5,7 +5,8 @@ Created on Fri Nov 19 16:28:00 2021
 @author: diieg
 """
 
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = "/home/ubuntu/Thenergy/diego/sun4heat/" #path ubuntu
 
 import pandas as pd
 
