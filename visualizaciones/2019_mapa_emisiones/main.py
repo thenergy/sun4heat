@@ -158,7 +158,7 @@ def ReadIndus():
 
     # indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
     indus = pd.read_excel(
-        path + "datos/RETC/indus_ll.csv",
+        path + "datos/RETC/indus_ll.xlsx",
         names=header,
         encoding="utf-8-sig",
         skiprows=1,
