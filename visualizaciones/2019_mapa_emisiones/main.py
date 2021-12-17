@@ -60,8 +60,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -88,37 +88,50 @@ tiles = [
     "ESRI_IMAGERY",
 ]
 
-# definición de categorías según columna del archivo "emisiones_aire_2018_cart.csv"
-# cats = {'Otras actividades':1,
-#             'Producción de alimentos':2,
-#             'Industria agropecuaria y silvicultura':3,
-#             'Gestor de residuos':4,
-#             'Transporte':5, 'Industria manufacturera':6, 'Extracción de minerales':7,
-#            'Producción de metal':8, 'Municipio':9, 'Construcción e inmobiliarias':10,
-#            'Generación de energía':11, 'Comercio':12, 'Pesca':13, 'Producción química':14,
-#            'Suministro y tratamiento de aguas':15,
-#            'Industria del papel y celulosa':16, 'Combustibles':17}
+# cats = {
+#     "Captación, tratamiento y distribución de agua": 1,
+#     "Comercio mayorista": 2,
+#     "Comercio minorista": 3,
+#     "Fundiciones de cobre": 4,
+#     "Gestores de residuos": 5,
+#     "Industria de la madera y Silvicultura": 6,
+#     "Industria del papel y celulosa": 7,
+#     "Industria química, del plástico y caucho": 8,
+#     "Minería": 9,
+#     "Otras actividades": 10,
+#     "Otras centrales de generación eléctrica": 11,
+#     "Otras industrias manufactureras": 12,
+#     "Pesca y Acuicultura": 13,
+#     "Plantas de tratamiento de aguas servidas": 14,
+#     "Producción agropecuaria": 15,
+#     "Producción de cemento, cal y yeso": 16,
+#     "Refinería de petróleo": 17,
+#     "Termoeléctricas": 18,
+#     "Ventas y reparaciones de vehículos automotores": 19,
+# }
 
 cats = {
-    "Captación, tratamiento y distribución de agua": 1,
-    "Comercio mayorista": 2,
-    "Comercio minorista": 3,
-    "Fundiciones de cobre": 4,
-    "Gestores de residuos": 5,
-    "Industria de la madera y Silvicultura": 6,
-    "Industria del papel y celulosa": 7,
-    "Industria química, del plástico y caucho": 8,
-    "Minería": 9,
-    "Otras actividades": 10,
-    "Otras centrales de generación eléctrica": 11,
-    "Otras industrias manufactureras": 12,
-    "Pesca y Acuicultura": 13,
-    "Plantas de tratamiento de aguas servidas": 14,
-    "Producción agropecuaria": 15,
-    "Producción de cemento, cal y yeso": 16,
-    "Refinería de petróleo": 17,
-    "Termoeléctricas": 18,
-    "Ventas y reparaciones de vehículos automotores": 19,
+    'Termoeléctricas':1,
+    'Industria del papel y celulosa':2,
+    'Fundiciones de cobre':3,
+    'Producción de cemento, cal y yeso':4,
+    'Otras industrias manufactureras':5,
+    'Industria de la madera y Silvicultura':6,
+    'Industria química, del plástico y caucho':7,
+    'Gestores de residuos':8,
+    'Minería':9,
+    'Producción agropecuaria':10,
+    'Construcción':11,
+    'Refinería de petróleo':12,
+    'Pesca y Acuicultura':13,
+    'Otras actividades':14,
+    'Plantas de tratamiento de aguas servidas':15,
+    'Otras centrales de generación eléctrica':16,
+    'Comercio mayorista':17,
+    'Captación, tratamiento y distribución de agua':18,
+    'Comercio minorista':19,
+    'Ventas y reparaciones de vehículos automotores':20
+        
 }
 
 # paleta de colores para los gráficos
@@ -140,21 +153,18 @@ def ReadIndus():
     
     Headers DataFrame (ANTIGUO, FALTA ACTUALIZAR)
     -----------------
-        'raz_social', 'nombre', 'ID', 'rubro', 'ciiu4', 'fuente_emision', 
-        'tipo_contaminante', 'ton_emision', 'anho', 'region', 'provincia', 
-        'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
+    ID', 'raz_social',	'nombre', 'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
+          'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
+          'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA',
+          po_contaminante', 'ton_emision', 'ORIGEN', Longitud, Latitud
         
     """
-    header = ['ID', 	'raz_social',	'nombre' #establecimiento
-              ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
-              'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
-              'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
-              'ton_emision', 'ORIGEN']
+    # header = ['ID', 	'raz_social',	'nombre' #establecimiento
+    #           ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
+    #           'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
+    #           'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
+    #           'ton_emision', 'ORIGEN']
 
-    # header = ['Razón Social','ID Establecimiento VU','Nombre Establecimiento','Rubro RETC','CIIU6',
-    #           'CIIU4','Región','Provincia','Comuna','Coordenada Este','Coordenada Norte','Huso',
-    #           'Fuente','Nombre Fuente','Tipo de Emisión','Combustible','Origen','Contaminante',
-    #             'Emisión (Toneladas)']
 
     # indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
     indus = pd.read_excel(
@@ -231,6 +241,8 @@ def FiltEquip(df, mkt):
         Mercado H2 ('IN','CF','CA','PC','PS')
         Generación Eléctrica ('GE')
         Todo ('CA', 'IN', 'PC', 'CF', 'PS', 'GE')
+        
+
 
     Parameters
     ----------
@@ -337,23 +349,26 @@ def FiltCatg(df, catg, max_empr):
     
     Categorias
     ----------
-            'Otras actividades'
-            'Producción de alimentos'
-            'Industria agropecuaria y silvicultura'
-            'Gestor de residuos'
-            'Transporte'
-            'Industria manufacturera'
-            'Extracción de minerales'   
-            'Producción de metal'
-            'Municipio'
-            'Construcción e inmobiliarias'
-            'Generación de energía'
-            'Comercio'            
-            'Pesca'
-            'Producción química'
-            'Suministro y tratamiento de aguas'
-            'Industria del papel y celulosa'
-            'Combustibles'
+            'Termoeléctricas',
+             'Industria del papel y celulosa',
+             'Fundiciones de cobre',
+             'Producción de cemento, cal y yeso',
+             'Otras industrias manufactureras',
+             'Industria de la madera y Silvicultura',
+             'Industria química, del plástico y caucho',
+             'Gestores de residuos',
+             'Minería',
+             'Producción agropecuaria',
+             'Construcción',
+             'Refinería de petróleo',
+             'Pesca y Acuicultura',
+             'Otras actividades',
+             'Plantas de tratamiento de aguas servidas',
+             'Otras centrales de generación eléctrica',
+             'Comercio mayorista',
+             'Captación, tratamiento y distribución de agua',
+             'Comercio minorista',
+             'Ventas y reparaciones de vehículos automotores'
 
     Parameters
     ----------
@@ -480,18 +495,14 @@ indus_tmp = FiltEquip(indus, mkt)  # deja unicamente los equipos del mercado a a
 # definir el mínimo de emisiones a analizar en las empresas
 min_ton = 1000
 max_ton = 0
-indus_ft = IndusFilt(
-    indus_tmp, min_ton, max_ton
-)  # agrupa por ID  (suma toneladas y n° de equipos que tiene)
+indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)  # agrupa por ID  (suma toneladas y n° de equipos que tiene)
 
 # definir máximo de empresas a analizar
 max_empr = 1000
 
 # definir categoría
-catg = ["Minería"]
-indus_ft = FiltCatg(
-    indus_ft, catg, max_empr
-)  # Cruza la base agrupada y con la categoría de actividad
+catg = ["Otras Actividades"]
+indus_ft = FiltCatg(indus_ft, catg, max_empr)  # Cruza la base agrupada y con la categoría de actividad
 
 # convertir latitud y longitud
 indus_ft = wgs84_to_web_mercator(
