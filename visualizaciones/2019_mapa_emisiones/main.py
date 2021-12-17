@@ -60,8 +60,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -147,9 +147,9 @@ def ReadIndus():
     """
     header = ['ID', 	'raz_social',	'nombre' #establecimiento
               ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
-              'coord_este', 'coord_norte', 'huso', 'COD_FUENTE', 'fuente_emision', 'COMBUSTIBLE PRIMARIO',
+              'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
               'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
-              'ton_emision', 'ORIGEN', 'Longitud', 'Latitud']
+              'ton_emision', 'ORIGEN']
 
     # header = ['Razón Social','ID Establecimiento VU','Nombre Establecimiento','Rubro RETC','CIIU6',
     #           'CIIU4','Región','Provincia','Comuna','Coordenada Este','Coordenada Norte','Huso',
@@ -158,9 +158,7 @@ def ReadIndus():
 
     # indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
     indus = pd.read_excel(
-        path + "datos/RETC/indus_ll.xlsx",
-        names=header,
-        encoding="utf-8-sig"
+        path + "datos/RETC/indus_ll.xlsx"
     )
 
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
@@ -169,30 +167,30 @@ def ReadIndus():
     return indus
 
 
-# def ReadComb():
-#     '''
-#     Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
+# # def ReadComb():
+# #     '''
+# #     Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
 
-#     Returns
-#     -------
-#     cmb : DataFrame
-#         DF con métricas de consumo anual, promedio y desviación estandar calculadas.
+# #     Returns
+# #     -------
+# #     cmb : DataFrame
+# #         DF con métricas de consumo anual, promedio y desviación estandar calculadas.
 
 
-#     '''
-#     cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
-#     cmb['f_index'] = cmb.fuente
-#     cmb = cmb.set_index('f_index')
-#     cmb = cmb[cmb.estado == 'Activa']
-#     cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
-#     cmb['promedio'] = cmb.con_anual/12
-#     cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
-#                         (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
-#                         (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
-#                         (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2
+# #     '''
+# #     cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
+# #     cmb['f_index'] = cmb.fuente
+# #     cmb = cmb.set_index('f_index')
+# #     cmb = cmb[cmb.estado == 'Activa']
+# #     cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
+# #     cmb['promedio'] = cmb.con_anual/12
+# #     cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
+# #                         (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
+# #                         (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
+# #                         (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2
 
-#     cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
-#     return cmb
+# #     cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
+# #     return cmb
 
 # extraer primeras 2 letras de la columna fuente_emision
 def IDequipo(df):
@@ -226,6 +224,7 @@ def FiltEquip(df, mkt):
     
     Equipos / Mercado
     -----------------
+    ACTUALIZAR EQUIPOS!!!
         Caldera Calefacción ('CA')
         Caldera Industrial ('IN')
         Mercado Solar ('IN', 'CF', 'CA')
@@ -470,9 +469,7 @@ ctm = "Carbon dioxide"
 indus = indus[indus.tipo_contaminante == ctm]
 
 # filtrar df indus según equipo a analizar
-indus = IDequipo(
-    indus
-)  # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
+indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
 # lista de equipos a analizar
 eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
@@ -589,13 +586,8 @@ source_empr = ColumnDataSource(data=df_empr)
 columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
     TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
-    TableColumn(
-        field="ton_emision",
-        title="Emisiones (ton CO2/año)",
-        width=25,
-        formatter=NumberFormatter(format="0.0"),
-    ),
-    TableColumn(field="combustible", title="Combustible", width=25),
+    TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0"),)
+    # TableColumn(field="combustible", title="Combustible", width=25),
     # TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
     # TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
     # TableColumn(field="ene", title="Enero",width=25, formatter=NumberFormatter(format="0.0")),
@@ -665,7 +657,7 @@ buttExportCSV_Excel = Button(
     label="Exportar a CSV y Excel", button_type="success", width=wdt
 )
 
-##############################################################################################
+#############################################################################################
 # definir coordenadas del mapa específico de una empresa
 lat = df_empr.y
 lon = df_empr.x
