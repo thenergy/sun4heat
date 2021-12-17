@@ -56,8 +56,8 @@ def ReadIndus():
     
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
     indus.coord_este = pd.to_numeric(indus.coord_este, errors='coerce')
-    indus.coord_norte = pd.to_numeric(indus.coord_norte, errors='coerce')
-    indus.huso = pd.to_numeric(indus.huso, errors='coerce')
+    # indus.coord_norte = pd.to_numeric(indus.coord_norte, errors='coerce')
+    # indus.huso = pd.to_numeric(indus.huso, errors='coerce')
     
     indus = indus.dropna()
     
@@ -90,8 +90,8 @@ def UTM2WGS84(indus):
 
 indus = ReadIndus()
 indus = UTM2WGS84(indus)
-indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal=',')
-#indus_ft.to_excel(path + 'visualizaciones/mapa_emisiones/empresas_filtradas.xlsx', encoding="utf-8-sig")   
+# indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal=',')
+indus.to_excel(path + 'datos/RETC/indus_ll.xlsx', encoding="utf-8-sig")   
     
     
     
