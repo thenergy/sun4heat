@@ -667,9 +667,7 @@ dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
 dropDownCat = Select(value="rubro", title="Categoría", options=["rubro", "combustible"])
 
-buttExportCSV_Excel = Button(
-    label="Descargar", button_type="success", width=wdt
-)
+
 
 #############################################################################################
 # definir coordenadas del mapa específico de una empresa
@@ -795,7 +793,7 @@ def UpdateTable():
     pt_size = np.log(indus_ft.ton_emision)
     indus_ft["pt_size"] = pt_size
     indus_ft["clr"] = indus_ft.rubro.map(clr)
-
+        
     source_indus.data = indus_ft
 
     tl = get_provider(dropDownTiles.value)
@@ -804,6 +802,16 @@ def UpdateTable():
     ]  # ?
     tile_renderer = TileRenderer(tile_source=tl)  # ?
     p1.renderers.insert(0, tile_renderer)
+    
+    source_indus.data = indus_ft
+        
+    button = Button(label="Download", button_type="success")
+    button.js_on_click(CustomJS(args=dict(source=source_indus),
+                                code=open(join(dirname(__file__), "download.js")).read()))
+    
+    return button
+    
+    
 
 
 buttCalcUpdate.on_click(UpdateTable)  # botón actualizar tabla
@@ -811,17 +819,17 @@ buttCalcUpdate.on_click(UpdateTable)  # botón actualizar tabla
 source_indus.selected.on_change("indices", function_source)
 
 # Botón exportar empresa especifica a csv
-def ExportToCSV_Excel():
+def DownloadCSV():
     """
-    Fución que utiliza todos los filtros puestos en la página, los almacena en un DF para ser llamado por un boton
-    el cual entregue un CSV y un Excel.
+    Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
+    aplicando todos los filtros colocados.
 
     Returns
     -------
     None.
 
     """
-
+    print('funcioabot')
     indus = ReadIndus()
     ctm = dropDownCtms.value
     indus = indus[indus.tipo_contaminante == ctm]
@@ -850,35 +858,38 @@ def ExportToCSV_Excel():
     pt_size = np.log(indus_ft.ton_emision)
     indus_ft["pt_size"] = pt_size
     indus_ft["clr"] = indus_ft.rubro.map(clr)
-
-    print("Antes de filtrar")
-
-    indus_ft.to_csv(
-        path + "visualizaciones/2019_mapa_emisiones/empresas_filtradas.csv",
-        encoding="utf-8-sig",
-        sep=".",
-        decimal=",",
-    )
-    indus_ft.to_excel(
-        path + "visualizaciones/2019_mapa_emisiones/empresas_filtradas.xlsx",
-        encoding="utf-8-sig",
-    )
-
-    print("Despues de filtrar")
     
-    source_indus = ColumnDataSource(data=indus_ft)
+    aux_df = indus_ft[['raz_social','nombre','ton_emision', 'region','rubro']]
     
+    
+    # #Se borran columnas que no son de interes de descarga
+    # aux_df2 = aux_df['ciiu4']
+    # aux_df = indus_ft.drop(['provincia','pt_size','max_emision','clr','catg', 'Latitud', 'Longitud', 'comuna', 'coord_este'
+    #           ,'coord_norte', 'huso', 'n_equip', 'x', 'y', 'orden', 'ciiu4'], axis = 1)
+     
+    # #se ordenan las columnas
+    # aux_df = indus_ft[['raz_social','nombre','ton_emision', 'region','rubro']]
+    
+    # aux_df = aux_df.assign( ciiu4 = aux_df2)
+    print(aux_df)
+    source_indus.data = aux_df 
+    
+        
     button = Button(label="Download", button_type="success")
     button.js_on_click(CustomJS(args=dict(source=source_indus),
                                 code=open(join(dirname(__file__), "download.js")).read()))
+    
     return button
+
+
     
 
 
     ####################################
 
-button = ExportToCSV_Excel()
-buttExportCSV_Excel.on_click(ExportToCSV_Excel)
+# button = UpdateTable()
+button = DownloadCSV()
+
 #############################################
 
 
@@ -891,7 +902,7 @@ layout = column(
     row(maxEmpr, multi_choice),
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles, dropDownCat),
-    row(buttCalcUpdate, buttExportCSV_Excel, button),
+    row(buttCalcUpdate, button),
     Spacer(height=spc - 20),
     row(p1, data_table),
     Spacer(height=spc + 30),
