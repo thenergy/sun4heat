@@ -5,8 +5,8 @@ Created on Fri Nov 19 16:28:00 2021
 @author: diieg
 """
 
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
-path = "/home/ubuntu/Thenergy/diego/sun4heat/" #path ubuntu
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/" #path ubuntu
 
 import pandas as pd
 
@@ -91,7 +91,7 @@ def UTM2WGS84(indus):
 
 indus = ReadIndus()
 indus = UTM2WGS84(indus)
-# indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal=',')
+indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep='.',decimal=',', index = False)
 indus.to_excel(path + 'datos/RETC/indus_ll.xlsx', index = False)   
     
     

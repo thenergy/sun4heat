@@ -17,6 +17,8 @@ import numpy as np
 import pandas as pd
 
 
+
+
 ## librerías de Bokeh
 from bokeh.plotting import Figure
 
@@ -60,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -167,14 +169,15 @@ def ReadIndus():
 
 
     # indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
-    indus = pd.read_excel(
-        path + "datos/RETC/indus_ll.xlsx"
-    )
+    indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", encoding="utf-8-sig", sep='.', decimal=',')
+    
 
-    indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
+    # indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
     indus = indus.dropna()
 
     return indus
+
+indus = ReadIndus()
 
 
 # # def ReadComb():
@@ -350,25 +353,25 @@ def FiltCatg(df, catg, max_empr):
     Categorias
     ----------
             'Termoeléctricas',
-             'Industria del papel y celulosa',
-             'Fundiciones de cobre',
-             'Producción de cemento, cal y yeso',
-             'Otras industrias manufactureras',
-             'Industria de la madera y Silvicultura',
-             'Industria química, del plástico y caucho',
-             'Gestores de residuos',
-             'Minería',
-             'Producción agropecuaria',
-             'Construcción',
-             'Refinería de petróleo',
-             'Pesca y Acuicultura',
-             'Otras actividades',
-             'Plantas de tratamiento de aguas servidas',
-             'Otras centrales de generación eléctrica',
-             'Comercio mayorista',
-             'Captación, tratamiento y distribución de agua',
-             'Comercio minorista',
-             'Ventas y reparaciones de vehículos automotores'
+              'Industria del papel y celulosa',
+              'Fundiciones de cobre',
+              'Producción de cemento, cal y yeso',
+              'Otras industrias manufactureras',
+              'Industria de la madera y Silvicultura',
+              'Industria química, del plástico y caucho',
+              'Gestores de residuos',
+              'Minería',
+              'Producción agropecuaria',
+              'Construcción',
+              'Refinería de petróleo',
+              'Pesca y Acuicultura',
+              'Otras actividades',
+              'Plantas de tratamiento de aguas servidas',
+              'Otras centrales de generación eléctrica',
+              'Comercio mayorista',
+              'Captación, tratamiento y distribución de agua',
+              'Comercio minorista',
+              'Ventas y reparaciones de vehículos automotores'
 
     Parameters
     ----------
@@ -665,7 +668,7 @@ dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 dropDownCat = Select(value="rubro", title="Categoría", options=["rubro", "combustible"])
 
 buttExportCSV_Excel = Button(
-    label="Exportar a CSV y Excel", button_type="success", width=wdt
+    label="Descargar", button_type="success", width=wdt
 )
 
 #############################################################################################
@@ -862,12 +865,19 @@ def ExportToCSV_Excel():
     )
 
     print("Despues de filtrar")
+    
+    source_indus = ColumnDataSource(data=indus_ft)
+    
+    button = Button(label="Download", button_type="success")
+    button.js_on_click(CustomJS(args=dict(source=source_indus),
+                                code=open(join(dirname(__file__), "download.js")).read()))
+    return button
+    
+
 
     ####################################
-# buttondownload = Button(label="Download", button_type="success")
-# buttondownload.js_on_click(CustomJS(args=dict(source=source_indus), code=open(join(dirname(
-#                                     "/home/ubuntu/Thenergy/diego/sun4heat/scripts"), 'download.js')).read()))
 
+button = ExportToCSV_Excel()
 buttExportCSV_Excel.on_click(ExportToCSV_Excel)
 #############################################
 
@@ -881,7 +891,7 @@ layout = column(
     row(maxEmpr, multi_choice),
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles, dropDownCat),
-    row(buttCalcUpdate, buttExportCSV_Excel),
+    row(buttCalcUpdate, buttExportCSV_Excel, button),
     Spacer(height=spc - 20),
     row(p1, data_table),
     Spacer(height=spc + 30),
