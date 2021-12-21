@@ -11,8 +11,8 @@ path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 import pandas as pd
 
 from pyproj import Proj, transform
-# import warnings
-# warnings.filterwarnings('ignore')
+import warnings
+warnings.filterwarnings('ignore')
 
 #path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
 
@@ -52,16 +52,20 @@ def ReadIndus():
     #             'Emisión (Toneladas)']
     
     indus = pd.read_excel(path + 'datos/RETC/2019_vfinal_v3.xlsx', names = header)
-   
-    
     
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
     indus.coord_este = pd.to_numeric(indus.coord_este, errors='coerce')
     indus.coord_norte = pd.to_numeric(indus.coord_norte, errors='coerce')
     indus.huso = pd.to_numeric(indus.huso, errors='coerce')
+   
+    indus = indus.dropna(subset=(['ton_emision','coord_este','coord_norte','huso']))
+    # indus = indus['coord_este'].dropna()
+    # indus = indus['coord_norte'].dropna()
+    # indus = indus['huso'].dropna()
     
-    # indus = indus.dropna()
+
     
+
     return indus
 
 def UTM2WGS84(indus):    
@@ -91,7 +95,7 @@ def UTM2WGS84(indus):
 
 indus = ReadIndus()
 indus = UTM2WGS84(indus)
-indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep='.',decimal=',', index = False)
+indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal='.', index = False)
 indus.to_excel(path + 'datos/RETC/indus_ll.xlsx', index = False)   
     
     

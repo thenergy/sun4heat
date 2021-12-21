@@ -62,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -169,11 +169,11 @@ def ReadIndus():
 
 
     # indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
-    indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", encoding="utf-8-sig", sep='.', decimal=',')
+    indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", encoding="utf-8-sig", sep=';', decimal=',')
     
 
     # indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
-    # indus = indus.dropna()
+
 
     return indus
 
