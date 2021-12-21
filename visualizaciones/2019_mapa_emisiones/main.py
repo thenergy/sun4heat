@@ -177,9 +177,6 @@ def ReadIndus():
 
     return indus
 
-indus = ReadIndus()
-
-
 # # def ReadComb():
 # #     '''
 # #     Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
@@ -754,6 +751,42 @@ def function_source(attr, old, new):
 # crear funcion para cambiar mapa y tabla general
 
 
+
+    
+    
+
+
+
+
+source_indus.selected.on_change("indices", function_source)
+
+# Botón exportar empresa especifica a csv
+def DownloadCSV(indus):
+    """
+    Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
+    aplicando todos los filtros colocados.
+
+    Returns
+    -------
+    None.
+
+    """
+    
+    indus = indus.drop(['Latitud','catg', 'clr','comuna','coord_este', 
+                        'coord_norte','huso','n_equip','orden','pt_size',
+                        'x', 'y'], axis = 1)
+    indus = indus[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
+    
+    source_indus.data = indus
+    
+        
+    button = Button(label="Download", button_type="success")
+    button.js_on_click(CustomJS(args=dict(source=source_indus),
+                                code=open(join(dirname(__file__), "download.js")).read()))
+    
+    return button
+
+
 def UpdateTable():
     """
     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
@@ -803,92 +836,26 @@ def UpdateTable():
     tile_renderer = TileRenderer(tile_source=tl)  # ?
     p1.renderers.insert(0, tile_renderer)
     
-    source_indus.data = indus_ft
+    button = DownloadCSV(indus_ft)
+    
+    
+    
+    # source_indus.data = indus_ft
         
-    button = Button(label="Download", button_type="success")
-    button.js_on_click(CustomJS(args=dict(source=source_indus),
-                                code=open(join(dirname(__file__), "download.js")).read()))
-    
-    return button
-    
-    
-
-
-buttCalcUpdate.on_click(UpdateTable)  # botón actualizar tabla
-
-source_indus.selected.on_change("indices", function_source)
-
-# Botón exportar empresa especifica a csv
-def DownloadCSV():
-    """
-    Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
-    aplicando todos los filtros colocados.
-
-    Returns
-    -------
-    None.
-
-    """
-    print('funcioabot')
-    indus = ReadIndus()
-    ctm = dropDownCtms.value
-    indus = indus[indus.tipo_contaminante == ctm]
-
-    indus = IDequipo(indus)
-    eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-    indus = indus[indus.equipo.isin(eqp_ft)]
-
-    mkt = dropdownEquip.value
-    indus_tmp = FiltEquip(indus, mkt)
-
-    min_ton = float(minTon.value)
-    max_ton = float(maxTon.value)
-    indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
-
-    max_empr = int(maxEmpr.value)
-    catg = multi_choice.value
-    indus_ft = FiltCatg(indus_ft, catg, max_empr)
-
-    rn = dropdownRegion.value
-    latN = float(latNorte.value)
-    latS = float(latSur.value)
-    indus_ft = FiltRegion(indus_ft, rn, latN, latS)
-
-    indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
-    pt_size = np.log(indus_ft.ton_emision)
-    indus_ft["pt_size"] = pt_size
-    indus_ft["clr"] = indus_ft.rubro.map(clr)
-    
-    aux_df = indus_ft[['raz_social','nombre','ton_emision', 'region','rubro']]
-    
-    
-    # #Se borran columnas que no son de interes de descarga
-    # aux_df2 = aux_df['ciiu4']
-    # aux_df = indus_ft.drop(['provincia','pt_size','max_emision','clr','catg', 'Latitud', 'Longitud', 'comuna', 'coord_este'
-    #           ,'coord_norte', 'huso', 'n_equip', 'x', 'y', 'orden', 'ciiu4'], axis = 1)
-     
-    # #se ordenan las columnas
-    # aux_df = indus_ft[['raz_social','nombre','ton_emision', 'region','rubro']]
-    
-    # aux_df = aux_df.assign( ciiu4 = aux_df2)
-    print(aux_df)
-    source_indus.data = aux_df 
-    
-        
-    button = Button(label="Download", button_type="success")
-    button.js_on_click(CustomJS(args=dict(source=source_indus),
-                                code=open(join(dirname(__file__), "download.js")).read()))
+    # button = Button(label="Download", button_type="success")
+    # button.js_on_click(CustomJS(args=dict(source=source_indus),
+    #                             code=open(join(dirname(__file__), "download.js")).read()))
     
     return button
 
 
-    
+buttCalcUpdate.on_click(UpdateTable)  # botón actualizar tabla    
 
 
     ####################################
 
 # button = UpdateTable()
-button = DownloadCSV()
+button = UpdateTable()
 
 #############################################
 

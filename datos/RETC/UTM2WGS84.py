@@ -11,8 +11,8 @@ path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 import pandas as pd
 
 from pyproj import Proj, transform
-import warnings
-warnings.filterwarnings('ignore')
+# import warnings
+# warnings.filterwarnings('ignore')
 
 #path = 'C:/Users/diieg/OneDrive/Documentos/Thenergy/sun4heat/'
 
@@ -51,16 +51,16 @@ def ReadIndus():
     #           'Fuente','Nombre Fuente','Tipo de Emisión','Combustible','Origen','Contaminante',
     #             'Emisión (Toneladas)']
     
-    indus = pd.read_excel(path + 'datos/RETC/2019_vfinal_v3.xlsx', names=header)
+    indus = pd.read_excel(path + 'datos/RETC/2019_vfinal_v3.xlsx', names = header)
    
     
     
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
     indus.coord_este = pd.to_numeric(indus.coord_este, errors='coerce')
-    # indus.coord_norte = pd.to_numeric(indus.coord_norte, errors='coerce')
-    # indus.huso = pd.to_numeric(indus.huso, errors='coerce')
+    indus.coord_norte = pd.to_numeric(indus.coord_norte, errors='coerce')
+    indus.huso = pd.to_numeric(indus.huso, errors='coerce')
     
-    indus = indus.dropna()
+    # indus = indus.dropna()
     
     return indus
 
@@ -87,7 +87,7 @@ def UTM2WGS84(indus):
     return indus
     
     
-##########################################################
+# ##########################################################
 
 indus = ReadIndus()
 indus = UTM2WGS84(indus)
