@@ -62,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -486,7 +486,9 @@ indus = indus[indus.tipo_contaminante == ctm]
 # filtrar df indus según equipo a analizar
 indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
-# lista de equipos a analizar
+
+
+# # lista de equipos a analizar
 eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
 indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
 mkt = "Mercado Solar"
@@ -514,13 +516,11 @@ pt_size = np.log(indus_ft.ton_emision)
 indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
 
-
 # Definir nuevo ID por fuente de emisión
 indus["f_ind"] = indus.fuente_emision
-indus = indus.set_index("f_ind")
+indus= indus.set_index("f_ind")
 
-indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
-
+indus= wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
 # ##leer archivo de combustibles y juntar df indus
 # cmb_indus = ReadComb()
@@ -566,27 +566,14 @@ p1 = Figure(
 p1.add_tile(tile_provider)
 
 # graficar marcadores de industria y definir info a desplegar con "hover"
-sct = p1.scatter(
-    x="x",
-    y="y",
-    size="pt_size",
-    fill_color="clr",
-    fill_alpha=0.8,
-    legend_field="rubro",
-    source=source_indus,
-)
+sct = p1.scatter(x="x", y="y", size="pt_size" ,fill_color="clr", fill_alpha=0.8, legend_field="rubro",
+                 source=source_indus)
+
 p1.legend.click_policy = "hide"
-p1.add_tools(
-    HoverTool(
-        renderers=[sct],
-        tooltips=[
-            ("Nombre: ", "@nombre"),
-            ("Emisiones (ton/año): ", "@ton_emision{0.0}"),
-            ("Rubro: ", "@rubro"),
-        ],
-    )
-)
-##########################################################################
+
+p1.add_tools(HoverTool(renderers=[sct],tooltips=[("Nombre: ", "@nombre"), ("Emisiones (ton/año): ", "@ton_emision"),
+            ("Rubro: ", "@rubro")]))
+#########################################################################
 
 # iniciar tabla específica de empresa
 empr1 = indus_ft["nombre"].iloc[0]
@@ -750,14 +737,6 @@ def function_source(attr, old, new):
 
 # crear funcion para cambiar mapa y tabla general
 
-
-
-    
-    
-
-
-
-
 source_indus.selected.on_change("indices", function_source)
 
 # Botón exportar empresa especifica a csv
@@ -854,7 +833,6 @@ buttCalcUpdate.on_click(UpdateTable)  # botón actualizar tabla
 
     ####################################
 
-# button = UpdateTable()
 button = UpdateTable()
 
 #############################################
