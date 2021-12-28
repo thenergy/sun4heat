@@ -63,7 +63,7 @@ from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
 # path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -74,7 +74,7 @@ from os.path import dirname, join
 # >>>>>>> 350a39b9ca7a3f4b215e4f8551be09387d69b24d
 # >>>>>>> main
 # path = '/home/ubuntu/sun4heat/'
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/test_repo/sun4heat/'
+# path = '/Users/fcuevas/Documents/Trabajo/thenergy/test_repo/sun4heat/'
 
 # Lista con nombre de los "tiles"
 tiles = [
@@ -734,33 +734,8 @@ def function_source(attr, old, new):
 
 source_indus.selected.on_change("indices", function_source)
 
+
 # Botón exportar empresa especifica a csv
-def DownloadCSV(indus):
-    """
-    Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
-    aplicando todos los filtros colocados.
-
-    Returns
-    -------
-    None.
-
-    """
-    
-
-    nl = indus
-    nl = nl.drop(['Latitud','catg', 'clr','comuna','coord_este', 
-                        'coord_norte','huso','n_equip','orden','pt_size',
-                        'x', 'y'], axis = 1)
-    nl = nl[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
-    
-    source_nl = ColumnDataSource(data=nl)
-    
-        
-    button = Button(label="Download", button_type="success")
-    button.js_on_click(CustomJS(args=dict(source=source_nl),
-                                code=open(join(dirname(__file__), "download.js")).read()))
-    
-    return button
 
 
 def UpdateTable():
@@ -805,6 +780,7 @@ def UpdateTable():
         
     source_indus.data = indus_ft
 
+
     tl = get_provider(dropDownTiles.value)
     p1.renderers = [
         x for x in p1.renderers if not str(x).startswith("TileRenderer")
@@ -812,26 +788,117 @@ def UpdateTable():
     tile_renderer = TileRenderer(tile_source=tl)  # ?
     p1.renderers.insert(0, tile_renderer)
     
-    button = DownloadCSV(indus_ft)
+    source_indus.data = indus_ft
+
+    # return indus_ft
     
+
+
+def DownloadButton():
+   
+    indus_D = ReadIndus()
+    ctm = dropDownCtms.value
+    indus_D = indus_D[indus_D.tipo_contaminante == ctm]
+
+    indus_D = IDequipo(indus)
+    eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+    indus_D = indus_D[indus_D.equipo.isin(eqp_ft)]
+
+    mkt = dropdownEquip.value
+    indus_tmp = FiltEquip(indus_D, mkt)
+
+    min_ton = float(minTon.value)
+    max_ton = float(maxTon.value)
+    indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
+
+    max_empr = int(maxEmpr.value)
+    catg = multi_choice.value
+    indus_ft = FiltCatg(indus_ft, catg, max_empr)
+ 
+    indus_ft = indus_ft.drop(['Latitud','Longitud','catg', 'comuna','coord_este', 
+                          'coord_norte','huso','n_equip','orden','max_emision'
+                           ], axis = 1)
     
+    nw = source_indus
     
-    # source_indus.data = indus_ft
-        
+    nw.data = indus_ft
+    
+    # source_indus = ColumnDataSource(data = indus_ft)
+    
     # button = Button(label="Download", button_type="success")
     # button.js_on_click(CustomJS(args=dict(source=source_indus),
     #                             code=open(join(dirname(__file__), "download.js")).read()))
     
-    return button
+    return nw
 
 
-buttCalcUpdate.on_click(UpdateTable)  # botón actualizar tabla    
+# def DownloadCSV():
+#     """
+#     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
+#     aplicando todos los filtros colocados.
+
+#     Returns
+#     -------
+#     None.
+
+#     """
+
+    
+#     aux_indus, aux_source = UpdateTable()
+    
+#     # new_source = source
+#     # indus_aux = indus
+#     aux_indus = aux_indus.drop(['Latitud','Longitud','catg', 'clr','comuna','coord_este', 
+#                       'coord_norte','huso','n_equip','orden','pt_size',
+#                           'x', 'y'], axis = 1)
+#       # = nl[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
+     
+#     aux_source.data = aux_indus
+    
+    
+#     button = Button(label="Descargar", button_type="success")
+#     button.js_on_click(CustomJS(args=dict(source=aux_source),
+#                                 code=open(join(dirname(__file__), "download.js")).read()))
+  
+#     return button
+
+    
+    
+    # var_aux = UpdateTable()
+    # source_download = ColumnDataSource(data = var_aux)
+    
+    # var_aux = var_aux.drop(['Latitud','catg', 'clr','comuna','coord_este', 
+    #                   'coord_norte','huso','n_equip','orden','pt_size',
+    #                       'x', 'y'], axis = 1)
+    
+    # source_download.data = var_aux
+    
+    # button = Button(label="Download", button_type="success")
+    # button.js_on_click(CustomJS(args=dict(source=source_indus),
+    #                             code=open(join(dirname(__file__), "download.js")).read()))
+    
+    
+    
+     
+
+# nw = DownloadButton()
+
+#############################################
+buttCalcUpdate.on_click(UpdateTable)
+# buttCalcUpdate.on_click(DownloadButton)
+# indus_temp = UpdateTable()
+# nw = DownloadButton()
 
 
-    ####################################
 
-button = UpdateTable()
 
+
+button = Button(label="Download", button_type="success")
+button.on_click(DownloadButton)
+button.on_click(DownloadButton)
+nw = DownloadButton()
+button.js_on_click(CustomJS(args=dict(source=nw),
+                        code=open(join(dirname(__file__), "download.js")).read()))
 #############################################
 
 
