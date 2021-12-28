@@ -62,7 +62,7 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
 # path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
@@ -74,7 +74,7 @@ path = "/home/ubuntu/Thenergy/diego/sun4heat/"
 # >>>>>>> 350a39b9ca7a3f4b215e4f8551be09387d69b24d
 # >>>>>>> main
 # path = '/home/ubuntu/sun4heat/'
-# path = '/Users/fcuevas/Documents/Trabajo/thenergy/test_repo/sun4heat/'
+path = '/Users/fcuevas/Documents/Trabajo/thenergy/test_repo/sun4heat/'
 
 # Lista con nombre de los "tiles"
 tiles = [
@@ -132,7 +132,7 @@ cats = {
     'Comercio mayorista':17,
     'Captación, tratamiento y distribución de agua':18,
     'Comercio minorista':19,
-    'Ventas y reparaciones de vehículos automotores':20
+    'Ventas y reparaciones de vehículos automotores':19
         
 }
 
@@ -507,14 +507,14 @@ catg = ["Minería"]
 indus_ft = FiltCatg(indus_ft, catg, max_empr)  # Cruza la base agrupada y con la categoría de actividad
 
 # convertir latitud y longitud
-indus_ft = wgs84_to_web_mercator(
-    indus_ft, lon="Longitud", lat="Latitud"
+indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud"
 )  # crea plano columnas (x,y) en función de lat y long
 
 # definir tamaño y color del marcador en el mapa
 pt_size = np.log(indus_ft.ton_emision)
 indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
+
 
 # Definir nuevo ID por fuente de emisión
 indus["f_ind"] = indus.fuente_emision
@@ -554,19 +554,14 @@ data_table = DataTable(
 ########################################################################################
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
-p1 = Figure(
-    plot_width=800,
-    plot_height=900,
-    tools=["pan,wheel_zoom,box_zoom,reset,save"],
-    x_axis_type="mercator",
-    y_axis_type="mercator",
-    x_range=(-9000000, -6000000),
-    y_range=(-6000000, -1200000),
-)
+p1 = Figure(plot_width=800, plot_height=900,tools=["pan,wheel_zoom,box_zoom,reset,save"],
+            x_axis_type="mercator", y_axis_type="mercator",
+            x_range=(-9000000,-6000000),y_range=(-6000000,-1200000))
 p1.add_tile(tile_provider)
 
+
 # graficar marcadores de industria y definir info a desplegar con "hover"
-sct = p1.scatter(x="x", y="y", size="pt_size" ,fill_color="clr", fill_alpha=0.8, legend_field="rubro",
+sct = p1.scatter(x="x", y="y", size="pt_size" , fill_color='clr', fill_alpha=0.8, legend_field="rubro",
                  source=source_indus)
 
 p1.legend.click_policy = "hide"
@@ -751,16 +746,18 @@ def DownloadCSV(indus):
 
     """
     
-    indus = indus.drop(['Latitud','catg', 'clr','comuna','coord_este', 
+
+    nl = indus
+    nl = nl.drop(['Latitud','catg', 'clr','comuna','coord_este', 
                         'coord_norte','huso','n_equip','orden','pt_size',
                         'x', 'y'], axis = 1)
-    indus = indus[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
+    nl = nl[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
     
-    source_indus.data = indus
+    source_nl = ColumnDataSource(data=nl)
     
         
     button = Button(label="Download", button_type="success")
-    button.js_on_click(CustomJS(args=dict(source=source_indus),
+    button.js_on_click(CustomJS(args=dict(source=source_nl),
                                 code=open(join(dirname(__file__), "download.js")).read()))
     
     return button
