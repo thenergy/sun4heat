@@ -90,49 +90,27 @@ tiles = [
     "ESRI_IMAGERY",
 ]
 
-# cats = {
-#     "Captación, tratamiento y distribución de agua": 1,
-#     "Comercio mayorista": 2,
-#     "Comercio minorista": 3,
-#     "Fundiciones de cobre": 4,
-#     "Gestores de residuos": 5,
-#     "Industria de la madera y Silvicultura": 6,
-#     "Industria del papel y celulosa": 7,
-#     "Industria química, del plástico y caucho": 8,
-#     "Minería": 9,
-#     "Otras actividades": 10,
-#     "Otras centrales de generación eléctrica": 11,
-#     "Otras industrias manufactureras": 12,
-#     "Pesca y Acuicultura": 13,
-#     "Plantas de tratamiento de aguas servidas": 14,
-#     "Producción agropecuaria": 15,
-#     "Producción de cemento, cal y yeso": 16,
-#     "Refinería de petróleo": 17,
-#     "Termoeléctricas": 18,
-#     "Ventas y reparaciones de vehículos automotores": 19,
-# }
 
 cats = {
-    'Termoeléctricas':1,
-    'Industria del papel y celulosa':2,
-    'Fundiciones de cobre':3,
-    'Producción de cemento, cal y yeso':4,
-    'Otras industrias manufactureras':5,
-    'Industria de la madera y Silvicultura':6,
-    'Industria química, del plástico y caucho':7,
-    'Gestores de residuos':8,
-    'Minería':9,
-    'Producción agropecuaria':10,
-    'Construcción':11,
-    'Refinería de petróleo':12,
-    'Pesca y Acuicultura':13,
-    'Otras actividades':14,
-    'Plantas de tratamiento de aguas servidas':15,
-    'Otras centrales de generación eléctrica':16,
-    'Comercio mayorista':17,
-    'Captación, tratamiento y distribución de agua':18,
-    'Comercio minorista':19,
-    'Ventas y reparaciones de vehículos automotores':19
+    'Otras actividades':1,
+     'Comercio minorista':2,
+     'Captación, tratamiento y distribución de agua':3,
+     'Otras industrias manufactureras':4,
+     'Pesca y acuicultura':5,
+     'Plantas de tratamiento de aguas servidas':6,
+     'Comercio mayorista':7,
+     'Producción agropecuaria':8,
+     'Ventas y mantención de vehículos automotores':9,
+     'Construcción':10,
+     'Minería':11,
+     'Termoeléctricas':12,
+     'Otras centrales de generación eléctrica':13,
+     'Industria del papel y celulosa':14,
+     'Industria química, de plástico y caucho':15,
+     'Industria de la madera y silvicultura':16,
+     'Refinería de petróleo':17,
+     'Gestores de residuos':18,
+     'Producción de cemento, cal y yeso':19
         
 }
 
@@ -161,20 +139,35 @@ def ReadIndus():
           po_contaminante', 'ton_emision', 'ORIGEN', Longitud, Latitud
         
     """
-    # header = ['ID', 	'raz_social',	'nombre' #establecimiento
-    #           ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
-    #           'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
-    #           'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
-    #           'ton_emision', 'ORIGEN']
-
-
-    # indus = pd.read_csv(path + 'datos/RETC/ckan_ruea_2019_v1.csv', names=header, encoding="latin-1",skiprows=1,sep=';',decimal=',')
-    indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", encoding="utf-8-sig", sep=';', decimal=',')
+    header = ['ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
+              ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
+              'Latitud', 'Longitud', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO', 'CCF8 PRIMARIO',
+              'tipo_contaminante','EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+              'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO']
     
+    
+    
+    # indus = pd.read_excel(path + 'datos/RETC/ruea_2020_ckan_final.xlsx', names = header)
+    indus = pd.read_csv(path + "datos/RETC/ruea_2020_ckan_final.csv",  sep=';', decimal=',', encoding = 'utf-8', names = header)
+    
+    indus = indus.drop(['ano','CCF8 PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+    'CCF8 MATERIA PRIMA','CONTAMINANTE 3', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO' ], axis = 1)
+    indus = indus.drop(0, axis=0)
+    
+    # indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
+    # indus.Longitud = pd.to_numeric(indus.Longitud, errors='coerce')
+    # indus.Latitud = pd.to_numeric(indus.Latitud, errors='coerce')
 
-    # indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
+    # indus = indus.dropna(subset=(['ton_emision','Longitud','Latitud']))
+    # # indus = indus['longitud'].dropna()
+    # indus = indus['latitud'].dropna()
+    # indus = indus['huso'].dropna()
 
 
+    # indus.huso = pd.to_numeric(indus.huso, errors='coerce')
+       
+
+        
     return indus
 
 # # def ReadComb():
@@ -320,8 +313,8 @@ def IndusFilt(df, min_ton, max_ton):
             "provincia": "first",
             "comuna": "first",
             "huso": "first",
-            "coord_norte": "first",
-            "coord_este": "first",
+            # "coord_norte": "first",
+            # "coord_este": "first",
             "Latitud": "first",
             "Longitud": "first",
         }
@@ -349,26 +342,25 @@ def FiltCatg(df, catg, max_empr):
     
     Categorias
     ----------
-            'Termoeléctricas',
-              'Industria del papel y celulosa',
-              'Fundiciones de cobre',
-              'Producción de cemento, cal y yeso',
-              'Otras industrias manufactureras',
-              'Industria de la madera y Silvicultura',
-              'Industria química, del plástico y caucho',
-              'Gestores de residuos',
-              'Minería',
-              'Producción agropecuaria',
-              'Construcción',
-              'Refinería de petróleo',
-              'Pesca y Acuicultura',
-              'Otras actividades',
-              'Plantas de tratamiento de aguas servidas',
-              'Otras centrales de generación eléctrica',
-              'Comercio mayorista',
-              'Captación, tratamiento y distribución de agua',
-              'Comercio minorista',
-              'Ventas y reparaciones de vehículos automotores'
+            'Otras actividades',
+             'Comercio minorista',
+             'Captación, tratamiento y distribución de agua',
+             'Otras industrias manufactureras',
+             'Pesca y acuicultura',
+             'Plantas de tratamiento de aguas servidas',
+             'Comercio mayorista',
+             'Producción agropecuaria',
+             'Ventas y mantención de vehículos automotores',
+             'Construcción',
+             'Minería',
+             'Termoeléctricas',
+             'Otras centrales de generación eléctrica',
+             'Industria del papel y celulosa',
+             'Industria química, de plástico y caucho',
+             'Industria de la madera y silvicultura',
+             'Refinería de petróleo',
+             'Gestores de residuos',
+             'Producción de cemento, cal y yeso'
 
     Parameters
     ----------
@@ -476,363 +468,269 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 # crear dataframe (df) indus
 indus = ReadIndus()
 
-# crear lista de contaminantes
-ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
+# # crear lista de contaminantes
+# ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
 
-# definir contaminante inicial a analizar y filtrar df indus
-ctm = "Carbon dioxide"
-indus = indus[indus.tipo_contaminante == ctm]
+# # definir contaminante inicial a analizar y filtrar df indus
+# ctm = "Carbon dioxide"
+# indus = indus[indus.tipo_contaminante == ctm]
 
-# filtrar df indus según equipo a analizar
-indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
+# # filtrar df indus según equipo a analizar
+# indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
 
 
 # # lista de equipos a analizar
-eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
-mkt = "Mercado Solar"
-indus_tmp = FiltEquip(indus, mkt)  # deja unicamente los equipos del mercado a analizar
-
-# definir el mínimo de emisiones a analizar en las empresas
-min_ton = 1000
-max_ton = 0
-indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)  # agrupa por ID  (suma toneladas y n° de equipos que tiene)
-
-# definir máximo de empresas a analizar
-max_empr = 1000
-
-# definir categoría
-catg = ["Minería"]
-indus_ft = FiltCatg(indus_ft, catg, max_empr)  # Cruza la base agrupada y con la categoría de actividad
-
-# convertir latitud y longitud
-indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud"
-)  # crea plano columnas (x,y) en función de lat y long
-
-# definir tamaño y color del marcador en el mapa
-pt_size = np.log(indus_ft.ton_emision)
-indus_ft["pt_size"] = pt_size
-indus_ft["clr"] = indus_ft.rubro.map(clr)
-
-
-# Definir nuevo ID por fuente de emisión
-indus["f_ind"] = indus.fuente_emision
-indus= indus.set_index("f_ind")
-
-indus= wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
-
-# ##leer archivo de combustibles y juntar df indus
-# cmb_indus = ReadComb()
-# indus_cmb = indus.join(cmb_indus)
-
-########################################################################################
-# crear un ColumnDataSource (ds)
-source_indus = ColumnDataSource(data=indus_ft)
-
-# definir titulo de columnas de una tabla
-columns = [
-    TableColumn(field="nombre", title="Nombre", width=60),
-    TableColumn(field="raz_social", title="Razon social", width=60),
-    TableColumn(
-        field="ton_emision",
-        title="Emisiones (ton CO2/año)",
-        width=30,
-        formatter=NumberFormatter(format="0.0"),
-    ),
-    TableColumn(field="region", title="Región", width=50),
-    TableColumn(field="rubro", title="Rubro RETC", width=60),
-    TableColumn(field="ciiu4", title="CIIU4", width=200),
-]
-
-# iniciar tabla con columnas y fuente de datos ds source_indus
-data_table = DataTable(
-    columns=columns, source=source_indus, width=1400, height=900, editable=True
-)
-########################################################################################
-
-########################################################################################
-# iniciar mapa
-tile_provider = get_provider(ESRI_IMAGERY)
-p1 = Figure(plot_width=800, plot_height=900,tools=["pan,wheel_zoom,box_zoom,reset,save"],
-            x_axis_type="mercator", y_axis_type="mercator",
-            x_range=(-9000000,-6000000),y_range=(-6000000,-1200000))
-p1.add_tile(tile_provider)
-
-
-# graficar marcadores de industria y definir info a desplegar con "hover"
-sct = p1.scatter(x="x", y="y", size="pt_size" , fill_color='clr', fill_alpha=0.8, legend_field="rubro",
-                 source=source_indus)
-
-p1.legend.click_policy = "hide"
-
-p1.add_tools(HoverTool(renderers=[sct],tooltips=[("Nombre: ", "@nombre"), ("Emisiones (ton/año): ", "@ton_emision"),
-            ("Rubro: ", "@rubro")]))
-#########################################################################
-
-# iniciar tabla específica de empresa
-empr1 = indus_ft["nombre"].iloc[0]
-
-df_empr = indus_ft[indus_ft.nombre == empr1]
-source_empr = ColumnDataSource(data=df_empr)
-
-columns_empr = [
-    TableColumn(field="nombre", title="Nombre", width=25),
-    TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
-    TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0"),)
-    # TableColumn(field="combustible", title="Combustible", width=25),
-    # TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
-    # TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="ene", title="Enero",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="feb", title="Febrero",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="mar", title="Marzo",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="abr", title="Abril",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="may", title="Mayo",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="jun", title="Junio",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="jul", title="Julio",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="ago", title="Agosto",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="sep", title="Septiembre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="oct", title="Octubre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="nov", title="Noviembre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="dic", title="Diciembre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="promedio", title="Promedio",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="desv_std", title="Desv Std",width=25, formatter=NumberFormatter(format="0.0")),
-]
-
-data_tableEmpr = DataTable(
-    columns=columns_empr, source=source_empr, width=1400, height=200, editable=True
-)
-
-
-#####################################################################################
-
-
-# crear los menus
-wdt = 250
-
-dropDownCtms = Select(value=ctm, title="Contaminante", options=ctms)
-
-minTon = TextInput(value=str(min_ton), title="Mínimo emisiones anuales", width=wdt)
-maxTon = TextInput(value=str(max_ton), title="Máximo emisiones anuales", width=wdt)
-mrc = [
-    "Mercado Solar",
-    "Mercado H2",
-    "Caldera Calefacción (CA)",
-    "Caldera Industrial (IN)",
-    "Generación eléctrica",
-    "Todo",
-]
-dropdownEquip = Select(value=mkt, title="Equipo térmico", options=mrc, width=wdt)
-
-rubro = list(indus.rubro.unique())
-multi_choice = MultiChoice(value=catg, options=rubro, width=600, height=200)
-
-region = list(indus.region.unique())
-region.append("Todas")
-region.append("Rango latitud")
-dropdownRegion = Select(value="Todas", title="Region", options=region, width=wdt)
-
-latNorte = TextInput(
-    value=str(-18.4), title="Latitud norte (Opción rango latitud)", width=wdt
-)
-latSur = TextInput(
-    value=str(-35), title="Latitud sur (Opción rango latitud)", width=wdt
-)
+# eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+# indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
+# mkt = "Mercado Solar"
+# indus_tmp = FiltEquip(indus, mkt)  # deja unicamente los equipos del mercado a analizar
+
+# # definir el mínimo de emisiones a analizar en las empresas
+# min_ton = 1000
+# max_ton = 0
+# indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)  # agrupa por ID  (suma toneladas y n° de equipos que tiene)
+
+# # definir máximo de empresas a analizar
+# max_empr = 1000
+
+# # definir categoría
+# catg = ["Minería"]
+# indus_ft = FiltCatg(indus_ft, catg, max_empr)  # Cruza la base agrupada y con la categoría de actividad
+
+# # convertir latitud y longitud
+# indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud"
+# )  # crea plano columnas (x,y) en función de lat y long
+
+# # definir tamaño y color del marcador en el mapa
+# pt_size = np.log(indus_ft.ton_emision)
+# indus_ft["pt_size"] = pt_size
+# indus_ft["clr"] = indus_ft.rubro.map(clr)
+
+
+# # Definir nuevo ID por fuente de emisión
+# indus["f_ind"] = indus.fuente_emision
+# indus= indus.set_index("f_ind")
+
+# indus= wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
+
+# # ##leer archivo de combustibles y juntar df indus
+# # cmb_indus = ReadComb()
+# # indus_cmb = indus.join(cmb_indus)
+
+# ########################################################################################
+# # crear un ColumnDataSource (ds)
+# source_indus = ColumnDataSource(data=indus_ft)
+
+# # definir titulo de columnas de una tabla
+# columns = [
+#     TableColumn(field="nombre", title="Nombre", width=60),
+#     TableColumn(field="raz_social", title="Razon social", width=60),
+#     TableColumn(
+#         field="ton_emision",
+#         title="Emisiones (ton CO2/año)",
+#         width=30,
+#         formatter=NumberFormatter(format="0.0"),
+#     ),
+#     TableColumn(field="region", title="Región", width=50),
+#     TableColumn(field="rubro", title="Rubro RETC", width=60),
+#     TableColumn(field="ciiu4", title="CIIU4", width=200),
+# ]
+
+# # iniciar tabla con columnas y fuente de datos ds source_indus
+# data_table = DataTable(
+#     columns=columns, source=source_indus, width=1400, height=900, editable=True
+# )
+# # ########################################################################################
+
+# #######################################################################################
+# # iniciar mapa
+# tile_provider = get_provider(ESRI_IMAGERY)
+# p1 = Figure(plot_width=800, plot_height=900,tools=["pan,wheel_zoom,box_zoom,reset,save"],
+#             x_axis_type="mercator", y_axis_type="mercator",
+#             x_range=(-9000000,-6000000),y_range=(-6000000,-1200000))
+# p1.add_tile(tile_provider)
+
+
+# # graficar marcadores de industria y definir info a desplegar con "hover"
+# sct = p1.scatter(x="x", y="y", size="pt_size" , fill_color='clr', fill_alpha=0.8, legend_field="rubro",
+#                   source=source_indus)
+
+# p1.legend.click_policy = "hide"
+
+# p1.add_tools(HoverTool(renderers=[sct],tooltips=[("Nombre: ", "@nombre"), ("Emisiones (ton/año): ", "@ton_emision"),
+#             ("Rubro: ", "@rubro")]))
+# ########################################################################
+
+# # iniciar tabla específica de empresa
+# empr1 = indus_ft["nombre"].iloc[0]
+
+# df_empr = indus_ft[indus_ft.nombre == empr1]
+# source_empr = ColumnDataSource(data=df_empr)
+
+# columns_empr = [
+#     TableColumn(field="nombre", title="Nombre", width=25),
+#     TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
+#     TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0"),)
+#     # TableColumn(field="combustible", title="Combustible", width=25),
+#     # TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
+#     # TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="ene", title="Enero",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="feb", title="Febrero",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="mar", title="Marzo",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="abr", title="Abril",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="may", title="Mayo",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="jun", title="Junio",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="jul", title="Julio",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="ago", title="Agosto",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="sep", title="Septiembre",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="oct", title="Octubre",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="nov", title="Noviembre",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="dic", title="Diciembre",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="promedio", title="Promedio",width=25, formatter=NumberFormatter(format="0.0")),
+#     # TableColumn(field="desv_std", title="Desv Std",width=25, formatter=NumberFormatter(format="0.0")),
+# ]
+
+# data_tableEmpr = DataTable(
+#     columns=columns_empr, source=source_empr, width=1400, height=200, editable=True
+# )
+
+
+# #####################################################################################
+
+
+# # crear los menus
+# wdt = 250
+
+# dropDownCtms = Select(value=ctm, title="Contaminante", options=ctms)
+
+# minTon = TextInput(value=str(min_ton), title="Mínimo emisiones anuales", width=wdt)
+# maxTon = TextInput(value=str(max_ton), title="Máximo emisiones anuales", width=wdt)
+# mrc = [
+#     "Mercado Solar",
+#     "Mercado H2",
+#     "Caldera Calefacción (CA)",
+#     "Caldera Industrial (IN)",
+#     "Generación eléctrica",
+#     "Todo",
+# ]
+# dropdownEquip = Select(value=mkt, title="Equipo térmico", options=mrc, width=wdt)
+
+# rubro = list(indus.rubro.unique())
+# multi_choice = MultiChoice(value=catg, options=rubro, width=600, height=200)
+
+# region = list(indus.region.unique())
+# region.append("Todas")
+# region.append("Rango latitud")
+# dropdownRegion = Select(value="Todas", title="Region", options=region, width=wdt)
+
+# latNorte = TextInput(
+#     value=str(-18.4), title="Latitud norte (Opción rango latitud)", width=wdt
+# )
+# latSur = TextInput(
+#     value=str(-35), title="Latitud sur (Opción rango latitud)", width=wdt
+# )
 
-maxEmpr = TextInput(value=str(max_empr), title="Total empresas", width=wdt)
-buttCalcUpdate = Button(label="Filtrar", button_type="success", width=wdt)
+# maxEmpr = TextInput(value=str(max_empr), title="Total empresas", width=wdt)
+# buttCalcUpdate = Button(label="Filtrar", button_type="success", width=wdt)
 
-dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
+# dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
-dropDownCat = Select(value="rubro", title="Categoría", options=["rubro", "combustible"])
+# dropDownCat = Select(value="rubro", title="Categoría", options=["rubro", "combustible"])
 
-
 
-#############################################################################################
-# definir coordenadas del mapa específico de una empresa
-lat = df_empr.y
-lon = df_empr.x
 
-offSet = 600
-ymin = lat.iloc[0] - offSet
-ymax = lat.iloc[0] + offSet
-yrng = Range1d()  # ?
-yrng.start = ymin
-yrng.end = ymax
+# #############################################################################################
+# # definir coordenadas del mapa específico de una empresa
+# lat = df_empr.y
+# lon = df_empr.x
 
-xmin = lon.iloc[0] - offSet
-xmax = lon.iloc[0] + offSet
-xrng = Range1d()  # ?
-xrng.start = xmin
-xrng.end = xmax
+# offSet = 600
+# ymin = lat.iloc[0] - offSet
+# ymax = lat.iloc[0] + offSet
+# yrng = Range1d()  # ?
+# yrng.start = ymin
+# yrng.end = ymax
 
-# iniciar mapa
-tile_provider = get_provider(ESRI_IMAGERY)
-p = Figure(
-    plot_width=700,
-    plot_height=700,
-    tools=["pan,wheel_zoom,box_zoom,reset,save"],
-    x_axis_type="mercator",
-    y_axis_type="mercator",
-    x_range=xrng,
-    y_range=yrng,
-)
-p.add_tile(tile_provider)
-
-source = ColumnDataSource(data=dict(lat=lat, lon=lon))
+# xmin = lon.iloc[0] - offSet
+# xmax = lon.iloc[0] + offSet
+# xrng = Range1d()  # ?
+# xrng.start = xmin
+# xrng.end = xmax
 
-p.circle(x="lon", y="lat", size=10, fill_color="blue", fill_alpha=0.8, source=source)
-###############################################################################################
+# # iniciar mapa
+# tile_provider = get_provider(ESRI_IMAGERY)
+# p = Figure(
+#     plot_width=700,
+#     plot_height=700,
+#     tools=["pan,wheel_zoom,box_zoom,reset,save"],
+#     x_axis_type="mercator",
+#     y_axis_type="mercator",
+#     x_range=xrng,
+#     y_range=yrng,
+# )
+# p.add_tile(tile_provider)
 
+# source = ColumnDataSource(data=dict(lat=lat, lon=lon))
 
-###################
-# crear funcion para cambiar mapa de empresa específica (cambio al clickear empresa en tabla superior)
-def function_source(attr, old, new):
-    """
-    Función que permite cambiar el mapa de la empresa específica (la cual cambia al clickear empresa en la tabla superior)
-
-    Parameters
-    ----------
-    attr : TYPE
-        DESCRIPTION.
-    old : TYPE
-        DESCRIPTION.
-    new : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
-    """
-    try:
-        selected_index = source_indus.selected.indices[0]
-        name_selected = source_indus.data["nombre"][selected_index]
+# p.circle(x="lon", y="lat", size=10, fill_color="blue", fill_alpha=0.8, source=source)
+# ###############################################################################################
 
-        df_empr = indus[indus.nombre == name_selected]
-        source_empr.data = df_empr
 
-        lat = df_empr.y
-        lon = df_empr.x
-        new_data = dict(lat=lat, lon=lon)
-        source.data = new_data
-
-        ymin = lat.iloc[0] - offSet
-        ymax = lat.iloc[0] + offSet
-
-        xmin = lon.iloc[0] - offSet
-        xmax = lon.iloc[0] + offSet
-        xrng.update(start=xmin, end=xmax)
-        yrng.update(start=ymin, end=ymax)
-        ##############
-
-    except IndexError:
-        pass
-
-
-# crear funcion para cambiar mapa y tabla general
-
-source_indus.selected.on_change("indices", function_source)
-
-
-# Botón exportar empresa especifica a csv
-
-
-def UpdateTable():
-    """
-    Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
-    aplicando todos los filtros colocados.
-
-    Returns
-    -------
-    None.
-
-    """
-
-    indus = ReadIndus()
-    ctm = dropDownCtms.value
-    indus = indus[indus.tipo_contaminante == ctm]
-
-    indus = IDequipo(indus)
-    eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-    indus = indus[indus.equipo.isin(eqp_ft)]
-
-    mkt = dropdownEquip.value
-    indus_tmp = FiltEquip(indus, mkt)
-
-    min_ton = float(minTon.value)
-    max_ton = float(maxTon.value)
-    indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
-
-    max_empr = int(maxEmpr.value)
-    catg = multi_choice.value
-    indus_ft = FiltCatg(indus_ft, catg, max_empr)
-
-    rn = dropdownRegion.value
-    latN = float(latNorte.value)
-    latS = float(latSur.value)
-    indus_ft = FiltRegion(indus_ft, rn, latN, latS)
-
-    indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
-    pt_size = np.log(indus_ft.ton_emision)
-    indus_ft["pt_size"] = pt_size
-    indus_ft["clr"] = indus_ft.rubro.map(clr)
-        
-    source_indus.data = indus_ft
-
-
-    tl = get_provider(dropDownTiles.value)
-    p1.renderers = [
-        x for x in p1.renderers if not str(x).startswith("TileRenderer")
-    ]  # ?
-    tile_renderer = TileRenderer(tile_source=tl)  # ?
-    p1.renderers.insert(0, tile_renderer)
-    
-    source_indus.data = indus_ft
-
-    # return indus_ft
-    
-
-
-def DownloadButton():
-   
-    indus_D = ReadIndus()
-    ctm = dropDownCtms.value
-    indus_D = indus_D[indus_D.tipo_contaminante == ctm]
-
-    indus_D = IDequipo(indus)
-    eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-    indus_D = indus_D[indus_D.equipo.isin(eqp_ft)]
-
-    mkt = dropdownEquip.value
-    indus_tmp = FiltEquip(indus_D, mkt)
-
-    min_ton = float(minTon.value)
-    max_ton = float(maxTon.value)
-    indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
-
-    max_empr = int(maxEmpr.value)
-    catg = multi_choice.value
-    indus_ft = FiltCatg(indus_ft, catg, max_empr)
- 
-    indus_ft = indus_ft.drop(['Latitud','Longitud','catg', 'comuna','coord_este', 
-                          'coord_norte','huso','n_equip','orden','max_emision'
-                           ], axis = 1)
-    
-    nw = source_indus
-    
-    nw.data = indus_ft
-    
-    # source_indus = ColumnDataSource(data = indus_ft)
-    
-    # button = Button(label="Download", button_type="success")
-    # button.js_on_click(CustomJS(args=dict(source=source_indus),
-    #                             code=open(join(dirname(__file__), "download.js")).read()))
-    
-    return nw
-
-
-# def DownloadCSV():
+# ###################
+# # crear funcion para cambiar mapa de empresa específica (cambio al clickear empresa en tabla superior)
+# def function_source(attr, old, new):
+#     """
+#     Función que permite cambiar el mapa de la empresa específica (la cual cambia al clickear empresa en la tabla superior)
+
+#     Parameters
+#     ----------
+#     attr : TYPE
+#         DESCRIPTION.
+#     old : TYPE
+#         DESCRIPTION.
+#     new : TYPE
+#         DESCRIPTION.
+
+#     Returns
+#     -------
+#     None.
+
+#     """
+#     try:
+#         selected_index = source_indus.selected.indices[0]
+#         name_selected = source_indus.data["nombre"][selected_index]
+
+#         df_empr = indus[indus.nombre == name_selected]
+#         source_empr.data = df_empr
+
+#         lat = df_empr.y
+#         lon = df_empr.x
+#         new_data = dict(lat=lat, lon=lon)
+#         source.data = new_data
+
+#         ymin = lat.iloc[0] - offSet
+#         ymax = lat.iloc[0] + offSet
+
+#         xmin = lon.iloc[0] - offSet
+#         xmax = lon.iloc[0] + offSet
+#         xrng.update(start=xmin, end=xmax)
+#         yrng.update(start=ymin, end=ymax)
+#         ##############
+
+#     except IndexError:
+#         pass
+
+
+# # crear funcion para cambiar mapa y tabla general
+
+# source_indus.selected.on_change("indices", function_source)
+
+
+# # Botón exportar empresa especifica a csv
+
+
+# def UpdateTable():
 #     """
 #     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
 #     aplicando todos los filtros colocados.
@@ -843,80 +741,174 @@ def DownloadButton():
 
 #     """
 
+#     indus = ReadIndus()
+#     ctm = dropDownCtms.value
+#     indus = indus[indus.tipo_contaminante == ctm]
+
+#     indus = IDequipo(indus)
+#     eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+#     indus = indus[indus.equipo.isin(eqp_ft)]
+
+#     mkt = dropdownEquip.value
+#     indus_tmp = FiltEquip(indus, mkt)
+
+#     min_ton = float(minTon.value)
+#     max_ton = float(maxTon.value)
+#     indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
+
+#     max_empr = int(maxEmpr.value)
+#     catg = multi_choice.value
+#     indus_ft = FiltCatg(indus_ft, catg, max_empr)
+
+#     rn = dropdownRegion.value
+#     latN = float(latNorte.value)
+#     latS = float(latSur.value)
+#     indus_ft = FiltRegion(indus_ft, rn, latN, latS)
+
+#     indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
+#     pt_size = np.log(indus_ft.ton_emision)
+#     indus_ft["pt_size"] = pt_size
+#     indus_ft["clr"] = indus_ft.rubro.map(clr)
+        
+#     source_indus.data = indus_ft
+
+
+#     tl = get_provider(dropDownTiles.value)
+#     p1.renderers = [
+#         x for x in p1.renderers if not str(x).startswith("TileRenderer")
+#     ]  # ?
+#     tile_renderer = TileRenderer(tile_source=tl)  # ?
+#     p1.renderers.insert(0, tile_renderer)
     
-#     aux_indus, aux_source = UpdateTable()
+#     source_indus.data = indus_ft
+
+#     # return indus_ft
     
-#     # new_source = source
-#     # indus_aux = indus
-#     aux_indus = aux_indus.drop(['Latitud','Longitud','catg', 'clr','comuna','coord_este', 
-#                       'coord_norte','huso','n_equip','orden','pt_size',
-#                           'x', 'y'], axis = 1)
-#       # = nl[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
+
+
+# def DownloadButton():
+   
+#     indus_D = ReadIndus()
+#     ctm = dropDownCtms.value
+#     indus_D = indus_D[indus_D.tipo_contaminante == ctm]
+
+#     indus_D = IDequipo(indus)
+#     eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+#     indus_D = indus_D[indus_D.equipo.isin(eqp_ft)]
+
+#     mkt = dropdownEquip.value
+#     indus_tmp = FiltEquip(indus_D, mkt)
+
+#     min_ton = float(minTon.value)
+#     max_ton = float(maxTon.value)
+#     indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
+
+#     max_empr = int(maxEmpr.value)
+#     catg = multi_choice.value
+#     indus_ft = FiltCatg(indus_ft, catg, max_empr)
+ 
+#     indus_ft = indus_ft.drop(['Latitud','Longitud','catg', 'comuna','coord_este', 
+#                           'coord_norte','huso','n_equip','orden','max_emision'
+#                             ], axis = 1)
+    
+#     nw = source_indus
+    
+#     nw.data = indus_ft
+    
+#     # source_indus = ColumnDataSource(data = indus_ft)
+    
+#     # button = Button(label="Download", button_type="success")
+#     # button.js_on_click(CustomJS(args=dict(source=source_indus),
+#     #                             code=open(join(dirname(__file__), "download.js")).read()))
+    
+#     return nw
+
+
+# # def DownloadCSV():
+# #     """
+# #     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
+# #     aplicando todos los filtros colocados.
+
+# #     Returns
+# #     -------
+# #     None.
+
+# #     """
+
+    
+# #     aux_indus, aux_source = UpdateTable()
+    
+# #     # new_source = source
+# #     # indus_aux = indus
+# #     aux_indus = aux_indus.drop(['Latitud','Longitud','catg', 'clr','comuna','coord_este', 
+# #                       'coord_norte','huso','n_equip','orden','pt_size',
+# #                           'x', 'y'], axis = 1)
+# #       # = nl[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
      
-#     aux_source.data = aux_indus
+# #     aux_source.data = aux_indus
     
     
-#     button = Button(label="Descargar", button_type="success")
-#     button.js_on_click(CustomJS(args=dict(source=aux_source),
-#                                 code=open(join(dirname(__file__), "download.js")).read()))
+# #     button = Button(label="Descargar", button_type="success")
+# #     button.js_on_click(CustomJS(args=dict(source=aux_source),
+# #                                 code=open(join(dirname(__file__), "download.js")).read()))
   
-#     return button
+# #     return button
 
     
     
-    # var_aux = UpdateTable()
-    # source_download = ColumnDataSource(data = var_aux)
+#     # var_aux = UpdateTable()
+#     # source_download = ColumnDataSource(data = var_aux)
     
-    # var_aux = var_aux.drop(['Latitud','catg', 'clr','comuna','coord_este', 
-    #                   'coord_norte','huso','n_equip','orden','pt_size',
-    #                       'x', 'y'], axis = 1)
+#     # var_aux = var_aux.drop(['Latitud','catg', 'clr','comuna','coord_este', 
+#     #                   'coord_norte','huso','n_equip','orden','pt_size',
+#     #                       'x', 'y'], axis = 1)
     
-    # source_download.data = var_aux
+#     # source_download.data = var_aux
     
-    # button = Button(label="Download", button_type="success")
-    # button.js_on_click(CustomJS(args=dict(source=source_indus),
-    #                             code=open(join(dirname(__file__), "download.js")).read()))
+#     # button = Button(label="Download", button_type="success")
+#     # button.js_on_click(CustomJS(args=dict(source=source_indus),
+#     #                             code=open(join(dirname(__file__), "download.js")).read()))
     
     
     
      
 
+# # nw = DownloadButton()
+
+# #############################################
+# buttCalcUpdate.on_click(UpdateTable)
+# # buttCalcUpdate.on_click(DownloadButton)
+# # indus_temp = UpdateTable()
+# # nw = DownloadButton()
+
+
+
+
+
+# button = Button(label="Download", button_type="success")
+# button.on_click(DownloadButton)
+# button.on_click(DownloadButton)
 # nw = DownloadButton()
-
-#############################################
-buttCalcUpdate.on_click(UpdateTable)
-# buttCalcUpdate.on_click(DownloadButton)
-# indus_temp = UpdateTable()
-# nw = DownloadButton()
+# button.js_on_click(CustomJS(args=dict(source=nw),
+#                         code=open(join(dirname(__file__), "download.js")).read()))
+# #############################################
 
 
+# #############################################
 
 
-
-button = Button(label="Download", button_type="success")
-button.on_click(DownloadButton)
-button.on_click(DownloadButton)
-nw = DownloadButton()
-button.js_on_click(CustomJS(args=dict(source=nw),
-                        code=open(join(dirname(__file__), "download.js")).read()))
-#############################################
-
-
-#############################################
-
-
-spc = 50
-layout = column(
-    row(dropDownCtms, minTon, maxTon, dropdownEquip),
-    row(maxEmpr, multi_choice),
-    row(dropdownRegion, latNorte, latSur),
-    row(dropDownTiles, dropDownCat),
-    row(buttCalcUpdate, button),
-    Spacer(height=spc - 20),
-    row(p1, data_table),
-    Spacer(height=spc + 30),
-    data_tableEmpr,
-    p,
-)
-############################################
-curdoc().add_root(layout)
+# spc = 50
+# layout = column(
+#     row(dropDownCtms, minTon, maxTon, dropdownEquip),
+#     row(maxEmpr, multi_choice),
+#     row(dropdownRegion, latNorte, latSur),
+#     row(dropDownTiles, dropDownCat),
+#     row(buttCalcUpdate, button),
+#     Spacer(height=spc - 20),
+#     row(p1, data_table),
+#     Spacer(height=spc + 30),
+#     data_tableEmpr,
+#     p,
+# )
+# ############################################
+# curdoc().add_root(layout)

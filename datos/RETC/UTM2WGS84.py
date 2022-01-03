@@ -39,33 +39,30 @@ def ReadIndus():
         'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
         
     '''
-    header = ['ID', 	'raz_social',	'nombre' #establecimiento
-              ,	'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
-              'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
-              'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA', 	'tipo_contaminante',
-              'ton_emision', 'ORIGEN']
-
-
-    # header = ['Razón Social','ID Establecimiento VU','Nombre Establecimiento','Rubro RETC','CIIU6',
-    #           'CIIU4','Región','Provincia','Comuna','Coordenada Este','Coordenada Norte','Huso',
-    #           'Fuente','Nombre Fuente','Tipo de Emisión','Combustible','Origen','Contaminante',
-    #             'Emisión (Toneladas)']
+    header = ['ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
+              ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
+              'latitud', 'longitud', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO', 'CCF8 PRIMARIO',
+              'tipo_contaminante','EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+              'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO']
     
-    indus = pd.read_excel(path + 'datos/RETC/2019_vfinal_v3.xlsx', names = header)
     
-    indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
-    indus.coord_este = pd.to_numeric(indus.coord_este, errors='coerce')
-    indus.coord_norte = pd.to_numeric(indus.coord_norte, errors='coerce')
-    indus.huso = pd.to_numeric(indus.huso, errors='coerce')
-   
-    indus = indus.dropna(subset=(['ton_emision','coord_este','coord_norte','huso']))
+    
+    # indus = pd.read_excel(path + 'datos/RETC/ruea_2020_ckan_final.xlsx', names = header)
+    indus = pd.read_csv(path + "datos/RETC/ruea_2020_ckan_final.csv", encoding="utf-8-sig", sep=';', decimal=',', names = header)
+        
+    # indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
+    # indus.longitud = pd.to_numeric(indus.coord_este, errors='coerce')
+    # indus.latitud = pd.to_numeric(indus.coord_norte, errors='coerce')
+    # indus.huso = pd.to_numeric(indus.huso, errors='coerce')
+       
+    # indus = indus.dropna(subset=(['ton_emision','longitud','latitud','huso']))
     # indus = indus['coord_este'].dropna()
     # indus = indus['coord_norte'].dropna()
     # indus = indus['huso'].dropna()
+        
     
-
+        
     
-
     return indus
 
 def UTM2WGS84(indus):    
