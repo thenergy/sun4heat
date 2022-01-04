@@ -48,7 +48,7 @@ def ReadIndus():
     
     
     # indus = pd.read_excel(path + 'datos/RETC/ruea_2020_ckan_final.xlsx', names = header)
-    indus = pd.read_csv(path + "datos/RETC/ruea_2020_ckan_final.csv", encoding="utf-8-sig", sep=';', decimal=',', names = header)
+    indus = pd.read_csv(path + "datos/RETC/ruea_2020_ckan_final.csv", encoding="utf-8-sig", sep=';', decimal='.', names = header)
         
     # indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
     # indus.longitud = pd.to_numeric(indus.coord_este, errors='coerce')
@@ -91,9 +91,9 @@ def UTM2WGS84(indus):
 # ##########################################################
 
 indus = ReadIndus()
-indus = UTM2WGS84(indus)
-indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal='.', index = False)
-indus.to_excel(path + 'datos/RETC/indus_ll.xlsx', index = False)   
+# indus = UTM2WGS84(indus)
+# indus.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal='.', index = False)
+# indus.to_excel(path + 'datos/RETC/indus_ll.xlsx', index = False)   
     
     
     
