@@ -133,10 +133,11 @@ def ReadIndus():
     
     Headers DataFrame (ANTIGUO, FALTA ACTUALIZAR)
     -----------------
-    ID', 'raz_social',	'nombre', 'rubro', 'ciiu6', 'ciiu4', 'region', 'provincia', 'comuna',
-          'coord_este', 'coord_norte', 'huso', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO',
-          'EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'EMISION SECUNDARIO', 'EMISION MATERIA PRIMA',
-          po_contaminante', 'ton_emision', 'ORIGEN', Longitud, Latitud
+  'ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
+            ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
+            'Latitud', 'Longitud', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO', 'CCF8 PRIMARIO',
+            'tipo_contaminante','EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+            'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO'
         
     """
     header = ['ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
@@ -154,8 +155,8 @@ def ReadIndus():
     
 
     
-    # indus = indus.drop(['ano','CCF8 PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
-    # 'CCF8 MATERIA PRIMA','CONTAMINANTE 3', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO' ], axis = 1)
+    indus = indus.drop(['ano','CCF8 PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+    'CCF8 MATERIA PRIMA','CONTAMINANTE 3', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO' ], axis = 1)
     
     indus['ton_emision'] = indus['ton_emision'].str.replace(".", '')
     indus['ton_emision'] = indus['ton_emision'].str.replace(",", '.')
@@ -169,7 +170,7 @@ def ReadIndus():
     indus.Longitud = pd.to_numeric(indus.Longitud, errors='coerce')
     indus.Latitud = pd.to_numeric(indus.Latitud, errors='coerce')
 
-    # indus = indus.dropna(subset=(['ton_emision','Longitud','Latitud']))
+    indus = indus.dropna(subset=(['ton_emision','Longitud','Latitud']))
     # indus = indus['longitud'].dropna()
     # indus = indus['latitud'].dropna()
     # indus = indus['huso'].dropna()
