@@ -62,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -131,7 +131,7 @@ def ReadIndus():
     indus: Data Frame
         DF con los headers expuestos abajo.
     
-    Headers DataFrame (ANTIGUO, FALTA ACTUALIZAR)
+    Headers DataFrame 
     -----------------
   'ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
             ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
@@ -148,7 +148,7 @@ def ReadIndus():
     
     
 
-    indus = pd.read_csv(path + "datos/RETC/ruea_2020_ckan_final.csv", sep =';', decimal=',', encoding = 'utf-8-sig', names = header)
+    indus = pd.read_csv(path + "datos/RETC/ruea_2020_ckan_final.csv", sep =';', decimal=',', thousands= '.', encoding = 'utf-8-sig', names = header)
 
       
     indus = indus.drop(0, axis=0)
@@ -158,6 +158,8 @@ def ReadIndus():
     indus = indus.drop(['ano','CCF8 PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
     'CCF8 MATERIA PRIMA','CONTAMINANTE 3', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO' ], axis = 1)
     
+    
+    #Se necesita reemplazar los puntos por nada, y las comas por puntos (ya que los decimales en python son con puntos.)
     indus['ton_emision'] = indus['ton_emision'].str.replace(".", '')
     indus['ton_emision'] = indus['ton_emision'].str.replace(",", '.')
     
