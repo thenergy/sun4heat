@@ -135,15 +135,15 @@ def ReadIndus():
     -----------------
   'ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
             ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
-            'Latitud', 'Longitud', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO', 'CCF8 PRIMARIO',
-            'tipo_contaminante','EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+            'Latitud', 'Longitud', 'fuente_emision', 'tipo_fuente, 'combustible_prim', 'CCF8 PRIMARIO',
+            'tipo_contaminante','EMISION PRIMARIO', 'combustible_sec', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
             'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO'
         
     """
     header = ['ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
               ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
-              'Latitud', 'Longitud', 'fuente_emision', 'TIPO DE FUENTE', 'COMBUSTIBLE PRIMARIO', 'CCF8 PRIMARIO',
-              'tipo_contaminante','EMISION PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+              'Latitud', 'Longitud', 'fuente_emision', 'tipo_fuente', 'combustible_prim', 'CCF8 PRIMARIO',
+              'tipo_contaminante','EMISION PRIMARIO', 'combustible_sec', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
               'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO']
     
     
@@ -155,7 +155,7 @@ def ReadIndus():
     
 
     
-    indus = indus.drop(['ano','CCF8 PRIMARIO', 'COMBUSTIBLE SECUNDARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+    indus = indus.drop(['ano','CCF8 PRIMARIO', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
     'CCF8 MATERIA PRIMA','CONTAMINANTE 3', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO' ], axis = 1)
     
     
@@ -265,11 +265,59 @@ def FiltEquip(df, mkt):
 
     """
 
-    if mkt == "Caldera Calefacción (CA)":
+    if mkt == "Antorcha":
+        eqp_ft = ["AN"]
+        
+    elif mkt == "Caldera de Fluido Térmico":
+        eqp_ft = ["CF"]
+        
+    elif mkt == "Caldera de Generación Eléctrica":
+        eqp_ft = ["CG"]
+        
+    elif mkt == "Calentador":
+        eqp_ft = ["CL"]
+        
+    elif mkt == "Caldera Recuperadora":
+        eqp_ft = ["CR"]      
+
+    elif mkt == "Convertidor Teniente (CT)":
+        eqp_ft = ["CV"]   
+        
+    elif mkt == "Convertidor Pierce Smith (CPS)":
+        eqp_ft = ["CV"]
+
+    elif mkt == "Caldera Calefacción (CA)":
         eqp_ft = ["CA"]
+        
+    elif mkt == "Grupo Electrógeno":
+        eqp_ft = ["EL"]
+         
+    elif mkt == "Horno de Panadería":
+        eqp_ft = ["HR"]
+        
+    elif mkt == "Incinerador":
+        eqp_ft = ["IC", "MO"]
+        
+    elif mkt == "Molino de Rodillo":
+        eqp_ft = ["MC"]
+
+    elif mkt == "Marmita de Calcinación":
+        eqp_ft = ["MC", "MO"]
 
     elif mkt == "Caldera Industrial (IN)":
         eqp_ft = ["IN"]
+        
+    elif mkt == "Motor Generación Eléctrica":
+        eqp_ft = ["MG"]
+        
+    elif mkt == "Turbina de Gas":
+        eqp_ft = ["TG"]
+        
+    elif mkt == "Regenerador Cracking Catalítico (FCCU)":
+        eqp_ft = ["RG"]
+        
+    elif mkt == "Secadores":
+        eqp_ft = ["SC"]
 
     elif mkt == "Mercado Solar":
         eqp_ft = ["IN", "CF", "CA"]
@@ -277,11 +325,25 @@ def FiltEquip(df, mkt):
     elif mkt == "Mercado H2":
         eqp_ft = ["IN", "CF", "CA", "PC", "PS"]
 
-    elif mkt == "Generación eléctrica":
-        eqp_ft = ["GE"]
-
     elif mkt == "Todo":
-        eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+        eqp_ft = ['CG',
+         'EL',
+         'AN',
+         'IN',
+         'PS',
+         'TG',
+         'HR',
+         'CA',
+         'RG',
+         'CF',
+         'MG',
+         'MC',
+         'SC',
+         'CV',
+         'IC',
+         'MO',
+         'CL',
+         'CR']
 
     df = df[df.equipo.isin(eqp_ft)]
 
@@ -326,6 +388,9 @@ def IndusFilt(df, min_ton, max_ton):
             "region": "first",
             "provincia": "first",
             "comuna": "first",
+            "combustible_prim": "first",
+            "combustible_sec":"first",
+            "fuente_emision":"first",            
             "huso": "first",
             # "coord_norte": "first",
             # "coord_este": "first",
@@ -494,10 +559,10 @@ indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las po
 
 
 
-# lista de equipos a analizar
-eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
-mkt = "Mercado Solar"
+# # lista de equipos a analizar
+# eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+# indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
+mkt = "Todo"
 indus_tmp = FiltEquip(indus, mkt)  # deja unicamente los equipos del mercado a analizar
 
 # definir el mínimo de emisiones a analizar en las empresas
@@ -528,9 +593,9 @@ indus= indus.set_index("f_ind")
 
 indus= wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
-# ##leer archivo de combustibles y juntar df indus
-# cmb_indus = ReadComb()
-# indus_cmb = indus.join(cmb_indus)
+# # ##leer archivo de combustibles y juntar df indus
+# # cmb_indus = ReadComb()
+# # indus_cmb = indus.join(cmb_indus)
 
 ########################################################################################
 # crear un ColumnDataSource (ds)
@@ -585,7 +650,9 @@ source_empr = ColumnDataSource(data=df_empr)
 columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
     TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
-    TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0"),)
+    TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0")),
+    TableColumn(field="combustible_prim", title="Combustible Primario", width=25),
+    TableColumn(field="combustible_sec", title="Secundario", width=25),
     # TableColumn(field="combustible", title="Combustible", width=25),
     # TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
     # TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
@@ -620,13 +687,30 @@ dropDownCtms = Select(value=ctm, title="Contaminante", options=ctms)
 
 minTon = TextInput(value=str(min_ton), title="Mínimo emisiones anuales", width=wdt)
 maxTon = TextInput(value=str(max_ton), title="Máximo emisiones anuales", width=wdt)
-mrc = [
+mrc = ["Antorcha",
+    "Caldera de Fluido Térmico",       
+    "Caldera de Generación Eléctrica",       
+    "Calentador",       
+    "Caldera Recuperadora",
+    "Convertidor Teniente (CT)",
+    "Convertidor Pierce Smith (CPS)",
+    "Caldera Calefacción (CA)",    
+    "Grupo Electrógeno",       
+    "Horno de Panadería",       
+    "Incinerador",       
+    "Molino de Rodillo",      
+    "Marmita de Calcinación",    
+    "Caldera Industrial (IN)",       
+    "Motor Generación Eléctrica",  
+    "Turbina de Gas",   
+    "Regenerador Cracking Catalítico (FCCU)",
+    "Secadores",
     "Mercado Solar",
     "Mercado H2",
     "Caldera Calefacción (CA)",
     "Caldera Industrial (IN)",
     "Generación eléctrica",
-    "Todo",
+    "Todo"
 ]
 dropdownEquip = Select(value=mkt, title="Equipo térmico", options=mrc, width=wdt)
 
@@ -837,55 +921,7 @@ def DownloadButton():
     
     return nw
 
-
-# def DownloadCSV():
-#     """
-#     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
-#     aplicando todos los filtros colocados.
-
-#     Returns
-#     -------
-#     None.
-
-#     """
-
     
-#     aux_indus, aux_source = UpdateTable()
-    
-#     # new_source = source
-#     # indus_aux = indus
-#     aux_indus = aux_indus.drop(['Latitud','Longitud','catg', 'clr','comuna','coord_este', 
-#                       'coord_norte','huso','n_equip','orden','pt_size',
-#                           'x', 'y'], axis = 1)
-#       # = nl[['nombre','raz_social','ton_emision','region','rubro', 'ciiu4']]
-     
-#     aux_source.data = aux_indus
-    
-    
-#     button = Button(label="Descargar", button_type="success")
-#     button.js_on_click(CustomJS(args=dict(source=aux_source),
-#                                 code=open(join(dirname(__file__), "download.js")).read()))
-  
-#     return button
-
-    
-    
-    # var_aux = UpdateTable()
-    # source_download = ColumnDataSource(data = var_aux)
-    
-    # var_aux = var_aux.drop(['Latitud','catg', 'clr','comuna','coord_este', 
-    #                   'coord_norte','huso','n_equip','orden','pt_size',
-    #                       'x', 'y'], axis = 1)
-    
-    # source_download.data = var_aux
-    
-    # button = Button(label="Download", button_type="success")
-    # button.js_on_click(CustomJS(args=dict(source=source_indus),
-    #                             code=open(join(dirname(__file__), "download.js")).read()))
-    
-    
-    
-     
 
 # nw = DownloadButton()
 
