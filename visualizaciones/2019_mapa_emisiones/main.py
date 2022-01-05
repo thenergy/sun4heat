@@ -559,7 +559,7 @@ indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las po
 
 
 
-# # lista de equipos a analizar
+# lista de equipos a analizar
 # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
 # indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
 mkt = "Todo"
@@ -592,6 +592,7 @@ indus["f_ind"] = indus.fuente_emision
 indus= indus.set_index("f_ind")
 
 indus= wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
+
 
 # # ##leer archivo de combustibles y juntar df indus
 # # cmb_indus = ReadComb()
@@ -844,8 +845,8 @@ def UpdateTable():
     indus = indus[indus.tipo_contaminante == ctm]
 
     indus = IDequipo(indus)
-    eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-    indus = indus[indus.equipo.isin(eqp_ft)]
+    # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+    # indus = indus[indus.equipo.isin(eqp_ft)]
 
     mkt = dropdownEquip.value
     indus_tmp = FiltEquip(indus, mkt)
