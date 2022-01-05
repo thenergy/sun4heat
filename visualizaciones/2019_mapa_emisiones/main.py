@@ -62,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -110,9 +110,7 @@ cats = {
      'Industria de la madera y silvicultura':16,
      'Refinería de petróleo':17,
      'Gestores de residuos':18,
-     'Producción de cemento, cal y yeso':19,
-     'Todo':20
-        
+     'Producción de cemento, cal y yeso':19,        
 }
 
 # paleta de colores para los gráficos
@@ -457,17 +455,15 @@ def FiltCatg(df, catg, max_empr):
         DF con la categoría filtrada.
 
     """
-    if catg == "Todo" :
-        df["catg"] = df.rubro.map(cats)
+    if catg == ["Todo"]:
         catg = list(indus.rubro.unique())
-        # catg.remove("Todo")
-        df = df[df.rubro.isin(catg)]
-        print(df)
-        
     else:
-        df["catg"] = df.rubro.map(cats)
-        df = df[df.rubro.isin(catg)]
-        
+        pass
+    
+    df["catg"] = df.rubro.map(cats)
+    df = df[df.rubro.isin(catg)]
+
+   
     return df
     
 
