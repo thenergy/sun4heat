@@ -62,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -110,7 +110,8 @@ cats = {
      'Industria de la madera y silvicultura':16,
      'Refinería de petróleo':17,
      'Gestores de residuos':18,
-     'Producción de cemento, cal y yeso':19
+     'Producción de cemento, cal y yeso':19,
+     'Todo':20
         
 }
 
@@ -456,11 +457,19 @@ def FiltCatg(df, catg, max_empr):
         DF con la categoría filtrada.
 
     """
-
-    df["catg"] = df.rubro.map(cats)
-    df = df[df.rubro.isin(catg)]
-
+    if catg == "Todo" :
+        df["catg"] = df.rubro.map(cats)
+        catg = list(indus.rubro.unique())
+        # catg.remove("Todo")
+        df = df[df.rubro.isin(catg)]
+        print(df)
+        
+    else:
+        df["catg"] = df.rubro.map(cats)
+        df = df[df.rubro.isin(catg)]
+        
     return df
+    
 
 
 # filtrar por region
@@ -716,6 +725,7 @@ mrc = ["Antorcha",
 dropdownEquip = Select(value=mkt, title="Equipo térmico", options=mrc, width=wdt)
 
 rubro = list(indus.rubro.unique())
+rubro.append("Todo")
 multi_choice = MultiChoice(value=catg, options=rubro, width=600, height=200)
 
 region = list(indus.region.unique())
@@ -858,6 +868,7 @@ def UpdateTable():
     max_empr = int(maxEmpr.value)
     catg = multi_choice.value
     indus_ft = FiltCatg(indus_ft, catg, max_empr)
+    
 
     rn = dropdownRegion.value
     latN = float(latNorte.value)
@@ -892,27 +903,28 @@ def DownloadButton():
     indus_D = indus_D[indus_D.tipo_contaminante == ctm]
 
     indus_D = IDequipo(indus)
-    eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-    indus_D = indus_D[indus_D.equipo.isin(eqp_ft)]
+    # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
+    # indus_D = indus_D[indus_D.equipo.isin(eqp_ft)]
 
     mkt = dropdownEquip.value
     indus_tmp = FiltEquip(indus_D, mkt)
 
     min_ton = float(minTon.value)
     max_ton = float(maxTon.value)
-    indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
+    indus_ft2 = IndusFilt(indus_tmp, min_ton, max_ton)
 
     max_empr = int(maxEmpr.value)
+    
     catg = multi_choice.value
-    indus_ft = FiltCatg(indus_ft, catg, max_empr)
+    indus_ft2 = FiltCatg(indus_ft, catg, max_empr)
  
-    indus_ft = indus_ft.drop(['Latitud','Longitud','catg', 'comuna'
+    indus_ft2 = indus_ft.drop(['Latitud','Longitud','catg', 'comuna'
                           ,'huso','n_equip','orden','max_emision'
                             ], axis = 1)
     
     nw = source_indus
     
-    nw.data = indus_ft
+    nw.data = indus_ft2
     
     # source_indus = ColumnDataSource(data = indus_ft)
     
@@ -952,6 +964,7 @@ spc = 50
 layout = column(
     row(dropDownCtms, minTon, maxTon, dropdownEquip),
     row(maxEmpr, multi_choice),
+    Spacer(height=spc + 30),
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles, dropDownCat),
     row(buttCalcUpdate, button),
