@@ -389,7 +389,8 @@ def IndusFilt(df, min_ton, max_ton):
             "comuna": "first",
             "combustible_prim": "first",
             "combustible_sec":"first",
-            "fuente_emision":"first",            
+            "fuente_emision":"first",   
+            "tipo_contaminante":"first",
             "huso": "first",
             # "coord_norte": "first",
             # "coord_este": "first",
@@ -657,8 +658,11 @@ columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
     TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
     TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0")),
+    TableColumn(field="tipo_contaminante", title="Contaminante", width=25),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=25),
     TableColumn(field="combustible_sec", title="Secundario", width=25),
+    
+
     # TableColumn(field="combustible", title="Combustible", width=25),
     # TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
     # TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
