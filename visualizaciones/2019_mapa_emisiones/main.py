@@ -113,8 +113,53 @@ cats = {
      'Producción de cemento, cal y yeso':19,        
 }
 
+
+combs_1 = {
+    'Carbón Bituminoso Pulverizado':1,
+     'Gas Natural':2,
+     'Gas de Coque':3,
+     'Carbón Sub Bituminoso':4,
+     'Licor Negro':5,
+     'Gas de Coque Diluido':6,
+     'Gas Licuado de Petróleo':7,
+     'Gas de Alto Horno':8,
+     'Carbón Coke':9,
+     'Coke de Petróleo (Petcoke)':10,
+     'Biomasa Combustible':11,
+     'Petróleo N 6':12,
+     'Carbón Bituminoso':13,
+     'Gas de Refinería':14,
+     'Aserrín':15,
+     'Viruta, Despuntes':16,
+     'Petróleo N 2 (Diesel)':17,
+     'Leña':18,
+     'Gas de Cañería':19,
+     'Petróleo N 5':20
+     }
+
+combs_2 = {
+     'Kerosene':1,
+     'Metanol':2,
+     'Propano':3,
+     'Aceite Usado':4,
+     'Carbón de Leña':5,
+     'Bencina':6,
+     'Biogas':7
+    }
+
+
 # paleta de colores para los gráficos
 clr = dict(zip(cats, Category20[20]))
+
+# paleta de colores para los combustibles
+clr_combs = {}
+clr_combs1 = dict(zip(combs_1, Category20[20]))
+clr_combs2 = dict(zip(combs_2,Category20[7]))
+
+clr_combs.update(clr_combs1)
+clr_combs.update(clr_combs2)
+
+
 # leer archivo "ckan_ruea_2019_v1"
 def ReadIndus():
     """
@@ -415,7 +460,7 @@ def IndusFilt(df, min_ton, max_ton):
 
 
 # filtrar por categorias
-def FiltCatg(df, catg, max_empr):
+def Filtrbr(df, rbr, max_empr):
     """
     Función que filtra según las categorias presentes en 'emisiones_aire_año_cart.csv'.
     
@@ -445,7 +490,7 @@ def FiltCatg(df, catg, max_empr):
     ----------
     df : DataFrame
         DF en donde se filtra la categoría correspondiente.
-    catg : List
+    rbr : List
         Lista de strings que contiene las categorías a filtrar.
     max_empr : int
         Por ahora ninguna función.
@@ -456,13 +501,28 @@ def FiltCatg(df, catg, max_empr):
         DF con la categoría filtrada.
 
     """
-    if catg == ["Todo"]:
-        catg = list(indus.rubro.unique())
-    else:
-        pass
     
-    df["catg"] = df.rubro.map(cats)
-    df = df[df.rubro.isin(catg)]
+    # if catg == "rubro":
+    if rbr == ["Todo"]:
+        rbr = list(indus.rubro.unique())
+        df["rbr"] = df.rubro.map(cats)
+        df = df[df.rubro.isin(rbr)]
+    else:
+        df["rbr"] = df.rubro.map(cats)
+        df = df[df.rubro.isin(rbr)]
+            
+    # else :
+    #     if rbr == ["Todo"]:
+    #         rbr = list(indus.combustible_prim.unique())
+    #         rbr.remove("Null")
+    #         rbr.remove(rbr[8])
+    #         df["rbr"] = df.combustible_prim.map(clr_combs)
+    #         df = df[df.combustible_prim.isin(rbr)]
+    #     else:
+    #         df["rbr"] = df.rubro.map(cats)
+    #         df = df[df.rubro.isin(rbr)]
+    #         df["rbr"] = df.rubro.map(clr_combs)
+    #         df = df[df.rubro.isin(rbr)]
 
    
     return df
@@ -553,12 +613,29 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 # crear dataframe (df) indus
 indus = ReadIndus()
 
+# crear lista de combustibles
+comb_list = list(indus.combustible_prim.unique())
+comb_list.remove("Null")
+comb_list.remove(comb_list[8])
+comb_list.sort()
+comb_list= ["Todo"] + comb_list
+
+
 # crear lista de contaminantes
-ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
+ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminanteç
+ctms.sort()
 
 # definir contaminante inicial a analizar y filtrar df indus
 ctm = "Carbon dioxide"
 indus = indus[indus.tipo_contaminante == ctm]
+
+comb = 'Todo'
+
+if comb == 'Todo':
+    pass
+else:
+    indus = indus[indus.combustible_prim == comb]
+
 
 # filtrar df indus según equipo a analizar
 indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
@@ -580,17 +657,18 @@ indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)  # agrupa por ID  (suma tonela
 max_empr = 1000
 
 # definir categoría
-catg = ["Minería"]
-indus_ft = FiltCatg(indus_ft, catg, max_empr)  # Cruza la base agrupada y con la categoría de actividad
+rbr = ["Minería"]
+catg = ["rubro"]
+indus_ft = Filtrbr(indus_ft, rbr, max_empr)  # Cruza la base agrupada con la categoría de actividad
 
 # convertir latitud y longitud
-indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud"
-)  # crea plano columnas (x,y) en función de lat y long
+indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")  # crea plano columnas (x,y) en función de lat y long
 
 # definir tamaño y color del marcador en el mapa
 pt_size = np.log(indus_ft.ton_emision)
 indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
+indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
 
 
 # Definir nuevo ID por fuente de emisión
@@ -619,6 +697,7 @@ columns = [
         formatter=NumberFormatter(format="0.0"),
     ),
     TableColumn(field="region", title="Región", width=50),
+    TableColumn(field= "combustible_prim", title = "Combustible Primario", width = 50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
     TableColumn(field="ciiu4", title="CIIU4", width=200),
 ]
@@ -645,7 +724,7 @@ sct = p1.scatter(x="x", y="y", size="pt_size" , fill_color='clr', fill_alpha=0.8
 p1.legend.click_policy = "hide"
 
 p1.add_tools(HoverTool(renderers=[sct],tooltips=[("Nombre: ", "@nombre"), ("Emisiones (ton/año): ", "@ton_emision"),
-            ("Rubro: ", "@rubro")]))
+            ("Rubro: ", "@rubro"), ("Combustible Primario: ", "@combustible_prim")]))
 ########################################################################
 
 # iniciar tabla específica de empresa
@@ -661,25 +740,6 @@ columns_empr = [
     TableColumn(field="tipo_contaminante", title="Contaminante", width=25),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=25),
     TableColumn(field="combustible_sec", title="Secundario", width=25),
-    
-
-    # TableColumn(field="combustible", title="Combustible", width=25),
-    # TableColumn(field="unidad_cmb", title="Unidad combustible",width=25),
-    # TableColumn(field="con_anual", title="Consumo combustible anual",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="ene", title="Enero",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="feb", title="Febrero",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="mar", title="Marzo",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="abr", title="Abril",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="may", title="Mayo",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="jun", title="Junio",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="jul", title="Julio",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="ago", title="Agosto",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="sep", title="Septiembre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="oct", title="Octubre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="nov", title="Noviembre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="dic", title="Diciembre",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="promedio", title="Promedio",width=25, formatter=NumberFormatter(format="0.0")),
-    # TableColumn(field="desv_std", title="Desv Std",width=25, formatter=NumberFormatter(format="0.0")),
 ]
 
 data_tableEmpr = DataTable(
@@ -717,16 +777,21 @@ mrc = ["Antorcha",
     "Secadores",
     "Mercado Solar",
     "Mercado H2",
-    "Caldera Calefacción (CA)",
-    "Caldera Industrial (IN)",
-    "Generación eléctrica",
-    "Todo"
+    "Generación eléctrica"
 ]
+
+mrc.sort()
+mrc = ["Todo"] + mrc
 dropdownEquip = Select(value=mkt, title="Equipo térmico", options=mrc, width=wdt)
 
 rubro = list(indus.rubro.unique())
-rubro.append("Todo")
-multi_choice = MultiChoice(value=catg, options=rubro, width=600, height=200)
+rubro.sort()
+rubro =["Todo"] + rubro
+rbr_multi_choice = MultiChoice(title = "Rubro", value=rbr, options=rubro, width=600, height=200)
+
+
+
+
 
 region = list(indus.region.unique())
 region.append("Todas")
@@ -745,7 +810,8 @@ buttCalcUpdate = Button(label="Filtrar", button_type="success", width=wdt)
 
 dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
-dropDownCat = Select(value="rubro", title="Categoría", options=["rubro", "combustible"])
+dropDownComb = Select(value="Todo", title="Combustible Primario", options=comb_list)
+
 
 
 
@@ -836,9 +902,20 @@ def function_source(attr, old, new):
 source_indus.selected.on_change("indices", function_source)
 
 
-# Botón exportar empresa especifica a csv
+# Botón exportar empresa especifica a csv    
+
+# def UpdateCatg(catg):
+
+#     if catg == "combustible":
+        
+#         rbr_multi_choice = MultiChoice(title = "Combustible", value=rbr, options=comb_list, width=600, height=200)
+    
+#     else :
+        
+#         rbr_multi_choice = MultiChoice(title = "Rubro", value=rbr, options=rubro, width=600, height=200)
 
 
+    
 def UpdateTable():
     """
     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
@@ -853,6 +930,15 @@ def UpdateTable():
     indus = ReadIndus()
     ctm = dropDownCtms.value
     indus = indus[indus.tipo_contaminante == ctm]
+    
+    comb = dropDownComb.value
+
+    if comb == "Todo":
+        # indus = indus[indus.combustible_prim == comb_list]
+        pass
+    else:
+        indus = indus[indus.combustible_prim == comb]
+
 
     indus = IDequipo(indus)
     # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
@@ -866,21 +952,28 @@ def UpdateTable():
     indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
 
     max_empr = int(maxEmpr.value)
-    catg = multi_choice.value
-    indus_ft = FiltCatg(indus_ft, catg, max_empr)
     
-
+    # catg = dropDownCat.value
+            
+    rbr = rbr_multi_choice.value
+    indus_ft = Filtrbr(indus_ft, rbr, max_empr)
+    
     rn = dropdownRegion.value
     latN = float(latNorte.value)
     latS = float(latSur.value)
     indus_ft = FiltRegion(indus_ft, rn, latN, latS)
-
+    
     indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
     pt_size = np.log(indus_ft.ton_emision)
     indus_ft["pt_size"] = pt_size
     indus_ft["clr"] = indus_ft.rubro.map(clr)
+    indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
         
     source_indus.data = indus_ft
+        
+    # else :
+        
+        
 
 
     tl = get_provider(dropDownTiles.value)
@@ -892,9 +985,7 @@ def UpdateTable():
     
     source_indus.data = indus_ft
 
-    # return indus_ft
     
-
 
 def DownloadButton():
    
@@ -914,11 +1005,14 @@ def DownloadButton():
     indus_ft2 = IndusFilt(indus_tmp, min_ton, max_ton)
 
     max_empr = int(maxEmpr.value)
+    # catg = dropDownCat.value
+
     
-    catg = multi_choice.value
-    indus_ft2 = FiltCatg(indus_ft, catg, max_empr)
+    rbr = rbr_multi_choice.value
+    indus_ft2 = Filtrbr(indus_ft, rbr, max_empr)
+
  
-    indus_ft2 = indus_ft.drop(['Latitud','Longitud','catg', 'comuna'
+    indus_ft2 = indus_ft.drop(['Latitud','Longitud','rbr', 'comuna'
                           ,'huso','n_equip','orden','max_emision'
                             ], axis = 1)
     
@@ -940,6 +1034,7 @@ def DownloadButton():
 
 #############################################
 buttCalcUpdate.on_click(UpdateTable)
+# buttCatgUpdate.on_click(UpdateCatg)
 # buttCalcUpdate.on_click(DownloadButton)
 # indus_temp = UpdateTable()
 # nw = DownloadButton()
@@ -949,6 +1044,8 @@ buttCalcUpdate.on_click(UpdateTable)
 
 
 button = Button(label="Download", button_type="success")
+
+
 button.on_click(DownloadButton)
 button.on_click(DownloadButton)
 nw = DownloadButton()
@@ -963,10 +1060,11 @@ button.js_on_click(CustomJS(args=dict(source=nw),
 spc = 50
 layout = column(
     row(dropDownCtms, minTon, maxTon, dropdownEquip),
-    row(maxEmpr, multi_choice),
-    Spacer(height=spc + 30),
+    row(maxEmpr, dropDownComb),# buttCatgUpdate),
+    row(rbr_multi_choice),
+    Spacer(height=spc),
     row(dropdownRegion, latNorte, latSur),
-    row(dropDownTiles, dropDownCat),
+    row(dropDownTiles),
     row(buttCalcUpdate, button),
     Spacer(height=spc - 20),
     row(p1, data_table),

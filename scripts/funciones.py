@@ -26,8 +26,8 @@ cp_w = 4.18
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
-#path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
-path = '/home/ubuntu/Thenergy/diego/sun4heat/'
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 
 ################################### COLECTORES SOLARES ###################################
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
