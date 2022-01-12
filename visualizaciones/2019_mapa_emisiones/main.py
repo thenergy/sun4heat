@@ -152,12 +152,12 @@ combs_2 = {
 clr = dict(zip(cats, Category20[20]))
 
 # paleta de colores para los combustibles
-clr_combs = {}
-clr_combs1 = dict(zip(combs_1, Category20[20]))
-clr_combs2 = dict(zip(combs_2,Category20[7]))
+# clr_combs = {}
+# clr_combs1 = dict(zip(combs_1, Category20[20]))
+# clr_combs2 = dict(zip(combs_2,Category20[7]))
 
-clr_combs.update(clr_combs1)
-clr_combs.update(clr_combs2)
+# clr_combs.update(clr_combs1)
+# clr_combs.update(clr_combs2)
 
 
 # leer archivo "ckan_ruea_2019_v1"
@@ -669,7 +669,7 @@ indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")  # cre
 pt_size = np.log(indus_ft.ton_emision)
 indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
-indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
+# indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
 
 
 # Definir nuevo ID por fuente de emisión
@@ -935,7 +935,6 @@ def UpdateTable():
     comb = dropDownComb.value
 
     if comb == ["Todo"]:
-        # indus = indus[indus.combustible_prim == comb_list]
         pass
     else:
         indus = indus[indus.combustible_prim.isin(comb)]
@@ -954,7 +953,6 @@ def UpdateTable():
 
     max_empr = int(maxEmpr.value)
     
-    # catg = dropDownCat.value
             
     rbr = rbr_multi_choice.value
     indus_ft = Filtrbr(indus_ft, rbr, max_empr)
@@ -968,15 +966,10 @@ def UpdateTable():
     pt_size = np.log(indus_ft.ton_emision)
     indus_ft["pt_size"] = pt_size
     indus_ft["clr"] = indus_ft.rubro.map(clr)
-    indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
+    # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
         
     source_indus.data = indus_ft
         
-    # else :
-        
-        
-
-
     tl = get_provider(dropDownTiles.value)
     p1.renderers = [
         x for x in p1.renderers if not str(x).startswith("TileRenderer")
@@ -985,18 +978,23 @@ def UpdateTable():
     p1.renderers.insert(0, tile_renderer)
     
     source_indus.data = indus_ft
-
-    
+  
 
 def DownloadButton():
    
     indus_D = ReadIndus()
     ctm = dropDownCtms.value
+    
     indus_D = indus_D[indus_D.tipo_contaminante == ctm]
+    
+    comb = dropDownComb.value
 
-    indus_D = IDequipo(indus)
-    # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
-    # indus_D = indus_D[indus_D.equipo.isin(eqp_ft)]
+    if comb == ["Todo"]:
+        pass
+    else:
+        indus_D = indus_D[indus_D.combustible_prim.isin(comb)]
+    
+    indus_D = IDequipo(indus_D)
 
     mkt = dropdownEquip.value
     indus_tmp = FiltEquip(indus_D, mkt)
@@ -1013,19 +1011,26 @@ def DownloadButton():
     indus_ft2 = Filtrbr(indus_ft, rbr, max_empr)
 
  
-    indus_ft2 = indus_ft.drop(['Latitud','Longitud','rbr', 'comuna'
-                          ,'huso','n_equip','orden','max_emision'
+    indus_ft2 = indus_ft2.drop(['clr','Latitud','Longitud','rbr', 'comuna'
+                          ,'huso','n_equip','orden','max_emision', 'pt_size'
+                          ,'x','y'
                             ], axis = 1)
     
-    nw = source_indus
+    indus_ft2 = indus_ft2[['nombre','raz_social','rubro',
+                           'ciiu4','region','provincia','fuente_emision',
+                           'combustible_prim','combustible_sec','tipo_contaminante',
+                           'ton_emision']]
+    
+    nw = ColumnDataSource(data = indus_ft2)
+    # nw = source_indus
     
     nw.data = indus_ft2
     
     # source_indus = ColumnDataSource(data = indus_ft)
     
-    # button = Button(label="Download", button_type="success")
-    # button.js_on_click(CustomJS(args=dict(source=source_indus),
-    #                             code=open(join(dirname(__file__), "download.js")).read()))
+    button = Button(label="Download", button_type="success")
+    button.js_on_click(CustomJS(args=dict(source=source_indus),
+                                code=open(join(dirname(__file__), "download.js")).read()))
     
     return nw
 
