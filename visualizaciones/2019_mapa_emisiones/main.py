@@ -629,12 +629,13 @@ ctms.sort()
 ctm = "Carbon dioxide"
 indus = indus[indus.tipo_contaminante == ctm]
 
-comb = 'Todo'
+comb = ['Todo']
 
-if comb == 'Todo':
+if comb == ['Todo']:
     pass
 else:
-    indus = indus[indus.combustible_prim == comb]
+   indus = indus[indus.combustible_prim.isin(comb)]
+
 
 
 # filtrar df indus según equipo a analizar
@@ -810,7 +811,7 @@ buttCalcUpdate = Button(label="Filtrar", button_type="success", width=wdt)
 
 dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
-dropDownComb = Select(value="Todo", title="Combustible Primario", options=comb_list)
+dropDownComb = MultiChoice(value=["Todo"], title="Combustible Primario", options=comb_list)
 
 
 
@@ -933,11 +934,11 @@ def UpdateTable():
     
     comb = dropDownComb.value
 
-    if comb == "Todo":
+    if comb == ["Todo"]:
         # indus = indus[indus.combustible_prim == comb_list]
         pass
     else:
-        indus = indus[indus.combustible_prim == comb]
+        indus = indus[indus.combustible_prim.isin(comb)]
 
 
     indus = IDequipo(indus)
