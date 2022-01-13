@@ -228,32 +228,7 @@ def ReadIndus():
         
     return indus
 
-# # def ReadComb():
-# #     '''
-# #     Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
 
-# #     Returns
-# #     -------
-# #     cmb : DataFrame
-# #         DF con métricas de consumo anual, promedio y desviación estandar calculadas.
-
-
-# #     '''
-# #     cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
-# #     cmb['f_index'] = cmb.fuente
-# #     cmb = cmb.set_index('f_index')
-# #     cmb = cmb[cmb.estado == 'Activa']
-# #     cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
-# #     cmb['promedio'] = cmb.con_anual/12
-# #     cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
-# #                         (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
-# #                         (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
-# #                         (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2
-
-# #     cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
-# #     return cmb
-
-# extraer primeras 2 letras de la columna fuente_emision
 def IDequipo(df):
     """
     Esta función extrae las dos primeras letras de la columna fuente_emisión del 
@@ -398,7 +373,7 @@ def FiltEquip(df, mkt):
 def IndusFilt(df, min_ton, max_ton):
     """
     Función que filtra el DF entregado (emisiones_aire_año_cart.csv) según un rango de toneladas (min_ton, max_ton). 
-    También agrupa según el ID, sumando las columnas de ton_emision y n_equip, agregando columna de max_emision.
+    También agrupa según el ID, sumando las columnas de ton_emision y n_equip, agregando columna de max_emision (conjunto de empresas).
     
     Parameters
     ----------
@@ -424,6 +399,7 @@ def IndusFilt(df, min_ton, max_ton):
     indus_gr = df.groupby(["ID"]).agg(
         {
             "ton_emision": "sum",
+            "ener_cons_Co2":"sum",
             "n_equip": "sum",
             "raz_social": "first",
             "nombre": "first",
@@ -437,8 +413,6 @@ def IndusFilt(df, min_ton, max_ton):
             "fuente_emision":"first",   
             "tipo_contaminante":"first",
             "huso": "first",
-            # "coord_norte": "first",
-            # "coord_este": "first",
             "Latitud": "first",
             "Longitud": "first",
         }
@@ -505,11 +479,12 @@ def Filtrbr(df, rbr, max_empr):
     # if catg == "rubro":
     if rbr == ["Todo"]:
         rbr = list(indus.rubro.unique())
-        df["rbr"] = df.rubro.map(cats)
-        df = df[df.rubro.isin(rbr)]
+
     else:
-        df["rbr"] = df.rubro.map(cats)
-        df = df[df.rubro.isin(rbr)]
+        pass
+    
+    df["rbr"] = df.rubro.map(cats)
+    df = df[df.rubro.isin(rbr)]
             
     # else :
     #     if rbr == ["Todo"]:
@@ -608,6 +583,18 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 
     return df
 
+def emission_to_energy(df):
+    
+    fc_CO2_GE_GN = 56.10 #ton/TJ
+    fc_CO2_GE_DS = 74.10
+    
+    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Gas Natural'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_GN*3600*4*365)*10**9
+    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS*3600*4*365)*10**9
+
+    df.loc[df.equipo != 'EL', 'ener_cons_Co2'] = np.nan
+    
+    return df
+
 
 # ########################################################################################
 # crear dataframe (df) indus
@@ -622,13 +609,17 @@ comb_list= ["Todo"] + comb_list
 
 
 # crear lista de contaminantes
-ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminanteç
+ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
 ctms.sort()
+ctms_opt = ["Todo"] + ctms
 
-# definir contaminante inicial a analizar y filtrar df indus
 ctm = "Carbon dioxide"
 indus = indus[indus.tipo_contaminante == ctm]
 
+#definición factor emisión/energía para grupo electrogenos
+
+
+# definir contaminante inicial a analizar y filtrar df indus
 comb = ['Todo']
 
 if comb == ['Todo']:
@@ -636,16 +627,17 @@ if comb == ['Todo']:
 else:
    indus = indus[indus.combustible_prim.isin(comb)]
 
-
-
 # filtrar df indus según equipo a analizar
 indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
+#convierte emisiones a factor energético
+indus = emission_to_energy(indus)
 
 
 # lista de equipos a analizar
 # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
 # indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
+
 mkt = "Todo"
 indus_tmp = FiltEquip(indus, mkt)  # deja unicamente los equipos del mercado a analizar
 
@@ -658,7 +650,7 @@ indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)  # agrupa por ID  (suma tonela
 max_empr = 1000
 
 # definir categoría
-rbr = ["Minería"]
+rbr = ["Todo"]
 catg = ["rubro"]
 indus_ft = Filtrbr(indus_ft, rbr, max_empr)  # Cruza la base agrupada con la categoría de actividad
 
@@ -691,12 +683,8 @@ source_indus = ColumnDataSource(data=indus_ft)
 columns = [
     TableColumn(field="nombre", title="Nombre", width=60),
     TableColumn(field="raz_social", title="Razon social", width=60),
-    TableColumn(
-        field="ton_emision",
-        title="Emisiones (ton CO2/año)",
-        width=30,
-        formatter=NumberFormatter(format="0.0"),
-    ),
+    TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=30, formatter=NumberFormatter(format="0.0"),),
+    TableColumn(field="ener_cons_Co2", title="Energía consumida promedio hora pic electrogenos (kW)", width=30, formatter=NumberFormatter(format="0.0"),),
     TableColumn(field="region", title="Región", width=50),
     TableColumn(field= "combustible_prim", title = "Combustible Primario", width = 50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
@@ -738,15 +726,15 @@ columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
     TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
     TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0")),
+    TableColumn(field="ener_cons_Co2", title="Energía consumida promedio hora pic electrogenos (kW)", width=25, formatter=NumberFormatter(format="0.0")),
     TableColumn(field="tipo_contaminante", title="Contaminante", width=25),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=25),
-    TableColumn(field="combustible_sec", title="Secundario", width=25),
-]
+    TableColumn(field="combustible_sec", title="Secundario", width=25) ]
 
 data_tableEmpr = DataTable(
     columns=columns_empr, source=source_empr, width=1400, height=200, editable=True
 )
-
+ 
 
 #####################################################################################
 
@@ -754,7 +742,7 @@ data_tableEmpr = DataTable(
 # crear los menus
 wdt = 250
 
-dropDownCtms = Select(value=ctm, title="Contaminante", options=ctms)
+dropDownCtms = Select(value=ctm, title="Contaminante", options=ctms_opt)
 
 minTon = TextInput(value=str(min_ton), title="Mínimo emisiones anuales", width=wdt)
 maxTon = TextInput(value=str(max_ton), title="Máximo emisiones anuales", width=wdt)
@@ -903,20 +891,7 @@ def function_source(attr, old, new):
 source_indus.selected.on_change("indices", function_source)
 
 
-# Botón exportar empresa especifica a csv    
 
-# def UpdateCatg(catg):
-
-#     if catg == "combustible":
-        
-#         rbr_multi_choice = MultiChoice(title = "Combustible", value=rbr, options=comb_list, width=600, height=200)
-    
-#     else :
-        
-#         rbr_multi_choice = MultiChoice(title = "Rubro", value=rbr, options=rubro, width=600, height=200)
-
-
-    
 def UpdateTable():
     """
     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
@@ -930,8 +905,12 @@ def UpdateTable():
 
     indus = ReadIndus()
     ctm = dropDownCtms.value
-    indus = indus[indus.tipo_contaminante == ctm]
     
+    if ctm == "Todo":
+        indus = indus[indus.tipo_contaminante.isin(ctms)]
+    else:
+        indus = indus[indus.tipo_contaminante == ctm]       
+        
     comb = dropDownComb.value
 
     if comb == ["Todo"]:
@@ -941,6 +920,9 @@ def UpdateTable():
 
 
     indus = IDequipo(indus)
+    
+    indus = emission_to_energy(indus)
+
     # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
     # indus = indus[indus.equipo.isin(eqp_ft)]
 
@@ -962,6 +944,8 @@ def UpdateTable():
     latS = float(latSur.value)
     indus_ft = FiltRegion(indus_ft, rn, latN, latS)
     
+    source_empr.data = indus_ft
+    
     indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
     pt_size = np.log(indus_ft.ton_emision)
     indus_ft["pt_size"] = pt_size
@@ -969,6 +953,8 @@ def UpdateTable():
     # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
         
     source_indus.data = indus_ft
+    source_empr.data = indus_ft
+    
         
     tl = get_provider(dropDownTiles.value)
     p1.renderers = [
@@ -976,17 +962,19 @@ def UpdateTable():
     ]  # ?
     tile_renderer = TileRenderer(tile_source=tl)  # ?
     p1.renderers.insert(0, tile_renderer)
-    
-    source_indus.data = indus_ft
+
+    source_empr.data = indus_ft
+    # source_indus.data = indus_ft
   
 
 def DownloadButton():
    
     indus_D = ReadIndus()
     ctm = dropDownCtms.value
-    
+     
     indus_D = indus_D[indus_D.tipo_contaminante == ctm]
-    
+
+
     comb = dropDownComb.value
 
     if comb == ["Todo"]:
@@ -995,6 +983,9 @@ def DownloadButton():
         indus_D = indus_D[indus_D.combustible_prim.isin(comb)]
     
     indus_D = IDequipo(indus_D)
+    
+    indus_D = emission_to_energy(indus_D)
+
 
     mkt = dropdownEquip.value
     indus_tmp = FiltEquip(indus_D, mkt)
@@ -1017,9 +1008,9 @@ def DownloadButton():
                             ], axis = 1)
     
     indus_ft2 = indus_ft2[['nombre','raz_social','rubro',
-                           'ciiu4','region','provincia','fuente_emision',
-                           'combustible_prim','combustible_sec','tipo_contaminante',
-                           'ton_emision']]
+                            'ciiu4','region','provincia','fuente_emision',
+                            'combustible_prim','combustible_sec','tipo_contaminante',
+                            'ton_emision']]
     
     nw = ColumnDataSource(data = indus_ft2)
     # nw = source_indus
