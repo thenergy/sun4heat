@@ -586,12 +586,13 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 def emission_to_energy(df):
     
     fc_CO2_GE_GN = 56.10 #ton/TJ
-    fc_CO2_GE_DS = 74.10
+    fc_CO2_GE_DS = 74.10 #ton/TJç
     
-    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Gas Natural'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_GN*3600*4*365)*10**9
-    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS*3600*4*365)*10**9
+    df.loc[df.equipo == df.equipo,'ener_cons_CO2'] = np.nan
+    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Gas Natural'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_GN*3600*4*182.5)*10**9
+    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS*3600*4*182.5)*10**9
 
-    df.loc[df.equipo != 'EL', 'ener_cons_Co2'] = np.nan
+    # df.loc[(df.equipo != 'EL') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural'), 'ener_cons_Co2'] = np.nan
     
     return df
 
