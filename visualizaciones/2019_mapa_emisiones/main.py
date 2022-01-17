@@ -589,8 +589,8 @@ def emission_to_energy(df):
     fc_CO2_GE_DS = 74.10 #ton/TJç
     
     df.loc[df.equipo == df.equipo,'ener_cons_CO2'] = np.nan
-    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Gas Natural'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_GN*3600*4*182.5)*10**9
-    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS*3600*4*182.5)*10**9
+    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Gas Natural'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_GN*4*182.5)*10**9
+    df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS*4*182.5)*10**9
 
     # df.loc[(df.equipo != 'EL') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural'), 'ener_cons_Co2'] = np.nan
     
@@ -685,7 +685,7 @@ columns = [
     TableColumn(field="nombre", title="Nombre", width=60),
     TableColumn(field="raz_social", title="Razon social", width=60),
     TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=30, formatter=NumberFormatter(format="0.0"),),
-    TableColumn(field="ener_cons_Co2", title="Energía consumida promedio hora pic electrogenos (kW)", width=30, formatter=NumberFormatter(format="0.0"),),
+    TableColumn(field="ener_cons_Co2", title="Energía consumida promedio hora pic electrogenos (kWh)", width=30, formatter=NumberFormatter(format="0.0"),),
     TableColumn(field="region", title="Región", width=50),
     TableColumn(field= "combustible_prim", title = "Combustible Primario", width = 50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
@@ -727,7 +727,7 @@ columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
     TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
     TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0")),
-    TableColumn(field="ener_cons_Co2", title="Energía consumida promedio hora pic electrogenos (kW)", width=25, formatter=NumberFormatter(format="0.0")),
+    TableColumn(field="ener_cons_Co2", title="Energía consumida promedio hora pic electrogenos (kWh)", width=25, formatter=NumberFormatter(format="0.0")),
     TableColumn(field="tipo_contaminante", title="Contaminante", width=25),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=25),
     TableColumn(field="combustible_sec", title="Secundario", width=25) ]
