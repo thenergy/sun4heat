@@ -270,30 +270,13 @@ a.boton:hover {
   background: #0f69b4;
   border-bottom: 2px solid #045282;
 }
-header.cs_banner.jumbotron{
-  padding: 0;
-  margin: 0;
-  height: 180px;
-  border-radius: 0;
-  background-image: url('mapa_emisiones/static/img/header.jpg');
-  background-size: cover;
-}
+
 section.cs_sistemaInfo{
   background-position: center;
   background-size: cover;
   max-width: 1800px;
 }
-header .wrap{
-  max-width: 1000px;
-  position: relative;
-  height: 180px;
-  margin: auto;
-}
-header h1#logo-main {
-  top: 0;
-  left: 0;
-  margin: 0;
-}
+
 
 h1#logo-main a:first-child {
   position: absolute;
@@ -309,48 +292,10 @@ h1#logo-main a:last-child {
   max-width: 250px;
   height: auto;
 }
-header nav#menu-principal {
-  color: #475156;
-  font-family: "gobCL", Tahoma, Verdana, Segoe, sans-serif;
-  width: 100%;
-  display: table;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-header nav#menu-principal ul {
-  background: #fff;
-  display: table-row;
-  padding: 0;
-  margin: 0;
-}
-header nav#menu-principal ul li {
-  margin: 0;
-  display: table-cell;
-  text-align: center;
-  position: relative;
-}
-header nav#menu-principal ul li a {
-  height: 50px;
-  padding: 18px 0 12px 0;
-  display: block;
-  border-right: 1px solid #e6e6e6;
-  border-bottom: 2px solid #bdc9d1;
-}
-header nav#menu-principal ul li a:hover {
-  color: #0f69b4;
-  border-bottom: 2px solid #0f69b4;
-  text-decoration: none;
-}
-header nav#menu-principal ul li:last-child a {
-  border-right: none;
-}
-header nav#menu-principal ul li.current-menu-item a,
-header nav#menu-principal ul li.current-menu-ancestor a {
-  color: #0f69b4;
-  border-bottom: 2px solid #0f69b4;
-}
+
+
+
+
 /*Sections*/
 
 section.cs_inicio{

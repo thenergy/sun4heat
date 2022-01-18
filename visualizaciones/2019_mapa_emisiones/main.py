@@ -62,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -249,6 +249,67 @@ def IDequipo(df):
     for cld in df.fuente_emision:
         clds.append(cld[0:2])
     df["equipo"] = clds
+    
+    eqps = []
+    for eqp in df.equipo:
+        if eqp == "AN":
+            eqps.append("Antorcha")
+            
+        elif eqp == "CF":
+            eqps.append("Caldera de Fluido Térmico")
+            
+        elif eqp == "CG":
+            eqps.append("Caldera de Generación Eléctrica")
+            
+        elif eqp == "CL":
+            eqps.append("Calentador")
+            
+        elif eqp == "CR":
+            eqps.append("Caldera Recuperadora")   
+
+        elif eqp == "CV":
+            eqps.append("Convertidor Teniente (CT)")
+            
+        elif eqp == "CV":
+            eqps.append("Convertidor Pierce Smith (CPS)")
+
+        elif eqp == "CA":
+            eqps.append("Caldera Calefacción (CA)")
+            
+        elif eqp == "EL":
+            eqps.append("Grupo Electrógeno")
+             
+        elif eqp == "HR":
+            eqps.append("Horno de Panadería")
+                        
+        elif eqp == "IC":
+            eqps.append("Incinerador")
+            
+        elif eqp == "MC":
+            eqps.append("Molino de Rodillo")
+
+        elif eqp == "Marmita de Calcinación":
+            eqps.append("MC")#, "MO")
+
+        elif eqp == "IN":
+            eqps.append("Caldera Industrial (IN)")
+            
+        elif eqp == "MG":
+            eqps.append("Motor Generación Eléctrica")
+            
+        elif eqp == "TG":
+            eqps.append("Turbina de Gas")
+            
+        elif eqp == "RG":
+            eqps.append("Regenerador Cracking Catalítico (FCCU)")
+            
+        elif eqp == "SC":
+            eqps.append("Secadores")
+        else :
+            eqps.append("NaN")
+    
+    df["equipo_name"] = eqps
+
 
     return df
 
@@ -284,88 +345,153 @@ def FiltEquip(df, mkt):
 
     """
 
-    if mkt == "Antorcha":
-        eqp_ft = ["AN"]
+    # if mkt == "Antorcha":
+    #     eqp_ft = ["AN"]
         
-    elif mkt == "Caldera de Fluido Térmico":
-        eqp_ft = ["CF"]
+    # elif mkt == "Caldera de Fluido Térmico":
+    #     eqp_ft = ["CF"]
         
-    elif mkt == "Caldera de Generación Eléctrica":
-        eqp_ft = ["CG"]
+    # elif mkt == "Caldera de Generación Eléctrica":
+    #     eqp_ft = ["CG"]
         
-    elif mkt == "Calentador":
-        eqp_ft = ["CL"]
+    # elif mkt == "Calentador":
+    #     eqp_ft = ["CL"]
         
-    elif mkt == "Caldera Recuperadora":
-        eqp_ft = ["CR"]      
+    # elif mkt == "Caldera Recuperadora":
+    #     eqp_ft = ["CR"]      
 
-    elif mkt == "Convertidor Teniente (CT)":
-        eqp_ft = ["CV"]   
+    # elif mkt == "Convertidor Teniente (CT)":
+    #     eqp_ft = ["CV"]   
         
-    elif mkt == "Convertidor Pierce Smith (CPS)":
-        eqp_ft = ["CV"]
+    # elif mkt == "Convertidor Pierce Smith (CPS)":
+    #     eqp_ft = ["CV"]
 
-    elif mkt == "Caldera Calefacción (CA)":
-        eqp_ft = ["CA"]
+    # elif mkt == "Caldera Calefacción (CA)":
+    #     eqp_ft = ["CA"]
         
-    elif mkt == "Grupo Electrógeno":
-        eqp_ft = ["EL"]
+    # elif mkt == "Grupo Electrógeno":
+    #     eqp_ft = ["EL"]
          
-    elif mkt == "Horno de Panadería":
-        eqp_ft = ["HR"]
+    # elif mkt == "Horno de Panadería":
+    #     eqp_ft = ["HR"]
         
-    elif mkt == "Incinerador":
-        eqp_ft = ["IC", "MO"]
+    # elif mkt == "Incinerador":
+    #     eqp_ft = ["IC", "MO"]
         
-    elif mkt == "Molino de Rodillo":
-        eqp_ft = ["MC"]
+    # elif mkt == "Molino de Rodillo":
+    #     eqp_ft = ["MC"]
 
-    elif mkt == "Marmita de Calcinación":
-        eqp_ft = ["MC", "MO"]
+    # elif mkt == "Marmita de Calcinación":
+    #     eqp_ft = ["MC", "MO"]
 
-    elif mkt == "Caldera Industrial (IN)":
-        eqp_ft = ["IN"]
+    # elif mkt == "Caldera Industrial (IN)":
+    #     eqp_ft = ["IN"]
         
-    elif mkt == "Motor Generación Eléctrica":
-        eqp_ft = ["MG"]
+    # elif mkt == "Motor Generación Eléctrica":
+    #     eqp_ft = ["MG"]
         
-    elif mkt == "Turbina de Gas":
-        eqp_ft = ["TG"]
+    # elif mkt == "Turbina de Gas":
+    #     eqp_ft = ["TG"]
         
-    elif mkt == "Regenerador Cracking Catalítico (FCCU)":
-        eqp_ft = ["RG"]
+    # elif mkt == "Regenerador Cracking Catalítico (FCCU)":
+    #     eqp_ft = ["RG"]
         
-    elif mkt == "Secadores":
-        eqp_ft = ["SC"]
+    # elif mkt == "Secadores":
+    #     eqp_ft = ["SC"]
 
-    elif mkt == "Mercado Solar":
-        eqp_ft = ["IN", "CF", "CA"]
+    # elif mkt == "Mercado Solar":
+    #     eqp_ft = ["IN", "CF", "CA"]
 
-    elif mkt == "Mercado H2":
-        eqp_ft = ["IN", "CF", "CA", "PC", "PS"]
+    # elif mkt == "Mercado H2":
+    #     eqp_ft = ["IN", "CF", "CA", "PC", "PS"]
+    
+    nl = []
 
-    elif mkt == "Todo":
+    if mkt == ["Todo"]:
         eqp_ft = ['CG',
-         'EL',
-         'AN',
-         'IN',
-         'PS',
-         'TG',
-         'HR',
-         'CA',
-         'RG',
-         'CF',
-         'MG',
-         'MC',
-         'SC',
-         'CV',
-         'IC',
-         'MO',
-         'CL',
-         'CR']
+          'EL',
+          'AN',
+          'IN',
+          'PS',
+          'TG',
+          'HR',
+          'CA',
+          'RG',
+          'CF',
+          'MG',
+          'MC',
+          'SC',
+          'CV',
+          'IC',
+          'MO',
+          'CL',
+          'CR']
+    
+        df = df[df.equipo.isin(eqp_ft)]
+    else :
+        for i in mkt :
+            if i == "Antorcha":
+                nl.append("AN")
+                
+            elif i == "Caldera de Fluido Térmico":
+                nl.append("CF")
+                
+            elif i == "Caldera de Generación Eléctrica":
+                nl.append("CG")
+                
+            elif i == "Calentador":
+                nl.append("CL")
+                
+            elif i == "Caldera Recuperadora":
+                nl.append("CR")      
 
-    df = df[df.equipo.isin(eqp_ft)]
+            elif i == "Convertidor Teniente (CT)":
+                nl.append("CV")   
+                
+            elif i == "Convertidor Pierce Smith (CPS)":
+                nl.append("CV")
 
+            elif i == "Caldera Calefacción (CA)":
+                nl.append("CA")
+                
+            elif i == "Grupo Electrógeno":
+                nl.append("EL")
+                 
+            elif i == "Horno de Panadería":
+                nl.append("HR")
+                
+            elif i == "Incinerador":
+                nl.append("IC", "MO")
+                
+            elif i == "Molino de Rodillo":
+                nl.append("MC")
+
+            elif i == "Marmita de Calcinación":
+                nl.append("MC", "MO")
+
+            elif i == "Caldera Industrial (IN)":
+                nl.append("IN")
+                
+            elif i == "Motor Generación Eléctrica":
+                nl.append("MG")
+                
+            elif i == "Turbina de Gas":
+                nl.append("TG")
+                
+            elif i == "Regenerador Cracking Catalítico (FCCU)":
+                nl.append("RG")
+                
+            elif i == "Secadores":
+                nl.append("SC")
+
+            elif i == "Mercado Solar":
+                nl.append("IN", "CF", "CA")
+
+            elif i == "Mercado H2":
+                nl.append("IN", "CF", "CA", "PC", "PS")
+            
+        df = df[df.equipo.isin(nl)]
+        
     return df
 
 
@@ -639,7 +765,7 @@ indus = emission_to_energy(indus)
 # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
 # indus = indus[indus.equipo.isin(eqp_ft)]  # cruzar eqp_ft con indus.equipo
 
-mkt = "Todo"
+mkt = ["Todo"]
 indus_tmp = FiltEquip(indus, mkt)  # deja unicamente los equipos del mercado a analizar
 
 # definir el mínimo de emisiones a analizar en las empresas
@@ -713,8 +839,15 @@ sct = p1.scatter(x="x", y="y", size="pt_size" , fill_color='clr', fill_alpha=0.8
 
 p1.legend.click_policy = "hide"
 
-p1.add_tools(HoverTool(renderers=[sct],tooltips=[("Nombre: ", "@nombre"), ("Emisiones (ton/año): ", "@ton_emision"),
+
+p1.add_tools(HoverTool(renderers=[sct],tooltips=[("Nombre: ", "@nombre"),("Region: ", "@region"), ("Emisiones (ton/año): ", "@ton_emision"),
             ("Rubro: ", "@rubro"), ("Combustible Primario: ", "@combustible_prim")]))
+
+b = Button(label="Resetear mapa", button_type="success", width=250)
+b.js_on_click(CustomJS(args=dict(p=p1), code="""
+    p.reset.emit()
+"""))
+
 ########################################################################
 
 # iniciar tabla específica de empresa
@@ -725,7 +858,7 @@ source_empr = ColumnDataSource(data=df_empr)
 
 columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
-    TableColumn(field="fuente_emision", title="Fuente emisión", width=25),
+    TableColumn(field="equipo_name", title="Fuente emisión", width=25),
     TableColumn(field="ton_emision", title="Emisiones (ton CO2/año)", width=25, formatter=NumberFormatter(format="0.0")),
     TableColumn(field="ener_cons_Co2", title="Energía consumida promedio hora pic electrogenos (mWh)", width=25, formatter=NumberFormatter(format="0.0")),
     TableColumn(field="tipo_contaminante", title="Contaminante", width=25),
@@ -745,8 +878,8 @@ wdt = 250
 
 dropDownCtms = Select(value=ctm, title="Contaminante", options=ctms_opt)
 
-minTon = TextInput(value=str(min_ton), title="Mínimo emisiones anuales", width=wdt)
-maxTon = TextInput(value=str(max_ton), title="Máximo emisiones anuales", width=wdt)
+minTon = TextInput(value=str(min_ton), title="Mínimo emisiones anuales [ton/año]", width=wdt)
+maxTon = TextInput(value=str(max_ton), title="Máximo emisiones anuales [ton/año]", width=wdt)
 mrc = ["Antorcha",
     "Caldera de Fluido Térmico",       
     "Caldera de Generación Eléctrica",       
@@ -772,12 +905,13 @@ mrc = ["Antorcha",
 
 mrc.sort()
 mrc = ["Todo"] + mrc
-dropdownEquip = Select(value=mkt, title="Equipo térmico", options=mrc, width=wdt)
+# dropdownEquip = Select(value=mkt, title="Equipo térmico", options=mrc, width=wdt)
+dropdownEquip = MultiChoice(value=mkt, title="Equipo térmico", options=mrc, width=300)
 
 rubro = list(indus.rubro.unique())
 rubro.sort()
 rubro =["Todo"] + rubro
-rbr_multi_choice = MultiChoice(title = "Rubro", value=rbr, options=rubro, width=600, height=200)
+rbr_multi_choice = MultiChoice(title = "Rubro", value=rbr, options=rubro, width=600)
 
 
 
@@ -797,10 +931,13 @@ latSur = TextInput(
 
 maxEmpr = TextInput(value=str(max_empr), title="Total empresas", width=wdt)
 buttCalcUpdate = Button(label="Filtrar", button_type="success", width=wdt)
+buttCalcUpdate.js_on_click(CustomJS(args=dict(p=p1), code="""
+    p.reset.emit()
+"""))
 
 dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
-dropDownComb = MultiChoice(value=["Todo"], title="Combustible Primario", options=comb_list)
+dropDownComb = MultiChoice(value=["Todo"], title="Combustible Primario", options=comb_list, width = 300)
 
 
 
@@ -1057,13 +1194,14 @@ button.js_on_click(CustomJS(args=dict(source=nw),
 
 spc = 50
 layout = column(
-    row(dropDownCtms, minTon, maxTon, dropdownEquip),
-    row(maxEmpr, dropDownComb),# buttCatgUpdate),
+    row(dropDownCtms, minTon, maxTon,maxEmpr),
+    row(dropdownEquip, dropDownComb),
     row(rbr_multi_choice),
     Spacer(height=spc),
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles),
     row(buttCalcUpdate, button),
+    row(b),
     Spacer(height=spc - 20),
     row(p1, data_table),
     Spacer(height=spc + 30),
