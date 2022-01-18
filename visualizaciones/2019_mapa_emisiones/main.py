@@ -62,8 +62,8 @@ from bokeh.tile_providers import (
 from os.path import dirname, join
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -306,7 +306,7 @@ def IDequipo(df):
         elif eqp == "SC":
             eqps.append("Secadores")
         else :
-            eqps.append("NaN")
+            eqps.append(eqp)
     
     df["equipo_name"] = eqps
 
@@ -344,67 +344,7 @@ def FiltEquip(df, mkt):
         DF con los filtros aplicados.
 
     """
-
-    # if mkt == "Antorcha":
-    #     eqp_ft = ["AN"]
-        
-    # elif mkt == "Caldera de Fluido Térmico":
-    #     eqp_ft = ["CF"]
-        
-    # elif mkt == "Caldera de Generación Eléctrica":
-    #     eqp_ft = ["CG"]
-        
-    # elif mkt == "Calentador":
-    #     eqp_ft = ["CL"]
-        
-    # elif mkt == "Caldera Recuperadora":
-    #     eqp_ft = ["CR"]      
-
-    # elif mkt == "Convertidor Teniente (CT)":
-    #     eqp_ft = ["CV"]   
-        
-    # elif mkt == "Convertidor Pierce Smith (CPS)":
-    #     eqp_ft = ["CV"]
-
-    # elif mkt == "Caldera Calefacción (CA)":
-    #     eqp_ft = ["CA"]
-        
-    # elif mkt == "Grupo Electrógeno":
-    #     eqp_ft = ["EL"]
-         
-    # elif mkt == "Horno de Panadería":
-    #     eqp_ft = ["HR"]
-        
-    # elif mkt == "Incinerador":
-    #     eqp_ft = ["IC", "MO"]
-        
-    # elif mkt == "Molino de Rodillo":
-    #     eqp_ft = ["MC"]
-
-    # elif mkt == "Marmita de Calcinación":
-    #     eqp_ft = ["MC", "MO"]
-
-    # elif mkt == "Caldera Industrial (IN)":
-    #     eqp_ft = ["IN"]
-        
-    # elif mkt == "Motor Generación Eléctrica":
-    #     eqp_ft = ["MG"]
-        
-    # elif mkt == "Turbina de Gas":
-    #     eqp_ft = ["TG"]
-        
-    # elif mkt == "Regenerador Cracking Catalítico (FCCU)":
-    #     eqp_ft = ["RG"]
-        
-    # elif mkt == "Secadores":
-    #     eqp_ft = ["SC"]
-
-    # elif mkt == "Mercado Solar":
-    #     eqp_ft = ["IN", "CF", "CA"]
-
-    # elif mkt == "Mercado H2":
-    #     eqp_ft = ["IN", "CF", "CA", "PC", "PS"]
-    
+   
     nl = []
 
     if mkt == ["Todo"]:
