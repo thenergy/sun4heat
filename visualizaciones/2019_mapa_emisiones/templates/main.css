@@ -274,7 +274,7 @@ a.boton:hover {
 section.cs_sistemaInfo{
   background-position: center;
   background-size: cover;
-  max-width: 1800px;
+  max-width: 100%;
 }
 
 
@@ -397,8 +397,8 @@ div.cs_objetivos, div.cs_mpr, div.cs_referencias{
   padding-right: 5%;
 }
 section.cs_sistemaInfo .jumbotron{
-  padding: 15vh 0;
-  min-height: 600px;
+  padding: 5vh 0;
+  min-height: 170px;
 }
 section.cs_sistemaInfo .jumbotron p{
   font-size: 1.2em;
