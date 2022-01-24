@@ -17,8 +17,6 @@ import numpy as np
 import pandas as pd
 
 
-
-
 ## librerías de Bokeh
 from bokeh.plotting import Figure
 
@@ -58,12 +56,13 @@ from bokeh.tile_providers import (
     ESRI_IMAGERY,
 )
 
-#Libreria para descargar csv boton
+# Libreria para descargar csv boton
 from os.path import dirname, join
+
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
 path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -92,60 +91,60 @@ tiles = [
 
 
 cats = {
-    'Otras actividades':1,
-     'Comercio minorista':2,
-     'Captación, tratamiento y distribución de agua':3,
-     'Otras industrias manufactureras':4,
-     'Pesca y acuicultura':5,
-     'Plantas de tratamiento de aguas servidas':6,
-     'Comercio mayorista':7,
-     'Producción agropecuaria':8,
-     'Ventas y mantención de vehículos automotores':9,
-     'Construcción':10,
-     'Minería':11,
-     'Termoeléctricas':12,
-     'Otras centrales de generación eléctrica':13,
-     'Industria del papel y celulosa':14,
-     'Industria química, de plástico y caucho':15,
-     'Industria de la madera y silvicultura':16,
-     'Refinería de petróleo':17,
-     'Gestores de residuos':18,
-     'Producción de cemento, cal y yeso':19,        
+    "Otras actividades": 1,
+    "Comercio minorista": 2,
+    "Captación, tratamiento y distribución de agua": 3,
+    "Otras industrias manufactureras": 4,
+    "Pesca y acuicultura": 5,
+    "Plantas de tratamiento de aguas servidas": 6,
+    "Comercio mayorista": 7,
+    "Producción agropecuaria": 8,
+    "Ventas y mantención de vehículos automotores": 9,
+    "Construcción": 10,
+    "Minería": 11,
+    "Termoeléctricas": 12,
+    "Otras centrales de generación eléctrica": 13,
+    "Industria del papel y celulosa": 14,
+    "Industria química, de plástico y caucho": 15,
+    "Industria de la madera y silvicultura": 16,
+    "Refinería de petróleo": 17,
+    "Gestores de residuos": 18,
+    "Producción de cemento, cal y yeso": 19,
 }
 
 
 combs_1 = {
-    'Carbón Bituminoso Pulverizado':1,
-     'Gas Natural':2,
-     'Gas de Coque':3,
-     'Carbón Sub Bituminoso':4,
-     'Licor Negro':5,
-     'Gas de Coque Diluido':6,
-     'Gas Licuado de Petróleo':7,
-     'Gas de Alto Horno':8,
-     'Carbón Coke':9,
-     'Coke de Petróleo (Petcoke)':10,
-     'Biomasa Combustible':11,
-     'Petróleo N 6':12,
-     'Carbón Bituminoso':13,
-     'Gas de Refinería':14,
-     'Aserrín':15,
-     'Viruta, Despuntes':16,
-     'Petróleo N 2 (Diesel)':17,
-     'Leña':18,
-     'Gas de Cañería':19,
-     'Petróleo N 5':20
-     }
+    "Carbón Bituminoso Pulverizado": 1,
+    "Gas Natural": 2,
+    "Gas de Coque": 3,
+    "Carbón Sub Bituminoso": 4,
+    "Licor Negro": 5,
+    "Gas de Coque Diluido": 6,
+    "Gas Licuado de Petróleo": 7,
+    "Gas de Alto Horno": 8,
+    "Carbón Coke": 9,
+    "Coke de Petróleo (Petcoke)": 10,
+    "Biomasa Combustible": 11,
+    "Petróleo N 6": 12,
+    "Carbón Bituminoso": 13,
+    "Gas de Refinería": 14,
+    "Aserrín": 15,
+    "Viruta, Despuntes": 16,
+    "Petróleo N 2 (Diesel)": 17,
+    "Leña": 18,
+    "Gas de Cañería": 19,
+    "Petróleo N 5": 20,
+}
 
 combs_2 = {
-     'Kerosene':1,
-     'Metanol':2,
-     'Propano':3,
-     'Aceite Usado':4,
-     'Carbón de Leña':5,
-     'Bencina':6,
-     'Biogas':7
-    }
+    "Kerosene": 1,
+    "Metanol": 2,
+    "Propano": 3,
+    "Aceite Usado": 4,
+    "Carbón de Leña": 5,
+    "Bencina": 6,
+    "Biogas": 7,
+}
 
 
 # paleta de colores para los gráficos
@@ -184,75 +183,106 @@ def ReadIndus():
             'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO'
         
     """
-    header = ['ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
-              ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
-              'Latitud', 'Longitud', 'fuente_emision', 'tipo_fuente', 'combustible_prim', 'ccf8',
-              'tipo_contaminante','EMISION PRIMARIO', 'combustible_sec', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
-              'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO']
-    
-    
+    header = [
+        "ano",
+        "ID",
+        "nombre",
+        "raz_social",
+        "ciiu4",
+        "ciiu6",
+        "rubro",
+        "region",
+        "provincia",
+        "comuna",
+        "huso",
+        "Latitud",
+        "Longitud",
+        "fuente_emision",
+        "tipo_fuente",
+        "combustible_prim",
+        "ccf8",
+        "tipo_contaminante",
+        "EMISION PRIMARIO",
+        "combustible_sec",
+        "CCF8 SECUNDARIO",
+        "CONTAMINANTE 2",
+        "EMISION SECUNDARIO",
+        "CCF8 MATERIA PRIMA",
+        "CONTAMINANTE 3",
+        "EMISION MATERIA PRIMA",
+        "ton_emision",
+        "ORIGEN",
+        "NIVEL ACTIVIDAD EXTERNO",
+    ]
 
-    indus = pd.read_csv(path + "datos/RETC/ruea_2020_ckan_final.csv", sep =';', decimal=',', thousands= '.', encoding = 'utf-8-sig', names = header)
+    indus = pd.read_csv(
+        path + "datos/RETC/ruea_2020_ckan_final.csv",
+        sep=";",
+        decimal=",",
+        thousands=".",
+        encoding="utf-8-sig",
+        names=header,
+    )
     # indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", sep =';', decimal=',', thousands= '.', encoding = 'utf-8-sig', names = header)
 
-
-      
     # indus = indus.drop(0, axis=0)
-    
 
-    
-    indus = indus.drop(['ano', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
-    'CCF8 MATERIA PRIMA','CONTAMINANTE 3', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO' ], axis = 1)
-    
-    
-    #Se necesita reemplazar los puntos por nada, y las comas por puntos (ya que los decimales en python son con puntos.)
-    
-    indus['ton_emision'] = indus['ton_emision'].str.replace(".", '')
-    indus['ton_emision'] = indus['ton_emision'].str.replace(",", '.')
-    
-    indus['Latitud'] = indus['Latitud'].str.replace(",", '.')
-    indus['Longitud'] = indus['Longitud'].str.replace(",", '.')
+    indus = indus.drop(
+        [
+            "ano",
+            "CCF8 SECUNDARIO",
+            "CONTAMINANTE 2",
+            "EMISION SECUNDARIO",
+            "CCF8 MATERIA PRIMA",
+            "CONTAMINANTE 3",
+            "ORIGEN",
+            "NIVEL ACTIVIDAD EXTERNO",
+        ],
+        axis=1,
+    )
 
+    # Se necesita reemplazar los puntos por nada, y las comas por puntos (ya que los decimales en python son con puntos.)
 
+    indus["ton_emision"] = indus["ton_emision"].str.replace(".", "")
+    indus["ton_emision"] = indus["ton_emision"].str.replace(",", ".")
 
-    indus.ton_emision = pd.to_numeric(indus.ton_emision, errors='coerce')
+    indus["Latitud"] = indus["Latitud"].str.replace(",", ".")
+    indus["Longitud"] = indus["Longitud"].str.replace(",", ".")
 
-    indus.ccf8 = pd.to_numeric(indus.ccf8, errors='coerce')
-    
+    indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
 
-    indus.Longitud = pd.to_numeric(indus.Longitud, errors='coerce')
-    indus.Latitud = pd.to_numeric(indus.Latitud, errors='coerce')
+    indus.ccf8 = pd.to_numeric(indus.ccf8, errors="coerce")
 
-    indus = indus.dropna(subset=(['ton_emision','Longitud','Latitud']))
+    indus.Longitud = pd.to_numeric(indus.Longitud, errors="coerce")
+    indus.Latitud = pd.to_numeric(indus.Latitud, errors="coerce")
+
+    indus = indus.dropna(subset=(["ton_emision", "Longitud", "Latitud"]))
     # indus = indus['longitud'].dropna()
     # indus = indus['latitud'].dropna()
     # indus = indus['huso'].dropna()
 
-
     # indus.huso = pd.to_numeric(indus.huso, errors='coerce')
-       
 
-        
     return indus
 
-def readccf8():
-    
-    
-    header = ['ccf8', 'ener_emis']
-    base = pd.read_csv(path + "datos/RETC/ccf8.csv",sep = ';', encoding = 'utf-8-sig', names = header)
-    
-    base = base.drop([0,1], axis=0)
 
-    
-    base['ccf8'] = base['ccf8'].str.replace("-", '')
-    base['ener_emis'] = base['ener_emis'].str.replace(",", '.')
-    
-    
-    base.ccf8 = pd.to_numeric(base.ccf8, errors = "coerce")
-    base.ener_emis= pd.to_numeric(base.ener_emis, errors = "coerce")
-    
+def readccf8():
+
+    header = ["ccf8", "ener_emis"]
+    base = pd.read_csv(
+        path + "datos/RETC/ccf8.csv", sep=";", names=header
+    )
+
+    base = base.drop([0, 1], axis=0)
+
+    base["ccf8"] = base["ccf8"].str.replace("-", "")
+    base["ener_emis"] = base["ener_emis"].str.replace(",", ".")
+
+    base.ccf8 = pd.to_numeric(base.ccf8, errors="coerce")
+    base.ener_emis = pd.to_numeric(base.ener_emis, errors="coerce")
 
     return base
+
 
 def IDequipo(df):
     """
@@ -274,65 +304,65 @@ def IDequipo(df):
     for cld in df.fuente_emision:
         clds.append(cld[0:2])
     df["equipo"] = clds
-    
+
     eqps = []
     for eqp in df.equipo:
         if eqp == "AN":
             eqps.append("Antorcha")
-            
+
         elif eqp == "CF":
             eqps.append("Caldera de Fluido Térmico")
-            
+
         elif eqp == "CG":
             eqps.append("Caldera de Generación Eléctrica")
-            
+
         elif eqp == "CL":
             eqps.append("Calentador")
-            
+
         elif eqp == "CR":
-            eqps.append("Caldera Recuperadora")   
+            eqps.append("Caldera Recuperadora")
 
         elif eqp == "CV":
             eqps.append("Convertidor Teniente (CT)")
-            
+
         elif eqp == "CV":
             eqps.append("Convertidor Pierce Smith (CPS)")
 
         elif eqp == "CA":
             eqps.append("Caldera Calefacción (CA)")
-            
+
         elif eqp == "EL":
             eqps.append("Grupo Electrógeno")
-             
+
         elif eqp == "HR":
             eqps.append("Horno de Panadería")
-                        
+
         elif eqp == "IC":
             eqps.append("Incinerador")
-            
+
         elif eqp == "MC":
             eqps.append("Molino de Rodillo")
 
         elif eqp == "Marmita de Calcinación":
-            eqps.append("MC")#, "MO")
+            eqps.append("MC")  # , "MO")
 
         elif eqp == "IN":
             eqps.append("Caldera Industrial (IN)")
-            
+
         elif eqp == "MG":
             eqps.append("Motor Generación Eléctrica")
-            
+
         elif eqp == "TG":
             eqps.append("Turbina de Gas")
-            
+
         elif eqp == "RG":
             eqps.append("Regenerador Cracking Catalítico (FCCU)")
-            
+
         elif eqp == "SC":
             eqps.append("Secadores")
-        else :
+        else:
             eqps.append(eqp)
-    
+
     df["equipo_name"] = eqps
 
     return df
@@ -368,65 +398,67 @@ def FiltEquip(df, mkt):
         DF con los filtros aplicados.
 
     """
-   
+
     nl = []
 
     if mkt == ["Todo"]:
-        eqp_ft = ['CG',
-          'EL',
-          'AN',
-          'IN',
-          'PS',
-          'TG',
-          'HR',
-          'CA',
-          'RG',
-          'CF',
-          'MG',
-          'MC',
-          'SC',
-          'CV',
-          'IC',
-          'MO',
-          'CL',
-          'CR']
-    
+        eqp_ft = [
+            "CG",
+            "EL",
+            "AN",
+            "IN",
+            "PS",
+            "TG",
+            "HR",
+            "CA",
+            "RG",
+            "CF",
+            "MG",
+            "MC",
+            "SC",
+            "CV",
+            "IC",
+            "MO",
+            "CL",
+            "CR",
+        ]
+
         df = df[df.equipo.isin(eqp_ft)]
-    else :
-        for i in mkt :
+    else:
+        for i in mkt:
             if i == "Antorcha":
                 nl.append("AN")
-                
+
             elif i == "Caldera de Fluido Térmico":
                 nl.append("CF")
-                
+
             elif i == "Caldera de Generación Eléctrica":
                 nl.append("CG")
-                
+
             elif i == "Calentador":
                 nl.append("CL")
-                
+
             elif i == "Caldera Recuperadora":
-                nl.append("CR")      
+                nl.append("CR")
 
             elif i == "Convertidor Teniente (CT)":
-                nl.append("CV")   
-                
+                nl.append("CV")
+
             elif i == "Convertidor Pierce Smith (CPS)":
                 nl.append("CV")
 
             elif i == "Caldera Calefacción (CA)":
                 nl.append("CA")
-                
+
             elif i == "Grupo Electrógeno":
                 nl.append("EL")
-                 
+
             elif i == "Horno de Panadería":
                 nl.append("HR")
-                
+
             elif i == "Incinerador":
                 nl.append("IC", "MO")
-                
+
             elif i == "Molino de Rodillo":
                 nl.append("MC")
 
@@ -435,16 +467,16 @@ def FiltEquip(df, mkt):
 
             elif i == "Caldera Industrial (IN)":
                 nl.append("IN")
-                
+
             elif i == "Motor Generación Eléctrica":
                 nl.append("MG")
-                
+
             elif i == "Turbina de Gas":
                 nl.append("TG")
-                
+
             elif i == "Regenerador Cracking Catalítico (FCCU)":
                 nl.append("RG")
-                
+
             elif i == "Secadores":
                 nl.append("SC")
 
@@ -453,9 +485,9 @@ def FiltEquip(df, mkt):
 
             elif i == "Mercado H2":
                 nl.append("IN", "CF", "CA", "PC", "PS")
-            
+
         df = df[df.equipo.isin(nl)]
-        
+
     return df
 
 
@@ -489,7 +521,7 @@ def IndusFilt(df, min_ton, max_ton):
     indus_gr = df.groupby(["ID"]).agg(
         {
             "ton_emision": "sum",
-            # 'ener_cons_CO2':"sum",
+            'ener_cons_CO2':"sum",
             "n_equip": "sum",
             "raz_social": "first",
             "nombre": "first",
@@ -499,13 +531,12 @@ def IndusFilt(df, min_ton, max_ton):
             "provincia": "first",
             "comuna": "first",
             "combustible_prim": "first",
-            "combustible_sec":"first",
-            "fuente_emision":"first",   
-            "tipo_contaminante":"first",
+            "combustible_sec": "first",
+            "fuente_emision": "first",
+            "tipo_contaminante": "first",
             "huso": "first",
             "Latitud": "first",
             "Longitud": "first",
-            
         }
     )
 
@@ -566,19 +597,18 @@ def Filtrbr(df, rbr, max_empr):
         DF con la categoría filtrada.
 
     """
-    
+
     # if catg == "rubro":
     if rbr == ["Todo"]:
         rbr = list(indus.rubro.unique())
 
     else:
         pass
-    
+
     df["rbr"] = df.rubro.map(cats)
     df = df[df.rubro.isin(rbr)]
-              
+
     return df
-    
 
 
 # filtrar por region
@@ -660,36 +690,39 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 
     return df
 
-# def emission_to_energy(df,df2):
-    
-#     # # fc_CO2_GE_GN = 56.10 #ton/TJ
-#     # # fc_CO2_GE_DS = 74.10 #ton/TJç
-    
-#     # df.loc[df.equipo == df.equipo,'ener_cons_CO2'] = np.nan
-#     # df['ener_cons_CO2'] = np.nan
-#     # df.loc[(df.ccf8) == df2.fc_ccf8, 'ener_cons_CO2'] = df.ton_emision/(df2.ener_emis)
-    
-#     # df['ener_cons_CO2'] = df['ccf8'].where(df['ccf8'] != df2['ccf8'],  df.ton_emision/df2.ener_emis)
 
-#     # df['ener_cons_CO2'] = np.where(df['ccf8'] == df2['ccf8'], [df.ton_emision/df2.ener_emis, np.nan] )
+def emission_to_energy(df, df2):
 
-#     # df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS)
-#     # df.ccf8.str.replace('.','')
-#     # df.loc[df[['ccf8']] == df2[['ccf8']], 'ener_cons_Co2'] = df.ton_emision/df2.ccf8
+    # # fc_CO2_GE_GN = 56.10 #ton/TJ
+    # # fc_CO2_GE_DS = 74.10 #ton/TJç
 
-#     # df.loc[(df.equipo != 'EL') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural'), 'ener_cons_Co2'] = np.nan
-    
-#     # for i in df.ccf8:
-#     #     for j in df2.ccf8:
-#     #         if i == j :
-#     #             df['ener_cons_CO2'] = df.ton_emision/df2.ener_emis
-    
-    
-#     # df.where(df.ccf8==df2.ccf8).notna()
-#     # df.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal=',', index = False)
+    # df.loc[df.equipo == df.equipo,'ener_cons_CO2'] = np.nan
+    # df['ener_cons_CO2'] = np.nan
+    # df.loc[(df.ccf8) == df2.fc_ccf8, 'ener_cons_CO2'] = df.ton_emision/(df2.ener_emis)
 
+    # df['ener_cons_CO2'] = df['ccf8'].where(df['ccf8'] != df2['ccf8'],  df.ton_emision/df2.ener_emis)
+
+    # df['ener_cons_CO2'] = np.where(df['ccf8'] == df2['ccf8'], [df.ton_emision/df2.ener_emis, np.nan] )
+
+    # df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS)
+    # df.ccf8.str.replace('.','')
+    # df.loc[df[['ccf8']] == df2[['ccf8']], 'ener_cons_Co2'] = df.ton_emision/df2.ccf8
+
+    # df.loc[(df.equipo != 'EL') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural'), 'ener_cons_Co2'] = np.nan
+
+    # for i in df.ccf8:
+    #     for j in df2.ccf8:
+    #         if i == j :
+    #             df['ener_cons_CO2'] = df.ton_emision/df2.ener_emis
+
+    # df.where(df.ccf8==df2.ccf8).notna()
+    # df.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal=',', index = False)
+    map_dict = df2.set_index('ccf8').T.to_dict('index')
     
-#     return df
+    df['fc_emis_prim'] = df.ccf8.map(map_dict['ener_emis'])   
+    df['ener_cons_CO2'] = df.ton_emision/df.fc_emis_prim
+    
+    return df
 
 
 # ########################################################################################
@@ -702,7 +735,7 @@ comb_list = list(indus.combustible_prim.unique())
 comb_list.remove("Null")
 comb_list.remove(comb_list[8])
 # comb_list.sort()
-comb_list= ["Todo"] + comb_list
+comb_list = ["Todo"] + comb_list
 
 
 # crear lista de contaminantes
@@ -713,22 +746,24 @@ ctms_opt = ["Todo"] + ctms
 ctm = "Carbon dioxide"
 indus = indus[indus.tipo_contaminante == ctm]
 
-#definición factor emisión/energía para grupo electrogenos
+# definición factor emisión/energía para grupo electrogenos
 
 
 # definir contaminante inicial a analizar y filtrar df indus
-comb = ['Todo']
+comb = ["Todo"]
 
-if comb == ['Todo']:
+if comb == ["Todo"]:
     pass
 else:
     indus = indus[indus.combustible_prim.isin(comb)]
 
 # filtrar df indus según equipo a analizar
-indus = IDequipo(indus) # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
+indus = IDequipo(
+    indus
+)  # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
-#convierte emisiones a factor energético
-# indus = emission_to_energy(indus,base)
+# convierte emisiones a factor energético
+indus = emission_to_energy(indus,base)
 
 
 # lista de equipos a analizar
@@ -741,7 +776,9 @@ indus_tmp = FiltEquip(indus, mkt)  # deja unicamente los equipos del mercado a a
 # definir el mínimo de emisiones a analizar en las empresas
 min_ton = 1000
 max_ton = 0
-indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)  # agrupa por ID  (suma toneladas y n° de equipos que tiene)
+indus_ft = IndusFilt(
+    indus_tmp, min_ton, max_ton
+)  # agrupa por ID  (suma toneladas y n° de equipos que tiene)
 
 # definir máximo de empresas a analizar
 max_empr = 1000
@@ -749,10 +786,14 @@ max_empr = 1000
 # definir categoría
 rbr = ["Todo"]
 catg = ["rubro"]
-indus_ft = Filtrbr(indus_ft, rbr, max_empr)  # Cruza la base agrupada con la categoría de actividad
+indus_ft = Filtrbr(
+    indus_ft, rbr, max_empr
+)  # Cruza la base agrupada con la categoría de actividad
 
 # convertir latitud y longitud
-indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")  # crea plano columnas (x,y) en función de lat y long
+indus_ft = wgs84_to_web_mercator(
+    indus_ft, lon="Longitud", lat="Latitud"
+)  # crea plano columnas (x,y) en función de lat y long
 
 # definir tamaño y color del marcador en el mapa
 pt_size = np.log(indus_ft.ton_emision)
@@ -763,9 +804,9 @@ indus_ft["clr"] = indus_ft.rubro.map(clr)
 
 # Definir nuevo ID por fuente de emisión
 indus["f_ind"] = indus.fuente_emision
-indus= indus.set_index("f_ind")
+indus = indus.set_index("f_ind")
 
-indus= wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
+indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
 
 # # ##leer archivo de combustibles y juntar df indus
@@ -780,10 +821,15 @@ source_indus = ColumnDataSource(data=indus_ft)
 columns = [
     TableColumn(field="nombre", title="Nombre", width=100),
     TableColumn(field="raz_social", title="Razon social", width=60),
-    TableColumn(field="ton_emision", title="Emisiones (ton/año)", width=30, formatter=NumberFormatter(format="0.0"),),
-    # TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TJ/año)", width=30, formatter=NumberFormatter(format="0.0"),),
+    TableColumn(
+        field="ton_emision",
+        title="Emisiones (ton/año)",
+        width=30,
+        formatter=NumberFormatter(format="0.0"),
+    ),
+    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TJ/año)", width=30, formatter=NumberFormatter(format="0.0"),),
     TableColumn(field="region", title="Región", width=50),
-    TableColumn(field= "combustible_prim", title = "Combustible Primario", width = 50),
+    TableColumn(field="combustible_prim", title="Combustible Primario", width=50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
     TableColumn(field="ciiu4", title="CIIU4", width=200),
 ]
@@ -797,26 +843,54 @@ data_table = DataTable(
 #######################################################################################
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
-p1 = Figure(plot_width=800, plot_height=900,tools=["pan,wheel_zoom,box_zoom,reset,save"],
-            x_axis_type="mercator", y_axis_type="mercator",
-            x_range=(-9000000,-6000000),y_range=(-6000000,-1200000))
+p1 = Figure(
+    plot_width=800,
+    plot_height=900,
+    tools=["pan,wheel_zoom,box_zoom,reset,save"],
+    x_axis_type="mercator",
+    y_axis_type="mercator",
+    x_range=(-9000000, -6000000),
+    y_range=(-6000000, -1200000),
+)
 p1.add_tile(tile_provider)
 
 
 # graficar marcadores de industria y definir info a desplegar con "hover"
-sct = p1.scatter(x="x", y="y", size="pt_size" , fill_color='clr', fill_alpha=0.8, legend_field="rubro",
-                  source=source_indus)
+sct = p1.scatter(
+    x="x",
+    y="y",
+    size="pt_size",
+    fill_color="clr",
+    fill_alpha=0.8,
+    legend_field="rubro",
+    source=source_indus,
+)
 
 p1.legend.click_policy = "hide"
 
 
-p1.add_tools(HoverTool(renderers=[sct],tooltips=[("Nombre: ", "@nombre"),("Region: ", "@region"), ("Emisiones (ton/año): ", "@ton_emision"),
-            ("Rubro: ", "@rubro"), ("Combustible Primario: ", "@combustible_prim")]))
+p1.add_tools(
+    HoverTool(
+        renderers=[sct],
+        tooltips=[
+            ("Nombre: ", "@nombre"),
+            ("Region: ", "@region"),
+            ("Emisiones (ton/año): ", "@ton_emision"),
+            ("Rubro: ", "@rubro"),
+            ("Combustible Primario: ", "@combustible_prim"),
+        ],
+    )
+)
 
 b = Button(label="Resetear mapa", button_type="success", width=250)
-b.js_on_click(CustomJS(args=dict(p=p1), code="""
+b.js_on_click(
+    CustomJS(
+        args=dict(p=p1),
+        code="""
     p.reset.emit()
-"""))
+""",
+    )
+)
 
 ########################################################################
 
@@ -829,16 +903,27 @@ source_empr = ColumnDataSource(data=df_empr)
 columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
     TableColumn(field="equipo_name", title="Fuente emisión", width=25),
-    TableColumn(field="ton_emision", title="Emisiones (ton/año)", width=25, formatter=NumberFormatter(format="0.0")),
-    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TJ/año)", width=25, formatter=NumberFormatter(format="0.0")),
+    TableColumn(
+        field="ton_emision",
+        title="Emisiones (ton/año)",
+        width=25,
+        formatter=NumberFormatter(format="0.0"),
+    ),
+    TableColumn(
+        field="ener_cons_CO2",
+        title="Energía consumida anual (TJ/año)",
+        width=25,
+        formatter=NumberFormatter(format="0.0"),
+    ),
     TableColumn(field="tipo_contaminante", title="Contaminante", width=25),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=25),
-    TableColumn(field="combustible_sec", title="Secundario", width=25) ]
+    TableColumn(field="combustible_sec", title="Secundario", width=25),
+]
 
 data_tableEmpr = DataTable(
     columns=columns_empr, source=source_empr, width=1400, height=200, editable=True
 )
- 
+
 
 #####################################################################################
 
@@ -848,29 +933,34 @@ wdt = 250
 
 dropDownCtms = Select(value=ctm, title="Contaminante", options=ctms_opt)
 
-minTon = TextInput(value=str(min_ton), title="Mínimo emisiones anuales [ton/año]", width=wdt)
-maxTon = TextInput(value=str(max_ton), title="Máximo emisiones anuales [ton/año]", width=wdt)
-mrc = ["Antorcha",
-    "Caldera de Fluido Térmico",       
-    "Caldera de Generación Eléctrica",       
-    "Calentador",       
+minTon = TextInput(
+    value=str(min_ton), title="Mínimo emisiones anuales [ton/año]", width=wdt
+)
+maxTon = TextInput(
+    value=str(max_ton), title="Máximo emisiones anuales [ton/año]", width=wdt
+)
+mrc = [
+    "Antorcha",
+    "Caldera de Fluido Térmico",
+    "Caldera de Generación Eléctrica",
+    "Calentador",
     "Caldera Recuperadora",
     "Convertidor Teniente (CT)",
     "Convertidor Pierce Smith (CPS)",
-    "Caldera Calefacción (CA)",    
-    "Grupo Electrógeno",       
-    "Horno de Panadería",       
-    "Incinerador",       
-    "Molino de Rodillo",      
-    "Marmita de Calcinación",    
-    "Caldera Industrial (IN)",       
-    "Motor Generación Eléctrica",  
-    "Turbina de Gas",   
+    "Caldera Calefacción (CA)",
+    "Grupo Electrógeno",
+    "Horno de Panadería",
+    "Incinerador",
+    "Molino de Rodillo",
+    "Marmita de Calcinación",
+    "Caldera Industrial (IN)",
+    "Motor Generación Eléctrica",
+    "Turbina de Gas",
     "Regenerador Cracking Catalítico (FCCU)",
     "Secadores",
     "Mercado Solar",
     "Mercado H2",
-    "Generación eléctrica"
+    "Generación eléctrica",
 ]
 
 mrc.sort()
@@ -880,11 +970,8 @@ dropdownEquip = MultiChoice(value=mkt, title="Equipo térmico", options=mrc, wid
 
 rubro = list(indus.rubro.unique())
 rubro.sort()
-rubro =["Todo"] + rubro
-rbr_multi_choice = MultiChoice(title = "Rubro", value=rbr, options=rubro, width=600)
-
-
-
+rubro = ["Todo"] + rubro
+rbr_multi_choice = MultiChoice(title="Rubro", value=rbr, options=rubro, width=600)
 
 
 region = list(indus.region.unique())
@@ -901,17 +988,22 @@ latSur = TextInput(
 
 maxEmpr = TextInput(value=str(max_empr), title="Total empresas", width=wdt)
 
-#boton para filtrar y resetear mapa.
+# boton para filtrar y resetear mapa.
 buttCalcUpdate = Button(label="Filtrar", button_type="success", width=wdt)
-buttCalcUpdate.js_on_click(CustomJS(args=dict(p=p1), code="""
+buttCalcUpdate.js_on_click(
+    CustomJS(
+        args=dict(p=p1),
+        code="""
     p.reset.emit()
-"""))
+""",
+    )
+)
 
 dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
-dropDownComb = MultiChoice(value=["Todo"], title="Combustible Primario", options=comb_list, width = 300)
-
-
+dropDownComb = MultiChoice(
+    value=["Todo"], title="Combustible Primario", options=comb_list, width=300
+)
 
 
 #############################################################################################
@@ -1001,7 +1093,6 @@ def function_source(attr, old, new):
 source_indus.selected.on_change("indices", function_source)
 
 
-
 def UpdateTable():
     """
     Función creada para un boton. Permite leer y procesar el archivo de 'emisiones_aire_año_cart.csv', 
@@ -1014,15 +1105,15 @@ def UpdateTable():
     """
 
     indus = ReadIndus()
-    # base = readccf8()
+    base = readccf8()
 
     ctm = dropDownCtms.value
-    
+
     if ctm == "Todo":
         indus = indus[indus.tipo_contaminante.isin(ctms)]
     else:
-        indus = indus[indus.tipo_contaminante == ctm]       
-        
+        indus = indus[indus.tipo_contaminante == ctm]
+
     comb = dropDownComb.value
 
     if comb == ["Todo"]:
@@ -1030,10 +1121,9 @@ def UpdateTable():
     else:
         indus = indus[indus.combustible_prim.isin(comb)]
 
-
     indus = IDequipo(indus)
-    
-    # indus = emission_to_energy(indus, base)
+
+    indus = emission_to_energy(indus, base)
 
     # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
     # indus = indus[indus.equipo.isin(eqp_ft)]
@@ -1046,28 +1136,26 @@ def UpdateTable():
     indus_ft = IndusFilt(indus_tmp, min_ton, max_ton)
 
     max_empr = int(maxEmpr.value)
-    
-            
+
     rbr = rbr_multi_choice.value
     indus_ft = Filtrbr(indus_ft, rbr, max_empr)
-    
+
     rn = dropdownRegion.value
     latN = float(latNorte.value)
     latS = float(latSur.value)
     indus_ft = FiltRegion(indus_ft, rn, latN, latS)
-    
+
     source_empr.data = indus_ft
-    
+
     indus_ft = wgs84_to_web_mercator(indus_ft, lon="Longitud", lat="Latitud")
     pt_size = np.log(indus_ft.ton_emision)
     indus_ft["pt_size"] = pt_size
     indus_ft["clr"] = indus_ft.rubro.map(clr)
     # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
-        
+
     source_indus.data = indus_ft
     source_empr.data = indus_ft
-    
-        
+
     tl = get_provider(dropDownTiles.value)
     p1.renderers = [
         x for x in p1.renderers if not str(x).startswith("TileRenderer")
@@ -1077,16 +1165,16 @@ def UpdateTable():
 
     source_empr.data = indus_ft
     # source_indus.data = indus_ft
-  
+
 
 def DownloadButton():
-   
-    indus_D = ReadIndus()
-    # base_D = readccf8()
-    ctm = dropDownCtms.value
-     
-    indus_D = indus_D[indus_D.tipo_contaminante == ctm]
 
+    indus_D = ReadIndus()
+    base_D = readccf8()
+    
+    ctm = dropDownCtms.value
+
+    indus_D = indus_D[indus_D.tipo_contaminante == ctm]
 
     comb = dropDownComb.value
 
@@ -1094,11 +1182,10 @@ def DownloadButton():
         pass
     else:
         indus_D = indus_D[indus_D.combustible_prim.isin(comb)]
-    
-    indus_D = IDequipo(indus_D)
-    
-    # indus_D = emission_to_energy(indus_D, base_D)
 
+    indus_D = IDequipo(indus_D)
+
+    indus_D = emission_to_energy(indus_D, base_D)
 
     mkt = dropdownEquip.value
     indus_tmp = FiltEquip(indus_D, mkt)
@@ -1110,35 +1197,60 @@ def DownloadButton():
     max_empr = int(maxEmpr.value)
     # catg = dropDownCat.value
 
-    
     rbr = rbr_multi_choice.value
     indus_ft2 = Filtrbr(indus_ft, rbr, max_empr)
 
- 
-    indus_ft2 = indus_ft2.drop(['clr','Latitud','Longitud','rbr', 'comuna'
-                          ,'huso','n_equip','orden','max_emision', 'pt_size'
-                          ,'x','y'
-                            ], axis = 1)
-    
-    indus_ft2 = indus_ft2[['nombre','raz_social','rubro',
-                            'ciiu4','region','provincia','fuente_emision',
-                            'combustible_prim','combustible_sec','tipo_contaminante',
-                            'ton_emision']]
-    
-    nw = ColumnDataSource(data = indus_ft2)
+    indus_ft2 = indus_ft2.drop(
+        [
+            "clr",
+            "Latitud",
+            "Longitud",
+            "rbr",
+            "comuna",
+            "huso",
+            "n_equip",
+            "orden",
+            "max_emision",
+            "pt_size",
+            "x",
+            "y",
+        ],
+        axis=1,
+    )
+
+    indus_ft2 = indus_ft2[
+        [
+            "nombre",
+            "raz_social",
+            "rubro",
+            "ciiu4",
+            "region",
+            "provincia",
+            "fuente_emision",
+            "combustible_prim",
+            "combustible_sec",
+            "tipo_contaminante",
+            "ton_emision",
+        ]
+    ]
+
+    nw = ColumnDataSource(data=indus_ft2)
     # nw = source_indus
-    
+
     nw.data = indus_ft2
-    
+
     # source_indus = ColumnDataSource(data = indus_ft)
-    
+
     button = Button(label="Download", button_type="success")
-    button.js_on_click(CustomJS(args=dict(source=source_indus),
-                                code=open(join(dirname(__file__), "download.js")).read()))
-    
+    button.js_on_click(
+        CustomJS(
+            args=dict(source=source_indus),
+            code=open(join(dirname(__file__), "download.js")).read(),
+        )
+    )
+
     return nw
 
-    
 
 # nw = DownloadButton()
 
@@ -1150,17 +1262,17 @@ buttCalcUpdate.on_click(UpdateTable)
 # nw = DownloadButton()
 
 
-
-
-
 button = Button(label="Download", button_type="success")
 
 
 button.on_click(DownloadButton)
 button.on_click(DownloadButton)
 nw = DownloadButton()
-button.js_on_click(CustomJS(args=dict(source=nw),
-                        code=open(join(dirname(__file__), "download.js")).read()))
+button.js_on_click(
+    CustomJS(
+        args=dict(source=nw), code=open(join(dirname(__file__), "download.js")).read()
+    )
+)
 #############################################
 
 
@@ -1169,7 +1281,7 @@ button.js_on_click(CustomJS(args=dict(source=nw),
 
 spc = 50
 layout = column(
-    row(dropDownCtms, minTon, maxTon,maxEmpr),
+    row(dropDownCtms, minTon, maxTon, maxEmpr),
     row(dropdownEquip, dropDownComb),
     row(rbr_multi_choice),
     Spacer(height=spc),
@@ -1178,7 +1290,7 @@ layout = column(
     row(buttCalcUpdate, button),
     row(b),
     Spacer(height=spc - 20),
-    row(p1,data_table), 
+    row(p1, data_table),
     Spacer(height=spc + 30),
     data_tableEmpr,
     p,

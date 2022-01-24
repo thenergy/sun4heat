@@ -89,7 +89,7 @@ def readccf8():
     
     
     header = ['ccf8', 'ener_emis']
-    base = pd.read_csv(path + "datos/RETC/ccf8.csv",sep = ';', encoding = 'utf-8-sig', names = header)
+    base = pd.read_csv(path + "datos/RETC/ccf8.csv",sep = ';', encoding = 'utf-8-sig', names = header)#dtype ={'ccf8':str,'ener_emis':np.float64})
     
     base = base.drop([0,1], axis=0)
 
@@ -97,9 +97,8 @@ def readccf8():
     base['ccf8'] = base['ccf8'].str.replace("-", '')
     base['ener_emis'] = base['ener_emis'].str.replace(",", '.')
     
-    
-    base.ccf8 = pd.to_numeric(base.ccf8, errors = "coerce")
-    base.ener_emis= pd.to_numeric(base.ener_emis, errors = "coerce")
+    base['ccf8'] = pd.to_numeric(base['ccf8'], errors = "coerce")
+    base['ener_emis']= pd.to_numeric(base['ener_emis'], errors = "coerce")
     
 
     return base
