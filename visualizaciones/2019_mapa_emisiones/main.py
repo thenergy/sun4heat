@@ -834,14 +834,12 @@ taptool = p1.select(type=TapTool)
 p1.on_event(Tap)
 
 b = Button(label="Resetear mapa", button_type="success", width=250)
-b.js_on_click(
-    CustomJS(
-        args=dict(p=p1),
-        code="""
-    p.reset.emit()
-""",
-    )
-)
+
+def resetglyph():
+    p1.selection_glyph = p1.glyph
+    p1.nonselection_glyph = p1.glyph
+
+
 
 ########################################################################
 
@@ -1194,7 +1192,7 @@ def DownloadButton():
 
     # source_indus = ColumnDataSource(data = indus_ft)
 
-    button = Button(label="Download", button_type="success")
+    button = Button(label="Descargar", button_type="success")
     button.js_on_click(
         CustomJS(
             args=dict(source=source_indus),
@@ -1213,6 +1211,7 @@ buttCalcUpdate.on_click(UpdateTable)
 # buttCalcUpdate.on_click(DownloadButton)
 # indus_temp = UpdateTable()
 # nw = DownloadButton()
+b.on_click(resetglyph)
 
 
 button = Button(label="Download", button_type="success")
@@ -1241,7 +1240,7 @@ layout = column(
     row(dropdownRegion, latNorte, latSur),
     row(dropDownTiles),
     row(buttCalcUpdate, button),
-    row(b),
+    # row(b),
     Spacer(height=spc - 20),
     row(p1, data_table),
     Spacer(height=spc + 30),
