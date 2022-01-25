@@ -34,7 +34,11 @@ from bokeh.models import (
     TileRenderer,
     MultiChoice,
     CustomJS,
+    TapTool
 )
+
+from bokeh.events import Tap
+
 from bokeh.io import curdoc
 from bokeh.layouts import column, row, Spacer
 from bokeh.models.widgets import Button
@@ -305,66 +309,6 @@ def IDequipo(df):
         clds.append(cld[0:2])
     df["equipo"] = clds
 
-    eqps = []
-    for eqp in df.equipo:
-        if eqp == "AN":
-            eqps.append("Antorcha")
-
-        elif eqp == "CF":
-            eqps.append("Caldera de Fluido Térmico")
-
-        elif eqp == "CG":
-            eqps.append("Caldera de Generación Eléctrica")
-
-        elif eqp == "CL":
-            eqps.append("Calentador")
-
-        elif eqp == "CR":
-            eqps.append("Caldera Recuperadora")
-
-        elif eqp == "CV":
-            eqps.append("Convertidor Teniente (CT)")
-
-        elif eqp == "CV":
-            eqps.append("Convertidor Pierce Smith (CPS)")
-
-        elif eqp == "CA":
-            eqps.append("Caldera Calefacción (CA)")
-
-        elif eqp == "EL":
-            eqps.append("Grupo Electrógeno")
-
-        elif eqp == "HR":
-            eqps.append("Horno de Panadería")
-
-        elif eqp == "IC":
-            eqps.append("Incinerador")
-
-        elif eqp == "MC":
-            eqps.append("Molino de Rodillo")
-
-        elif eqp == "Marmita de Calcinación":
-            eqps.append("MC")  # , "MO")
-
-        elif eqp == "IN":
-            eqps.append("Caldera Industrial (IN)")
-
-        elif eqp == "MG":
-            eqps.append("Motor Generación Eléctrica")
-
-        elif eqp == "TG":
-            eqps.append("Turbina de Gas")
-
-        elif eqp == "RG":
-            eqps.append("Regenerador Cracking Catalítico (FCCU)")
-
-        elif eqp == "SC":
-            eqps.append("Secadores")
-        else:
-            eqps.append(eqp)
-
-    df["equipo_name"] = eqps
-
     return df
 
 
@@ -401,90 +345,92 @@ def FiltEquip(df, mkt):
 
     nl = []
 
-    if mkt == ["Todo"]:
-        eqp_ft = [
-            "CG",
-            "EL",
-            "AN",
-            "IN",
-            "PS",
-            "TG",
-            "HR",
-            "CA",
-            "RG",
-            "CF",
-            "MG",
-            "MC",
-            "SC",
-            "CV",
-            "IC",
-            "MO",
-            "CL",
-            "CR",
-        ]
+    if "Todo" in mkt:
+        
+        eqp_ft = list(indus.equipo.unique())
+        # eqp_ft = [
+        #     "CG",
+        #     "EL",
+        #     "AN",
+        #     "IN",
+        #     "PS",
+        #     "TG",
+        #     "HR",
+        #     "CA",
+        #     "RG",
+        #     "CF",
+        #     "MG",
+        #     "MC",
+        #     "SC",
+        #     "CV",
+        #     "IC",
+        #     "MO",
+        #     "CL",
+        #     "CR",
+        # ]
 
         df = df[df.equipo.isin(eqp_ft)]
     else:
-        for i in mkt:
-            if i == "Antorcha":
-                nl.append("AN")
 
-            elif i == "Caldera de Fluido Térmico":
-                nl.append("CF")
+        if "Antorcha" in mkt:
+            nl.append("AN")
 
-            elif i == "Caldera de Generación Eléctrica":
-                nl.append("CG")
+        if "Caldera de Fluido Térmico" in mkt:
+            nl.append("CF")
 
-            elif i == "Calentador":
-                nl.append("CL")
+        if  "Caldera de Generación Eléctrica" in mkt:
+            nl.append("CG")
 
-            elif i == "Caldera Recuperadora":
-                nl.append("CR")
+        if  "Calentador" in mkt:
+            nl.append("CL")
 
-            elif i == "Convertidor Teniente (CT)":
-                nl.append("CV")
+        if  "Caldera Recuperadora" in mkt:
+            nl.append("CR")
 
-            elif i == "Convertidor Pierce Smith (CPS)":
-                nl.append("CV")
+        if  "Convertidor Teniente (CT)" in mkt:
+            nl.append("CV")
 
-            elif i == "Caldera Calefacción (CA)":
-                nl.append("CA")
+        if  "Convertidor Pierce Smith (CPS)" in mkt:
+            nl.append("CV")
 
-            elif i == "Grupo Electrógeno":
-                nl.append("EL")
+        if  "Caldera Calefacción (CA)" in mkt:
+            nl.append("CA")
 
-            elif i == "Horno de Panadería":
-                nl.append("HR")
+        if  "Grupo Electrógeno" in mkt:
+            nl.append("EL")
 
-            elif i == "Incinerador":
-                nl.append("IC", "MO")
+        if  "Horno" in mkt:
+            nl.append("HR")
 
-            elif i == "Molino de Rodillo":
-                nl.append("MC")
+        if  "Incinerador" in mkt:
+            nl.append("IC", "MO")
 
-            elif i == "Marmita de Calcinación":
-                nl.append("MC", "MO")
+        if  "Molino de Rodillo" in mkt:
+            nl.append("MC")
 
-            elif i == "Caldera Industrial (IN)":
-                nl.append("IN")
+        if  "Marmita de Calcinación" in mkt:
+            nl.append("MC", "MO")
 
-            elif i == "Motor Generación Eléctrica":
-                nl.append("MG")
+        if  "Caldera Industrial (IN)" in mkt:
+            nl.append("IN")
 
-            elif i == "Turbina de Gas":
-                nl.append("TG")
+        if  "Motor Generación Eléctrica" in mkt:
+            nl.append("MG")
 
-            elif i == "Regenerador Cracking Catalítico (FCCU)":
-                nl.append("RG")
+        if  "Turbina de Gas" in mkt:
+            nl.append("TG")
 
-            elif i == "Secadores":
-                nl.append("SC")
+        if  "Regenerador Cracking Catalítico (FCCU)" in mkt:
+            nl.append("RG")
 
-            elif i == "Mercado Solar":
-                nl.append("IN", "CF", "CA")
+        if  "Secadores" in mkt:
+            nl.append("SC")
 
-            elif i == "Mercado H2":
-                nl.append("IN", "CF", "CA", "PC", "PS")
+        if  "Mercado Solar" in mkt:
+            nl.append("IN", "CF", "CA")
+
+        if  "Mercado H2" in mkt:
+            nl.append("IN", "CF", "CA", "PC", "PS")
 
         df = df[df.equipo.isin(nl)]
 
@@ -632,13 +578,14 @@ def FiltRegion(df, rgn, latNor, latSur):
     df_filt : DataFrame.
         DF con el filtro de región/latitud realizados.       
     """
-
-    if rgn == "Todas":
+   
+    if "Rango latitud" in rgn:
+       df_filt = df[(df.Latitud < latNor) & (df.Latitud > latSur)]
+    elif "Todas" in rgn:
         df_filt = df
-    elif rgn == "Rango latitud":
-        df_filt = df[(df.Latitud < latNor) & (df.Latitud > latSur)]
     else:
-        df_filt = df[df.region == rgn]
+        # df_filt = df[df.region == rgn]
+        df_filt = df[df.region.isin(rgn)]
 
     return df_filt
 
@@ -846,7 +793,7 @@ tile_provider = get_provider(ESRI_IMAGERY)
 p1 = Figure(
     plot_width=800,
     plot_height=900,
-    tools=["pan,wheel_zoom,box_zoom,reset,save"],
+    tools=["pan,wheel_zoom,box_zoom,reset,save,tap"],
     x_axis_type="mercator",
     y_axis_type="mercator",
     x_range=(-9000000, -6000000),
@@ -882,6 +829,10 @@ p1.add_tools(
     )
 )
 
+taptool = p1.select(type=TapTool)
+
+p1.on_event(Tap)
+
 b = Button(label="Resetear mapa", button_type="success", width=250)
 b.js_on_click(
     CustomJS(
@@ -902,7 +853,7 @@ source_empr = ColumnDataSource(data=df_empr)
 
 columns_empr = [
     TableColumn(field="nombre", title="Nombre", width=25),
-    TableColumn(field="equipo_name", title="Fuente emisión", width=25),
+    TableColumn(field="tipo_fuente", title="Fuente emisión", width=25),
     TableColumn(
         field="ton_emision",
         title="Emisiones (ton/año)",
@@ -939,6 +890,8 @@ minTon = TextInput(
 maxTon = TextInput(
     value=str(max_ton), title="Máximo emisiones anuales [ton/año]", width=wdt
 )
+
+# mrc = list(indus.tipo_fuente.unique())
 mrc = [
     "Antorcha",
     "Caldera de Fluido Térmico",
@@ -977,7 +930,7 @@ rbr_multi_choice = MultiChoice(title="Rubro", value=rbr, options=rubro, width=60
 region = list(indus.region.unique())
 region.append("Todas")
 region.append("Rango latitud")
-dropdownRegion = Select(value="Todas", title="Region", options=region, width=wdt)
+dropdownRegion = MultiChoice(value=["Todas"], title="Region o Rango de latitud", options=region, width=wdt)
 
 latNorte = TextInput(
     value=str(-18.4), title="Latitud norte (Opción rango latitud)", width=wdt
@@ -1297,3 +1250,4 @@ layout = column(
 )
 ############################################
 curdoc().add_root(layout)
+
