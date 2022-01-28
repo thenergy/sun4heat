@@ -65,8 +65,8 @@ from os.path import dirname, join
 
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
-# path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -166,7 +166,7 @@ clr = dict(zip(cats, Category20[20]))
 # leer archivo "ckan_ruea_2019_v1"
 def ReadIndus():
     """
-    Esta función lee csv 'emisiones_aire_año_cart.csv' y entrega un DF.
+    Función que lee la base de emisiones entregada por el ministerio (variable por trimestre) y entrega un DF para manipular.
     
     Parameters
     ----------
@@ -440,7 +440,7 @@ def FiltEquip(df, mkt):
 # agrupar
 def IndusFilt(df, min_ton, max_ton):
     """
-    Función que filtra el DF entregado (emisiones_aire_año_cart.csv) según un rango de toneladas (min_ton, max_ton). 
+    Función que filtra el DF entregado (emisiones de industrias) según un rango de toneladas (min_ton, max_ton). 
     También agrupa según el ID, sumando las columnas de ton_emision y n_equip, agregando columna de max_emision (conjunto de empresas).
     
     Parameters
@@ -639,31 +639,23 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 
 
 def emission_to_energy(df, df2):
+    """
+    Función que cruza los factores de emisiones de los equipos según el ccf8 presente en la 
+    "GUIA-METODOLOGICA-PARA-LA-ESTIMACION-DE-EMISIONES-PROVENIENTES-DE-FUENTES-PUNTUALES" y en la base de industrias.
 
-    # # fc_CO2_GE_GN = 56.10 #ton/TJ
-    # # fc_CO2_GE_DS = 74.10 #ton/TJç
+    Parameters
+    ----------
+    df : DataFrame
+        bbdd que contiene la informaciónd e las industrias (indus)
+    df2 : DataFrame
+        bbdd que contiene la información de factor emisión según el ccf8.
 
-    # df.loc[df.equipo == df.equipo,'ener_cons_CO2'] = np.nan
-    # df['ener_cons_CO2'] = np.nan
-    # df.loc[(df.ccf8) == df2.fc_ccf8, 'ener_cons_CO2'] = df.ton_emision/(df2.ener_emis)
+    Returns
+    -------
+    None.
 
-    # df['ener_cons_CO2'] = df['ccf8'].where(df['ccf8'] != df2['ccf8'],  df.ton_emision/df2.ener_emis)
+    """
 
-    # df['ener_cons_CO2'] = np.where(df['ccf8'] == df2['ccf8'], [df.ton_emision/df2.ener_emis, np.nan] )
-
-    # df.loc[(df.equipo == 'EL') & (df.combustible_prim == 'Petróleo N 2 (Diesel)'), 'ener_cons_Co2'] = df.ton_emision/(fc_CO2_GE_DS)
-    # df.ccf8.str.replace('.','')
-    # df.loc[df[['ccf8']] == df2[['ccf8']], 'ener_cons_Co2'] = df.ton_emision/df2.ccf8
-
-    # df.loc[(df.equipo != 'EL') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural') or (df.equipo == 'EL' and df. combustible_prim != 'Gas Natural'), 'ener_cons_Co2'] = np.nan
-
-    # for i in df.ccf8:
-    #     for j in df2.ccf8:
-    #         if i == j :
-    #             df['ener_cons_CO2'] = df.ton_emision/df2.ener_emis
-
-    # df.where(df.ccf8==df2.ccf8).notna()
-    # df.to_csv(path + 'datos/RETC/indus_ll.csv', encoding="utf-8-sig",sep=';',decimal=',', index = False)
     map_dict = df2.set_index('ccf8').T.to_dict('index')
     
     df['fc_emis_prim'] = df.ccf8.map(map_dict['ener_emis'])   
@@ -753,6 +745,7 @@ indus_ft["clr"] = indus_ft.rubro.map(clr)
 indus["f_ind"] = indus.fuente_emision
 indus = indus.set_index("f_ind")
 
+#
 indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
 
@@ -763,6 +756,8 @@ indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 ########################################################################################
 # crear un ColumnDataSource (ds)
 source_indus = ColumnDataSource(data=indus_ft)
+nw = ColumnDataSource(data=indus_ft)   
+
 
 # definir titulo de columnas de una tabla
 columns = [
@@ -832,13 +827,6 @@ p1.add_tools(
 taptool = p1.select(type=TapTool)
 
 p1.on_event(Tap)
-
-b = Button(label="Resetear mapa", button_type="success", width=250)
-
-def resetglyph():
-    p1.selection_glyph = p1.glyph
-    p1.nonselection_glyph = p1.glyph
-
 
 
 ########################################################################
@@ -1115,11 +1103,25 @@ def UpdateTable():
     p1.renderers.insert(0, tile_renderer)
 
     source_empr.data = indus_ft
-    # source_indus.data = indus_ft
+    source_indus.data = indus_ft
+    
+    nw.data = indus_ft
+
 
 
 def DownloadButton():
+    """
+    Función que filtra y elimina las columnas no deseables para la descarga del df
 
+    Returns
+    -------
+    nw : Data Source
+        DS similar al source_indus pero con menos columnas (de no interés)
+    """
+
+    
+    nw = source_indus
+    
     indus_D = ReadIndus()
     base_D = readccf8()
     
@@ -1185,46 +1187,37 @@ def DownloadButton():
         ]
     ]
 
-    nw = ColumnDataSource(data=indus_ft2)
+    # nw = ColumnDataSource(data=indus_ft2)
+
+    # nw.data = indus_ft2
+
     # nw = source_indus
 
-    nw.data = indus_ft2
+    nw.data = indus_ft2    
 
-    # source_indus = ColumnDataSource(data = indus_ft)
 
-    button = Button(label="Descargar", button_type="success")
-    button.js_on_click(
-        CustomJS(
-            args=dict(source=source_indus),
-            code=open(join(dirname(__file__), "download.js")).read(),
-        )
-    )
-
+    # button = Button(label="Descargar", button_type="success")
+    # button.js_on_click(
+    #     CustomJS(
+    #         args=dict(source=nw),
+    #         code=open(join(dirname(__file__), "download.js")).read(),
+    #     )
+    # )
+    
     return nw
+    
 
 
-# nw = DownloadButton()
 
 #############################################
 buttCalcUpdate.on_click(UpdateTable)
-# buttCatgUpdate.on_click(UpdateCatg)
-# buttCalcUpdate.on_click(DownloadButton)
-# indus_temp = UpdateTable()
-# nw = DownloadButton()
-b.on_click(resetglyph)
 
-
-button = Button(label="Download", button_type="success")
-
-
-button.on_click(DownloadButton)
-button.on_click(DownloadButton)
-nw = DownloadButton()
+button = Button(label="Descargar", button_type="success")
 button.js_on_click(
     CustomJS(
-        args=dict(source=nw), code=open(join(dirname(__file__), "download.js")).read()
-    )
-)
+        args=dict(source=source_indus), code=open(join(dirname(__file__), "download.js")).read()
+    ))
+
 #############################################
 
 

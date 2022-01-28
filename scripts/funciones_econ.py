@@ -10,54 +10,11 @@ import numpy as np
 
 from funciones import flat_list
 
-#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
-# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
-path = '/home/ubuntu/Thenergy/diego/sun4heat/'
+path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+#path = '/home/ubuntu/sun4heat/'
 
 def TableCapex(aCol,costCol_m2,costInst_m2, cost_storage, vol, land_prep, fact_uso, cont, fit, fee, 
                table_inst, cHH_mec, cHH_mec_help, cHH_elec, cHH_elec_help):
-    '''
-    Calcula el CAPEX de la inversión.
-
-    Parameters
-    ----------
-    aCol : int
-        Área del colector.
-    costCol_m2 : float
-        Costo del colector por m**2
-    costInst_m2 : float
-        Costo de la isntalación por m**2.
-    cost_storage : float
-        Costo por almacenamiento.
-    vol : int
-        Volumen del almacenador.
-    land_prep : TYPE
-        DESCRIPTION.
-    fact_uso : TYPE
-        DESCRIPTION.
-    cont : TYPE
-        DESCRIPTION.
-    fit : TYPE
-        DESCRIPTION.
-    fee : TYPE
-        DESCRIPTION.
-    table_inst : TYPE
-        DESCRIPTION.
-    cHH_mec : TYPE
-        DESCRIPTION.
-    cHH_mec_help : TYPE
-        DESCRIPTION.
-    cHH_elec : TYPE
-        DESCRIPTION.
-    cHH_elec_help : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    table_capex : TYPE
-        DESCRIPTION.
-
-    '''
     #Mano obra local (US$/m2)
     manObra = table_inst.mecanico.sum() * cHH_mec + table_inst.mecanico.sum() * cHH_mec_help + \
     table_inst.electrico.sum() * cHH_elec + table_inst.electrico.sum() * cHH_elec_help
@@ -84,47 +41,6 @@ def TableCapex(aCol,costCol_m2,costInst_m2, cost_storage, vol, land_prep, fact_u
  
 def TableOpex(aCol,costCol_m2,SF_refresh,PM,consElectrico,costElectrico,nLimp,costLimp,nOper,salOper,
               aguaLimp,aguaCost,nInspect,cInspect,monitoreo):
-    '''
-    
-
-    Parameters
-    ----------
-    aCol : int
-        Área colector.
-    costCol_m2 : float
-        Costo del colector por m**2.
-    SF_refresh : TYPE
-        DESCRIPTION.
-    PM : TYPE
-        DESCRIPTION.
-    consElectrico : TYPE
-        DESCRIPTION.
-    costElectrico : TYPE
-        DESCRIPTION.
-    nLimp : TYPE
-        DESCRIPTION.
-    costLimp : TYPE
-        DESCRIPTION.
-    nOper : TYPE
-        DESCRIPTION.
-    salOper : TYPE
-        DESCRIPTION.
-    aguaLimp : TYPE
-        DESCRIPTION.
-    aguaCost : TYPE
-        DESCRIPTION.
-    nInspect : TYPE
-        DESCRIPTION.
-    cInspect : TYPE
-        DESCRIPTION.
-    monitoreo : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
-    '''
     costCol = costCol_m2*aCol
     #Solar Field maintenance
     SFM = SF_refresh + PM
@@ -148,42 +64,6 @@ def TableOpex(aCol,costCol_m2,SF_refresh,PM,consElectrico,costElectrico,nLimp,co
 #table_eval,flujo_acum,vals_econ,eje_anho = TableEval(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,
 #                                                                              impuesto,tasa_equi,dif_infl,anho_contr,val_depr,anho_depr,inSol)
 def TableEval(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,anho_contr,val_depr,anho_depr,inSol):
-    '''
-    
-
-    Parameters
-    ----------
-    Capex : TYPE
-        DESCRIPTION.
-    OPEX : TYPE
-        DESCRIPTION.
-    tasa_deuda : TYPE
-        DESCRIPTION.
-    pago_deuda : TYPE
-        DESCRIPTION.
-    perc_deuda : TYPE
-        DESCRIPTION.
-    impuesto : TYPE
-        DESCRIPTION.
-    tasa_equi : TYPE
-        DESCRIPTION.
-    dif_infl : TYPE
-        DESCRIPTION.
-    anho_contr : TYPE
-        DESCRIPTION.
-    val_depr : TYPE
-        DESCRIPTION.
-    anho_depr : TYPE
-        DESCRIPTION.
-    inSol : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
-    '''
-    
 #    print ("funcion eval")
     # monto de la deuda
     deuda = perc_deuda/100 * Capex
@@ -239,51 +119,6 @@ def TableEval(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
 
 def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
               anho_contr,anho_proy,val_depr,anho_depr,enerYield,indSol,indFuel,CFuel):
-    '''
-    
-
-    Parameters
-    ----------
-    Capex : TYPE
-        DESCRIPTION.
-    OPEX : TYPE
-        DESCRIPTION.
-    tasa_deuda : TYPE
-        DESCRIPTION.
-    pago_deuda : TYPE
-        DESCRIPTION.
-    perc_deuda : TYPE
-        DESCRIPTION.
-    impuesto : int
-        Porcentaje de impuesto.
-    tasa_equi : TYPE
-        DESCRIPTION.
-    dif_infl : TYPE
-        DESCRIPTION.
-    infl_cl : TYPE
-        DESCRIPTION.
-    anho_contr : TYPE
-        DESCRIPTION.
-    anho_proy : TYPE
-        DESCRIPTION.
-    val_depr : TYPE
-        DESCRIPTION.
-    anho_depr : TYPE
-        DESCRIPTION.
-    enerYield : TYPE
-        DESCRIPTION.
-    indSol : TYPE
-        DESCRIPTION.
-    indFuel : TYPE
-        DESCRIPTION.
-    CFuel : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
-    '''
 #    print ("funcion eval")
     # monto de la deuda
     deuda = perc_deuda/100 * Capex
@@ -293,7 +128,8 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
     pg = Pago(tasa_deuda/100,pago_deuda,deuda)
     #wacc chile
     wacc_cl = perc_deuda/100 * tasa_deuda/100 * (1-impuesto/100) + perc_equi/100 * tasa_equi/100
-#    wacc_us = (1+wacc_cl)*dif_infl - 1 
+#    wacc_us = (1+wacc_cl)*dif_infl - 1
+    
 #    print (wacc_cl,wacc_us)
     
     inversion = np.zeros(anho_contr+1).reshape(anho_contr+1,1) 
@@ -411,6 +247,144 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
     annual_proy['cost_sol'] = lc_vect
     
     return table_eval, annual_table, annual_proy
+
+
+
+
+
+###################################  
+def LCOE_FV(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
+              anho_contr,anho_proy,val_depr,anho_depr,enerYield,indSol):
+#    print ("funcion eval")
+    # monto de la deuda
+    deuda = perc_deuda/100 * Capex
+    # porcentaje equity
+    perc_equi = 100 - perc_deuda
+    # anualidad deuda
+    pg = Pago(tasa_deuda/100,pago_deuda,deuda)
+    #wacc chile
+    wacc_cl = perc_deuda/100 * tasa_deuda/100 * (1-impuesto/100) + perc_equi/100 * tasa_equi/100
+#    wacc_us = (1+wacc_cl)*dif_infl - 1
+    
+#    print (wacc_cl,wacc_us)
+    
+    inversion = np.zeros(anho_contr+1).reshape(anho_contr+1,1) 
+    inversion[0] = Capex
+    debt = np.zeros(anho_contr+1).reshape(anho_contr+1,1) 
+    debt[0] = deuda
+    
+#    print ("check 1")
+    amrt,interes = PagoPrinInt(pg,tasa_deuda/100,pago_deuda,deuda,anho_contr)
+#    print ("check 2")
+    opex = Vector(OPEX,anho_contr,infl_cl)
+    
+#    lcoh = 120.42
+    vm = []
+    lc = []
+    for n,lcoh in enumerate(np.arange(1,1000,1)):
+        inSol = enerYield * lcoh
+        
+        ing_enrg = Vector(inSol,anho_contr,indSol)
+        depr = Depr(val_depr,anho_depr,anho_contr)
+        
+        utilidades = ing_enrg - opex - interes - depr
+        
+        perdidas = Perdidas(utilidades)
+        base_impuesto = BaseImpuesto(utilidades,perdidas)
+        impuestoPrimCat = -base_impuesto * impuesto/100
+    #    impuestoPrimCat = ImpuestoPrimCat(utilidades,impuesto)
+        util_impuesto = utilidades + impuestoPrimCat
+        
+        flujo_neto = -inversion + debt + depr + util_impuesto - amrt
+        flujo_acum = FlujoAcum(flujo_neto)
+        vn = Van(wacc_cl,flujo_neto)
+        VAN = vn.sum()/1000
+        
+        vm.append(VAN)
+        lc.append(lcoh)
+        
+        if n == 0:
+            pass
+        
+        else:
+            vn_tmp = vm[n] * vm[n-1]
+            if vn_tmp < 0:
+                break
+    
+    for n,l in enumerate(np.arange(lc[-2],lc[-1],0.001)):
+
+        inSol = enerYield * l
+        
+        ing_enrg = Vector(inSol,anho_contr,indSol)
+        depr = Depr(val_depr,anho_depr,anho_contr)
+        
+        utilidades = ing_enrg - opex - interes - depr
+        
+        perdidas = Perdidas(utilidades)
+        base_impuesto = BaseImpuesto(utilidades,perdidas)
+        impuestoPrimCat = -base_impuesto * impuesto/100
+    #    impuestoPrimCat = ImpuestoPrimCat(utilidades,impuesto)
+        util_impuesto = utilidades + impuestoPrimCat
+        
+        flujo_neto = -inversion + debt + depr + util_impuesto - amrt
+        flujo_acum = FlujoAcum(flujo_neto)
+        vn = Van(wacc_cl,flujo_neto)
+        VAN = vn.sum()/1000        
+
+        if (VAN < 0.5 and VAN > -0.5):
+            lcoh = l
+            break
+    
+    TIR = Tir(flujo_neto)*100
+    payback = Payback(flujo_acum)   
+    
+    costSolar = Vector(lcoh,anho_contr,indSol)
+
+    
+    table_eval = pd.Series()
+    table_eval['LCOE (US$/MWh)'] = "{:10.1f}".format(lcoh)
+    table_eval['CAPEX (kUS$)'] = "{:10.1f}".format(Capex/1000)
+    table_eval['OPEX (kUS$)'] = "{:10.1f}".format(OPEX/1000)
+    table_eval['VAN (kUS$)'] = "{:10.1f}".format(VAN)
+    table_eval['TIR (%)'] = "{:10.1f}".format(TIR)
+    table_eval['Payback (Años)'] = "{:10.1f}".format(payback)
+    
+    anhos = np.arange(0,anho_contr+1)    
+    annual_table = pd.DataFrame(index=anhos)
+    annual_table['ing_ener'] = ing_enrg/1000
+    annual_table['opex'] = opex/1000
+    annual_table['utilidades'] = utilidades/1000
+    annual_table['perdidas'] = perdidas/1000
+    annual_table['base_imp'] = base_impuesto/1000
+    annual_table['imp_PC'] = impuestoPrimCat/1000
+    annual_table['util_imp'] = util_impuesto/1000
+    annual_table['flujo_neto'] = flujo_neto/1000
+    annual_table['flujo_acum'] = flujo_acum/1000
+    annual_table['vect_VAN'] = vn/1000
+    annual_table['costSol'] = costSolar
+    
+    anhosPr = np.arange(0,anho_proy+1)    
+    annual_proy = pd.DataFrame(index=anhosPr)
+    costSlr = Vector(lcoh,anho_proy,indSol)
+    oym = Vector(OPEX,anho_proy,infl_cl)
+    annual_proy['cost_sol'] = costSlr
+    annual_proy['oym'] = oym
+    
+    lc_vect = []
+    for n,lc in enumerate(annual_proy.cost_sol):
+        if n < anho_contr:
+            lc_vect.append(lc)
+        else:
+            lc_vect.append(0)
+            
+    annual_proy['cost_sol'] = lc_vect
+    
+    return table_eval, annual_table, annual_proy
+
+
+
+
+
 
 
 ###################################    
