@@ -8,7 +8,8 @@ Created on Tue Dec 21 20:46:28 2021
 
 import sys
 sys.path
-sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+# sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
+sys.path.append('/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts')
 
 from funciones_econ import LCOE_FV
 
@@ -51,7 +52,8 @@ mnths = {1:'Enero',
          12:'Diciembre'}
 
 # ruta de la ubicación de la visualizacion
-path = '/Users/fcuevas/Documents/Trabajo/thenergy/H2_sim'
+# path = '/Users/fcuevas/Documents/Trabajo/thenergy/H2_sim'
+path = '/home/diegonaranjo/Documentos/Thenergy/H2_sim'
 
 # nombre de columnas del archivo resultante de la simulación del SAM (1 MW)
 header_pv = ['date','sys_pow','ac_pow','dc_pow','mod_temp','poa','tamb','dni','diff','glob']

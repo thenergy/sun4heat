@@ -5,13 +5,13 @@ c_number = c_double # must be c_double or c_double depending on how defined in s
 class PySSC:
 	def __init__(self):
 		if sys.platform == 'win32' or sys.platform == 'cygwin':
-# 			self.pdll = CDLL("/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts/ssc.dll") 
+ 			# self.pdll = CDLL("/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts/ssc.dll") 
  			self.pdll = CDLL("/home/ubuntu/Thenergy/diego/sun4heat/scripts/ssc.dll") 
 		elif sys.platform == 'darwin':
-# 			self.pdll = CDLL("/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts/ssc.dylib") 
+ 			# self.pdll = CDLL("/home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts/ssc.dylib") 
  			self.pdll = CDLL("/home/ubuntu/Thenergy/diego/sun4heat/scripts/ssc.dylib") 
 		elif sys.platform == 'linux':
-# 			self.pdll = CDLL('//home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts/ssc.so')
+ 			# self.pdll = CDLL('//home/diegonaranjo/Documentos/Thenergy/sun4heat/scripts/ssc.so')
  			self.pdll = CDLL('/home/ubuntu/Thenergy/diego/sun4heat/scripts/ssc.so')   # instead of relative path, require user to have on LD_LIBRARY_PATH
 		else:
 			print ('Platform not supported ', sys.platform)
