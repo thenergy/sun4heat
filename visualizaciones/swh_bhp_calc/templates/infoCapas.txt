@@ -1,0 +1,6 @@
+    <a href="#MineriaCobre">Minas de cobre</a>
+    <a href="#MineriaOro">Minas de oro</a>
+    <a href="#OtraMinMet">Otra minería metálica</a>
+    <a href="#MineriaNoMet">Minería no metálica</a>
+    <a href="#IndCarnica">Industria cárnica</a>
+    <a href="#estacionAlmagro">Estación de medición en Diego de Almagro</a>

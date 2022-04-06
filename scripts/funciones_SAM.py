@@ -15,7 +15,9 @@ from PySSC import PySSC
 
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
 # path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
-path = '/home/ubuntu/Thenergy/diego/sun4heat/'
+# path = '/home/ubuntu/Thenergy/diego/sun4heat/'
+
+path = '/home/diego/Documentos/sun4heat/'
 
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
        'Sunmark HT-SolarBoost':    {'n0':0.850,'a1':2.300,'a2':0.02900,'color':'green'},
@@ -70,7 +72,7 @@ def CopyRadFile(lugar,data):
         path_meteo = path + 'datos/radiacion_solar/meteonorm/TMY_' + lugar + '.csv'
         
         shutil.copy(path_file,path_tmp)
-        os.rename(path_tmp + '/TMY_' + S + '_SAM.csv',path_SAM)
+        os.rename(path_tmp + '/TMY_' + lugar + '_SAM.csv',path_SAM)
                 
         header = ['year','month','day','hour','hour_real','ghi','dhi','ght','dht','dni','temp']
         df_temp = pd.read_csv(path_meteo,sep=';',names=header)
@@ -125,10 +127,10 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
     print ('SSC Build Information = ', ssc.build_info().decode("utf - 8"))
     ssc.module_exec_set_print(0)
     dataSam = ssc.data_create()
-    ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
-    # ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/ubuntu/Thenergy/diego/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
-    ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
-    # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/ubuntu/Thenergy/diego/sun4heat/visualizaciones/swh_calc/scaled_draw.csv')
+    # ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
+    ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diego/Documentos/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
+    # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
+    ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/scaled_draw.csv')
 
     # sc.data_set_string( dataSam, b'solar_resource_file', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
@@ -163,14 +165,14 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
     ssc.data_set_number( dataSam, b'pump_power', 45 )
     ssc.data_set_number( dataSam, b'pump_eff', 0.85000002384185791 )
     ssc.data_set_number( dataSam, b'use_custom_mains', 1 )
-    ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
-    # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/ubuntu/Thenergy/diego/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
+    # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
+    ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
     
     # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
     # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/ubuntu/visualizaciones/swh_calc/custom_mains.csv');
     ssc.data_set_number( dataSam, b'use_custom_set', 1 )
-    ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_set.csv');
-    # ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/ubuntu/Thenergy/diego/sun4heat/visualizaciones/swh_calc/custom_set.csv');
+    # ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_set.csv');
+    ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/custom_set.csv');
 
     # ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/ubuntu/sun4heat/visualizaciones/swh_calc/custom_set.csv');
     ssc.data_set_number( dataSam, b'adjust:constant', 0 )

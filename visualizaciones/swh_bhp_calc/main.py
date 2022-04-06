@@ -47,12 +47,12 @@ cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'
 # RADIACION
 ###################################
 # ciudades = pd.read_csv('/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
-ciudades = pd.read_csv('/home/diego/Documentos/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
+minas = pd.read_csv('/home/diego/Documentos/sun4heat/datos/radiacion_solar/minas_bhp.csv',sep=',')
 
 # ciudades = pd.read_csv('/home/ubuntu/Thenergy/diego/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
 
-lugar = 'SanVicente'
-data_lugar = ciudades[ciudades.Ciudad == lugar]
+lugar = 'Spence'
+data_lugar = minas[minas.Mina == lugar]
 ghi_sg = data_lugar.GHI_SG.iloc[0]
 dataSol = 'Explorador Solar'
 
@@ -278,8 +278,8 @@ plot_h = 450
 #################################
 
 #################################
-ciudad_nombre=list(ciudades.Ciudad)
-dropdownData = Select(value=lugar, title="Lugar",options=ciudad_nombre) 
+mina_nombre=list(minas.Mina)
+dropdownData = Select(value=lugar, title="Lugar",options=mina_nombre) 
 
 solData=['Meteonorm','Explorador Solar']
 dropdownSolData = Select(value='Explorador Solar', title="Dato radiación",options=solData) 
@@ -628,13 +628,13 @@ def CalcRad():
     source_rad.data = new_data
 
     table_rad = TableRad(df)
-    data_lugar = ciudades[ciudades.Ciudad == lugar]
+    data_lugar = minas[minas.Mina == lugar]
     ghi_sg = data_lugar.GHI_SG.iloc[0]
     table_rad['GHI Solargis (kWh/m2/año)'] = ghi_sg
     
     infoRad.text = str(table_rad)
    
-    return df
+    return df, p_rad
 
 def CalcSystem():
     '''
@@ -934,17 +934,18 @@ layout = column(Spacer(height=spc),
                 
                 Spacer(height=spc),
                 row(data_table,infoEval),                 
-                row(p1,p2,infoProy),
+                # row(p1,p2,infoProy),
                 
-                Spacer(height=spc),
-                row(buttCalcWalk,ind,fctInd),
-                p3,
-                row(p4,p5,infoProy2),
+                # Spacer(height=spc),
+                # row(buttCalcWalk,ind,fctInd),
+                # p3,
+                # row(p4,p5,infoProy2),
                 
                 
-                Spacer(height=spc),
-                row(buttCalcMC,n_esc),
-                row(p6,p7)  )
+                # Spacer(height=spc),
+                # row(buttCalcMC,n_esc),
+                # row(p6,p7) 
+                )
                 
 ############################################
 curdoc().add_root(layout)

@@ -11,7 +11,8 @@ import numpy as np
 from funciones import flat_list
 
 # path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
-path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+# path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
+path = '/home/diego/Documentos/sun4heat/'
 
 #path = '/home/ubuntu/sun4heat/'
 
