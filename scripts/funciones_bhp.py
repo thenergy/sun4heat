@@ -226,7 +226,7 @@ def BalanceYear(df_temp):
             esol.append(eSol)
             edis.append(0)
                 
-    enerSol = pd.Series(esol,index=np.arange(1,13))
+    # enerSol = pd.Series(esol,index=np.arange(1,13))
     enerAux = enerProc - enerSol
     enerSto = df_temp['Qsto'].groupby(df_temp.index.year).sum()/1000
     enerPeak = df_temp['Qpeak'].groupby(df_temp.index.year).sum()/1000

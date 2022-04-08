@@ -14,7 +14,7 @@ sys.path.append('/home/diego/Documentos/sun4heat/scripts')
 import numpy as np
 import pandas as pd
 
-from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, TableEner, TableFuel, TableSteam, BalanceYear, BalanceMonth, TableProy
+from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel, TableSteam, BalanceYear, BalanceMonth, TableProy
 from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
 from funciones_econ import Pago, PagoPrinInt, Vector, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc
 
