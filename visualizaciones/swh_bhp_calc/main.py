@@ -14,8 +14,8 @@ sys.path.append('/home/diego/Documentos/sun4heat/scripts')
 import numpy as np
 import pandas as pd
 
-from funciones import TableRad,  Col_eff_val, RadMonth,  SystemMonth, TableEner, TableFuel, TableSteam, BalanceMonth, TableProy
-from funciones_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
+from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, TableEner, TableFuel, TableSteam, BalanceYear, BalanceMonth, TableProy
+from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
 from funciones_econ import Pago, PagoPrinInt, Vector, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc
 
 from bokeh.plotting import Figure
@@ -122,8 +122,11 @@ costFuel = 0.32
 indFuel = 2.4
 
 #Turno
-turno = 'Agrosuper Sanit'
+turno = '24/7'
 
+#year
+
+year= 2024
 ##########################
 
 # Colector
@@ -166,13 +169,36 @@ percOpex = 1.5
 OPEX = CPX * percOpex/100
 
 ###################################
-SetTurno(df,turno, flow_p)
+# SetTurno(df,turno, flow_p)
 SetTMains(df,Tout_p)
 SetTSet(df,Tin_p)
-df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss)
+df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
+#########################################
+#           BALANCE ANUAL
+#########################################
+
+enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceYear(df)
+balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balance_mensual.csv')
+balance['enerHeater'] = balance.enerProc/(effHeater/100)
+balance['Meses'] = meses
+source_bal = ColumnDataSource(data=balance)
+    
+table_ener = TableEner(df,flow_p, Tout_h, Tin_h,effHeater,Col)
+table_fuel = TableFuel(df,fuel,effHeater)
+table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
+
+totSol = enerSol.sum()
+totProc = enerProc.sum()
+totHeater = enerAux.sum()
+solFrac = totSol/totProc
+
+
+#########################################
+#           BALANCE MENSUAL
+#########################################
 enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df)
-balance = pd.read_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
+balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balance_mensual.csv')
 balance['enerHeater'] = balance.enerProc/(effHeater/100)
 balance['Meses'] = meses
 source_bal = ColumnDataSource(data=balance)
@@ -328,9 +354,43 @@ vol_sto = TextInput(value=str(vol), title="Volumen acumulación (m3):")
 loss_sto= TextInput(value=str(sto_loss), title="Pérdidas almacenamiento (%):")
 
 buttCalcEnergy = Button(label="Calcular", button_type="success",width=100)
-############################
-#GRAFICO BALANCE DE ENERGÍA 
-############################
+
+####################################
+#GRAFICO BALANCE DE ENERGÍA ANUAL
+####################################
+ener = ['Proceso','Caldera','Solar']
+ener_year, x_year = SystemYear(df) ####################
+source_ener = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
+palette = ["red", "black","orange"]
+    
+p_month = Figure(tools=TOOLS, x_range=FactorRange(*x_month),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
+            y_axis_label="Energía (MWh/mes)")
+p_month.vbar(x='x', top='ener', width=1.0, source=source_ener, 
+      fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
+      line_color='white')
+p_month.xaxis.major_label_orientation = 1
+
+p_month.select_one(HoverTool).tooltips = [
+    ('Energía (MWh/mes)', '@ener{0.0}')]
+p_month.select_one(HoverTool).mode='vline'
+
+
+cols_balance = [
+        TableColumn(field="Meses", title="Mes",width=60),
+        TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
+        TableColumn(field="enerHeater", title="E caldera (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
+        TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
+        TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
+
+table_bal = DataTable(columns=cols_balance, source=source_bal,width=600, height=450,
+                      editable=True)
+
+
+
+
+####################################
+#GRAFICO BALANCE DE ENERGÍA MENSUAL
+####################################
 ener = ['Proceso','Caldera','Solar']
 ener_month, x_month = SystemMonth(df)
 source_ener = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
@@ -620,8 +680,9 @@ def CalcRad():
     tilt = float(incl.value)
     azim = float(orie.value)
         
-    df = CopyRadFile(lugar,dataSol) 
+    df = CopyRadFile(lugar,dataSol)
     df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss)
+    
     
     rad_month, x_month = RadMonth(df)
     new_data=dict(x=x_month, rad=rad_month)
@@ -634,7 +695,7 @@ def CalcRad():
     
     infoRad.text = str(table_rad)
    
-    return df, p_rad
+    return df
 
 def CalcSystem():
     '''
@@ -693,7 +754,7 @@ def CalcSystem():
     vol  = float(vol_sto.value)
     sto_loss = float(loss_sto.value)
     
-    SetTurno(df,turno, flow_p)
+    SetTurno(df,turno)
     SetTMains(df,Tout_p)
     SetTSet(df,Tin_p)
     

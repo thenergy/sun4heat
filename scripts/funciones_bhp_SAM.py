@@ -82,7 +82,7 @@ def CopyRadFile(lugar,data):
     return df_temp
 
 
-def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
+def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss,year):
     '''
     Realiza la simulación en SAM en función de los parámetros establecidos, obteniendo
     las variables de interes.
@@ -108,7 +108,6 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
         Volumen almacenamiento.
     sto_loss : int
         Porcentaje pérdidas del almacenamiento.
-
     Returns
     -------
     df_temp : DataFrame
@@ -127,10 +126,15 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss):
     print ('SSC Build Information = ', ssc.build_info().decode("utf - 8"))
     ssc.module_exec_set_print(0)
     dataSam = ssc.data_create()
+
+    
     # ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diego/Documentos/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
-    ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/scaled_draw.csv')
+    # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/scaled_draw_'+ str(year)+ '.csv')
+    ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diego/Documentos/sun4heat/visualizaciones/BHP_vinc/load_profile/scaled_draw_'+ str(year).encode('ascii')+ b'.csv')
+
+
 
     # sc.data_set_string( dataSam, b'solar_resource_file', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
@@ -307,7 +311,7 @@ def SetTSet(df_temp,Tset):
     df_temp['Tset'] = Tset
     df_temp['Tset'].to_csv(path + "visualizaciones/swh_calc/custom_set.csv", index=False, header=False)
 
-def SetTurno(df_temp,turno, m_proc):
+def SetTurno(df_temp,turno):
     '''
     Establece el nivel de demanda en función del turno.
     
@@ -597,8 +601,8 @@ def SetTurno(df_temp,turno, m_proc):
             dem_tmp.append(tmp)
         df_temp['demanda'] = dem_tmp 
     
-    df_temp['flujo'] = df_temp.demanda*m_proc*1000
-    df_temp['flujo'].to_csv(path + "visualizaciones/swh_calc/scaled_draw.csv", index=False, header=False)
+    # df_temp['flujo'] = df_temp.demanda*m_proc*1000
+    # df_temp['flujo'].to_csv(path + "visualizaciones/swh_calc/scaled_draw.csv", index=False, header=False)
     
     return df_temp
     

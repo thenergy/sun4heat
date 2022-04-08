@@ -25,6 +25,8 @@ cp_w = 4.18
 
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
+years = np.arange(2024,2045)
+
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
 # path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # path = '/home/ubuntu/Thenergy/diego/sun4heat/'
@@ -209,10 +211,10 @@ def BalanceYear(df_temp):
         DESCRIPTION.
 
     '''
-    enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
-    enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000 
+    enerSol = df_temp['Qgross'].groupby(df_temp.index.year).sum()/1000
+    enerSol = df_temp['Qgross'].groupby(df_temp.index.year).sum()/1000 
     
-    enerProc= df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
+    enerProc= df_temp['Qproc'].groupby(df_temp.index.year).sum()/1000
     
     esol = []
     edis = []
@@ -226,15 +228,15 @@ def BalanceYear(df_temp):
                 
     enerSol = pd.Series(esol,index=np.arange(1,13))
     enerAux = enerProc - enerSol
-    enerSto = df_temp['Qsto'].groupby(df_temp.index.month).sum()/1000
-    enerPeak = df_temp['Qpeak'].groupby(df_temp.index.month).sum()/1000
+    enerSto = df_temp['Qsto'].groupby(df_temp.index.year).sum()/1000
+    enerPeak = df_temp['Qpeak'].groupby(df_temp.index.year).sum()/1000
     
-    bal_month = pd.DataFrame(enerProc,index=np.arange(1,13))
-    bal_month['Qsol'] = enerSol
-    bal_month['SF'] = bal_month.Qsol / bal_month.Qproc * 100
-    bal_month = bal_month.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
+    bal_year = pd.DataFrame(enerProc,index=np.arange(1,21))
+    bal_year['Qsol'] = enerSol
+    bal_year['SF'] = bal_year.Qsol / bal_year.Qproc * 100
+    bal_year = bal_year.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
     
-    bal_month.to_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
+    bal_year.to_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv')
     
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
 
@@ -290,6 +292,21 @@ def BalanceMonth(df_temp):
     
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
  
+def SystemYear(df_temp):
+    ener = ['Proceso','Caldera','Solar']
+#    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
+#    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
+#    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
+    
+    yearProc, yearAux, yearSol, yearPeak, yearSto = BalanceYear(df_temp)
+    
+    ener_year = [(total,heater,solar) for total,heater,solar in zip(yearProc,yearAux,yearSol)]
+    ener_year = flat_list(ener_year)
+    
+    x_year = [(year,enr) for year in years for enr in ener]
+    return ener_year, x_year 
+
+  
 def SystemMonth(df_temp):
     ener = ['Proceso','Caldera','Solar']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
