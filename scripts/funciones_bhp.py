@@ -13,7 +13,7 @@ import os
 
 #from funciones_econ import Vector
 
-from funciones_SAM import SetTurno
+from funciones_bhp_SAM import CallSWH, SetTurno
 from iapws import IAPWS97
 
 #Propiedades del agua
@@ -187,10 +187,39 @@ def RadMonth(df_temp):
     x_month = [(month,rad) for month in meses for rad in rads]
     return rad_month,x_month
 
+# def RadYear(df_temp):
+#     '''
+#     Agrupa/suma por/la irradiancia horizontal directa  (GHI) y
+#     la irradiancia directa en un panel (POA)
+ 
+#     Parameters
+#     ----------
+#     df_temp : DataFrame
+#         DESCRIPTION.
 
-def BalanceYear(df_temp):   
+#     Returns
+#     -------
+#     rad_month : list
+#         Radiación mensual.
+#     x_month : list
+#         mes y proceso
+
+#     '''
+#     rads = ['GHI','POA']
+#     rad_years_ghi = df_temp['ghi'].groupby(df_temp.index.year).sum()/1000
+#     rad_years_poa = df_temp['poa'].groupby(df_temp.index.year).sum()/1000
+    
+#     rad_year = [(ghi,poa) for ghi,poa in zip(rad_months_ghi,rad_months_poa)]
+#     rad_month = flat_list(rad_month)
+    
+    
+#     x_month = [(month,rad) for month in meses for rad in rads]
+#     return rad_month,x_month
+
+
+def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss):   
     '''
-    Los datos obtenidos por hora los suma y convierte en datos mensuales.
+    Los datos obtenidos por hora los suma y convierte en datos anuales.
 
     Parameters
     ----------
@@ -211,33 +240,43 @@ def BalanceYear(df_temp):
         DESCRIPTION.
 
     '''
-    enerSol = df_temp['Qgross'].groupby(df_temp.index.year).sum()/1000
-    enerSol = df_temp['Qgross'].groupby(df_temp.index.year).sum()/1000 
     
-    enerProc= df_temp['Qproc'].groupby(df_temp.index.year).sum()/1000
+    bal_years = pd.DataFrame(columns = ['enerProc','enerSol','SF'])
     
-    esol = []
-    edis = []
-    for eSol,eProc in zip(enerSol,enerProc):
-        if eSol - eProc > 0:
-            esol.append(eProc)
-            edis.append(eSol-eProc)
-        else:
-            esol.append(eSol)
-            edis.append(0)
-                
-    # enerSol = pd.Series(esol,index=np.arange(1,13))
-    enerAux = enerProc - enerSol
-    enerSto = df_temp['Qsto'].groupby(df_temp.index.year).sum()/1000
-    enerPeak = df_temp['Qpeak'].groupby(df_temp.index.year).sum()/1000
+    for year in years:
+        
+        df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year)   
+
+        # enerSol = df_temp['Qgross'].groupby(df_temp.index.year).sum()/1000
+        enerSol = df_temp['Qgross'].groupby(df_temp.index.year).sum()/1000 
+        
+        enerProc= df_temp['Qproc'].groupby(df_temp.index.year).sum()/1000
     
-    bal_year = pd.DataFrame(enerProc,index=np.arange(1,21))
-    bal_year['Qsol'] = enerSol
-    bal_year['SF'] = bal_year.Qsol / bal_year.Qproc * 100
-    bal_year = bal_year.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
-    
-    bal_year.to_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv')
-    
+        esol = []
+        edis = []
+        for eSol,eProc in zip(enerSol,enerProc):
+            if eSol - eProc > 0:
+                esol.append(eProc)
+                edis.append(eSol-eProc)
+            else:
+                esol.append(eSol)
+                edis.append(0)
+                    
+        enerSol = pd.Series(esol,index=np.arange(2018,2019))
+        enerAux = enerProc - enerSol
+        enerSto = df_temp['Qsto'].groupby(df_temp.index.year).sum()/1000
+        enerPeak = df_temp['Qpeak'].groupby(df_temp.index.year).sum()/1000
+        
+        bal_year = pd.DataFrame(enerProc,index=np.arange(2018,2019))
+        bal_year['Qsol'] = enerSol
+        bal_year['SF'] = bal_year.Qsol / bal_year.Qproc * 100
+        bal_year = bal_year.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
+        
+        bal_years.append(bal_year)
+
+    bal_years.to_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv')
+        
+
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
 
 def BalanceMonth(df_temp):   

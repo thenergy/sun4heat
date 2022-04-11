@@ -30,6 +30,10 @@ meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sept
 # path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 path = '/home/diego/Documentos/sun4heat/'
 
+years = np.arange(2024,2045)
+years = list(years)
+years_list = list(map(str, years))
+
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
       'Sunmark HT-SolarBoost':    {'n0':0.850,'a1':2.300,'a2':0.02900,'color':'green'},
       'Chromagen':                {'n0':0.722,'a1':3.390,'a2':0.01400,'color':'blue'},
@@ -43,9 +47,14 @@ cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'
       'Piscina':                  {'n0':0.850,'a1':18.00,'a2':0.00000,'color':'slategray'},
       'Savosolar':                {'n0':0.874,'a1':3.160,'a2':0.00980,'color':'black'},
       'Sunoptimo':                {'n0':0.824,'a1':2.905,'a2':0.00300,'color':'black'}}
+
+
+
+
 ##################################
-# RADIACION
+#           RADIACION
 ###################################
+
 # ciudades = pd.read_csv('/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
 minas = pd.read_csv('/home/diego/Documentos/sun4heat/datos/radiacion_solar/minas_bhp.csv',sep=',')
 
@@ -65,37 +74,39 @@ source_rad = ColumnDataSource(data=dict(x=x_month, rad=rad_month))
 
 
 ###################################
-# APORTE SISTEMA SOLAR
+#       APORTE SISTEMA SOLAR
 ###################################
 
 #Propiedades del agua
-# densidad (kg/m3)
-dens_w = 1000
+#densidad 
+dens_w = 1000  # (kg/m3)
 
-# Calor específico agua (kJ/(kg*K))
-cp_w = 4.18   
-################################
+# Calor específico agua 
+cp_w = 4.18     #(kJ/(kg*K))
+
+
+##################################
+
 # temperatura de entrada al proceso
 Tin_p  = 70
+
 # temperatura de salida del proceso
-# ºC
-Tout_p = 50
+Tout_p = 50     # ºC
 
 # flujo de agua, proceso
-# m3/hr
-flow_p = 30
-################
+flow_p = 30     # m3/hr
+
+
+###################################
+
 # caldera, temperatura de salida
-# ºC
-Tout_h = Tin_p + 5
+Tout_h = Tin_p + 5      # ºC
 
 # caldera, temperatura de entrada
-# ºC
-Tin_h  = Tout_h - (Tin_p - Tout_p) 
+Tin_h  = Tout_h - (Tin_p - Tout_p)      # ºC
 
 # flujo de agua
-# m3/hr
-flow_h = flow_p
+flow_h = flow_p     # m3/hr
 
 # Eficiencia caldera
 effHeater = 75
@@ -125,28 +136,44 @@ indFuel = 2.4
 turno = '24/7'
 
 #year
+year= '2024'
 
-year= 2024
-##########################
 
-# Colector
+###########################
+#    COLECTOR SOLAR
+###########################
+
+#Colector
 Col = 'GreenOneTec GK_SG'
+
 #Area de colector
 aCol = 1800
+
 #Temperatura media del colector
 Tmean = (Tin_h + Tout_h)/2.
+
 # Eficiencia del colector
 eff_col = Col_eff_val(Col,Tmean,25,1000)
+
 # area de la planta solar peak
 peak_plant = heater_pow/eff_col * 1.1
+
 #inclinación campo solar
 tilt = 0
+
 #azimuth campos solar
 azim = 0
+
 # Volumen almacenamiento
 vol = 180
+
 # Porcentaje pérdidas del almacenamiento
 sto_loss=10
+
+
+############################
+#   ECON COLECTOR SOLAR
+############################
 
 # Indexacion del precio solar
 indSol = 2
@@ -168,30 +195,42 @@ percOpex = 1.5
 
 OPEX = CPX * percOpex/100
 
+
 ###################################
+#   Condiciones para Calculadora
+###################################
+
 # SetTurno(df,turno, flow_p)
 SetTMains(df,Tout_p)
 SetTSet(df,Tin_p)
+
 df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
+
 #########################################
-#           BALANCE ANUAL
+#           BALANCE ANUAL (por 20 años)
 #########################################
 
-enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceYear(df)
-balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balance_mensual.csv')
+
+df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)   
+enerProcYear, enerAuxYear, enerSolYear, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss)
+
+balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv')
 balance['enerHeater'] = balance.enerProc/(effHeater/100)
-balance['Meses'] = meses
+# balance['años'] = years
+
 source_bal = ColumnDataSource(data=balance)
     
 table_ener = TableEner(df,flow_p, Tout_h, Tin_h,effHeater,Col)
 table_fuel = TableFuel(df,fuel,effHeater)
 table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
-
-totSol = enerSol.sum()
-totProc = enerProc.sum()
-totHeater = enerAux.sum()
+    
+totSol = enerSolYear.sum()
+totProc = enerProcYear.sum()
+totHeater = enerAuxYear.sum()
 solFrac = totSol/totProc
+
+balance.to_csv(path + 'visualizaciones/swh_bhp_calc/prueba.csv')
 
 
 #########################################
@@ -312,6 +351,12 @@ dropdownSolData = Select(value='Explorador Solar', title="Dato radiación",optio
 incl = TextInput(value=str(tilt), title="Inclinación:")
 orie = TextInput(value=str(azim), title="Orientación:")
 buttCalcRad = Button(label="Calcular", button_type="success",width=100)
+
+
+
+
+dropdownYearData = Select(value = '2024', title = 'Año a analizar', options = years_list)
+
 ########################
 # INFO GRAF RADIACIÓN
 ########################
@@ -327,6 +372,10 @@ p_rad.select_one(HoverTool).tooltips = [
     ('Radiación (kWh/mes): ', '@rad{0.0}')]
 p_rad.select_one(HoverTool).mode='vline'
 infoRad = PreText(text=str(table_rad), width=600)
+
+
+
+
 #################################
 #INFO VARIABLES e AL GRAFICO BALANCE DE ENERGÍA
 ##################################
@@ -360,19 +409,19 @@ buttCalcEnergy = Button(label="Calcular", button_type="success",width=100)
 ####################################
 ener = ['Proceso','Caldera','Solar']
 ener_year, x_year = SystemYear(df) ####################
-source_ener = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
+source_ener = ColumnDataSource(data=dict(x=x_year, ener=ener_year))
 palette = ["red", "black","orange"]
     
-p_month = Figure(tools=TOOLS, x_range=FactorRange(*x_month),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
-            y_axis_label="Energía (MWh/mes)")
-p_month.vbar(x='x', top='ener', width=1.0, source=source_ener, 
+p_year = Figure(tools=TOOLS, x_range=FactorRange(*x_year),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
+            y_axis_label="Energía (MWh/año)")
+p_year.vbar(x='x', top='ener', width=1.0, source=source_ener, 
       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
       line_color='white')
-p_month.xaxis.major_label_orientation = 1
+p_year.xaxis.major_label_orientation = 1
 
-p_month.select_one(HoverTool).tooltips = [
+p_year.select_one(HoverTool).tooltips = [
     ('Energía (MWh/mes)', '@ener{0.0}')]
-p_month.select_one(HoverTool).mode='vline'
+p_year.select_one(HoverTool).mode='vline'
 
 
 cols_balance = [
@@ -697,6 +746,48 @@ def CalcRad():
    
     return df
 
+def CalcRad_Year():
+    '''
+    Actualiza la simulación de radiación según los filtros de lugar,
+    datos solares, inclinación y orientación establecidos.
+    
+    Variables a definir
+    --------------------
+    lugar: Lugar a evaluar.
+    dataSol: De donde se obtienen los datos solares (ej: explorador solar).
+    tilt: Inclinación campo solar.
+    azim: Azimuth.
+    
+    Returns
+    -------
+    df : DataFrame
+        DF con los filtros aplicados.
+
+    '''
+    ######################
+    lugar = dropdownData.value
+    dataSol = dropdownSolData.value
+    year = dropdownYearData.value
+    tilt = float(incl.value)
+    azim = float(orie.value)
+        
+    df = CopyRadFile(lugar,dataSol)
+    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+    
+    
+    rad_month, x_month = RadMonth(df)
+    new_data=dict(x=x_month, rad=rad_month)
+    source_rad.data = new_data
+
+    table_rad = TableRad(df)
+    data_lugar = minas[minas.Mina == lugar]
+    ghi_sg = data_lugar.GHI_SG.iloc[0]
+    table_rad['GHI Solargis (kWh/m2/año)'] = ghi_sg
+    
+    infoRad.text = str(table_rad)
+   
+    return df
+
 def CalcSystem():
     '''
     A través de la simulación en SAM hecha por CallSWH calcula la 
@@ -754,7 +845,7 @@ def CalcSystem():
     vol  = float(vol_sto.value)
     sto_loss = float(loss_sto.value)
     
-    SetTurno(df,turno)
+    # SetTurno(df,turno)
     SetTMains(df,Tout_p)
     SetTSet(df,Tin_p)
     
@@ -975,8 +1066,8 @@ layout = column(Spacer(height=spc),
                 row(p_rad,infoRad),
                 
                 
-                row(Tin_proc,Tout_proc,flow_proc,selectTurno),
-                row(eff_heater,dropdownFuel), #,dropdownFluid
+                row(Tin_proc,Tout_proc,flow_proc),#,selectTurno),
+                row(eff_heater,dropdownFuel, dropdownYearData), #,dropdownFluid
                 row(presion_vapor,perc_cond),
                 row(selectCol,areaCol,vol_sto,loss_sto),
                 buttCalcEnergy,

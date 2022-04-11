@@ -131,7 +131,7 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss,year):
     # ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     ssc.data_set_string( dataSam, b'solar_resource_file', b'/home/diego/Documentos/sun4heat/datos/radiacion_solar/TMY_SAM.csv' );
     # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/scaled_draw.csv');
-    # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/scaled_draw_'+ str(year)+ '.csv')
+    # ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/scaled_draw.csv')
     ssc.data_set_array_from_csv( dataSam, b'scaled_draw', b'/home/diego/Documentos/sun4heat/visualizaciones/BHP_vinc/load_profile/scaled_draw_'+ str(year).encode('ascii')+ b'.csv')
 
 
@@ -170,13 +170,13 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss,year):
     ssc.data_set_number( dataSam, b'pump_eff', 0.85000002384185791 )
     ssc.data_set_number( dataSam, b'use_custom_mains', 1 )
     # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
-    ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
+    ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_bhp_calc/custom_mains.csv');
     
     # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_calc/custom_mains.csv');
     # ssc.data_set_array_from_csv( dataSam, b'custom_mains', b'/home/ubuntu/visualizaciones/swh_calc/custom_mains.csv');
     ssc.data_set_number( dataSam, b'use_custom_set', 1 )
     # ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/diegonaranjo/Documentos/Thenergy/sun4heat/visualizaciones/swh_calc/custom_set.csv');
-    ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_calc/custom_set.csv');
+    ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/diego/Documentos/sun4heat/visualizaciones/swh_bhp_calc/custom_set.csv');
 
     # ssc.data_set_array_from_csv( dataSam, b'custom_set', b'/home/ubuntu/sun4heat/visualizaciones/swh_calc/custom_set.csv');
     ssc.data_set_number( dataSam, b'adjust:constant', 0 )
@@ -288,7 +288,7 @@ def SetTMains(df_temp,Tmains):
     df_temp = pd.DataFrame(np.arange(0,8760,1),columns=["demanda"])
     df_temp.index = pd.date_range(start='2018-01-01 00:00', end='2018-12-31 23:00', freq='H')
     df_temp['Tmains'] = Tmains
-    df_temp['Tmains'].to_csv(path + "visualizaciones/swh_calc/custom_mains.csv", index=False, header=False)
+    df_temp['Tmains'].to_csv(path + "visualizaciones/swh_bhp_calc/custom_mains.csv", index=False, header=False)
     
 def SetTSet(df_temp,Tset):
     '''
@@ -309,9 +309,11 @@ def SetTSet(df_temp,Tset):
     df_temp = pd.DataFrame(np.arange(0,8760,1),columns=["demanda"])
     df_temp.index = pd.date_range(start='2018-01-01 00:00', end='2018-12-31 23:00', freq='H')
     df_temp['Tset'] = Tset
-    df_temp['Tset'].to_csv(path + "visualizaciones/swh_calc/custom_set.csv", index=False, header=False)
+    df_temp['Tset'].to_csv(path + "visualizaciones/swh_bhp_calc/custom_set.csv", index=False, header=False)
 
-def SetTurno(df_temp,turno):
+
+# CASO BHP 24/7, DEMANDA YA SE ESTABLECE EN SCALED DRAW ANUAL.
+def SetTurno(df_temp,turno):    #,m_proc):
     '''
     Establece el nivel de demanda en función del turno.
     
