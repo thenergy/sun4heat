@@ -26,6 +26,11 @@ cp_w = 4.18
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
 years = np.arange(2024,2045)
+# years = [str(x) for x in years]
+years = list(map(str, years))
+
+
+
 
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
 # path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
@@ -244,6 +249,7 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):
     bal_years = pd.DataFrame(columns = ['enerProc','enerSol','SF'])
     
     enerProc_list = []
+    # enerProc_serie = pd.Series()
     enerAux_list = []
     enerSol_list = []
     enerPeak_list = []
@@ -285,16 +291,23 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):
         enerPeak_list.append(enerPeak)
         enerSto_list.append(enerSto)
         
+        enerProc = pd.Series(enerProc_list, name = 'Qproc')
+        enerAux = pd.Series(enerAux_list)
+        enerSol = pd.Series(enerSol_list)
+        enerPeak = pd.Series(enerPeak_list, name = 'Qpeak')
+        enerSto = pd.Series(enerSto_list, name = 'Qsto')
+        
+        
     # enerProc = pd.Series(enerProc_list, name = 'Qproc')
 
 
     bal_years.to_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv', index = None)
         
 
-    # return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
-    return  enerProc_list, enerAux_list, enerSol_list, enerPeak_list, enerSto_list #, enerDis
+    return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
+    # return  enerProc_list, enerAux_list, enerSol_list, enerPeak_list, enerSto_list #, enerDis
 
-def BalanceMonth(df_temp):   
+def BalanceMonth(df_temp,year):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos mensuales.
 
@@ -317,7 +330,6 @@ def BalanceMonth(df_temp):
         DESCRIPTION.
 
     '''
-    df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss, year)
     
     # enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
     enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000 
@@ -348,33 +360,37 @@ def BalanceMonth(df_temp):
     
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
  
-def SystemYear(df_temp):
+def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):
     ener = ['Proceso','Caldera','Solar']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
 #    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
     
-    yearProc, yearAux, yearSol, yearPeak, yearSto = BalanceYear(df_temp)
+    yearProc, yearAux, yearSol, yearPeak, yearSto = BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year)
     
     ener_year = [(total,heater,solar) for total,heater,solar in zip(yearProc,yearAux,yearSol)]
     ener_year = flat_list(ener_year)
+    ener_year = flat_list(ener_year)
+
     
     x_year = [(year,enr) for year in years for enr in ener]
+    
     return ener_year, x_year 
 
   
-def SystemMonth(df_temp):
+def SystemMonth(df_temp, year):
     ener = ['Proceso','Caldera','Solar']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
 #    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp, year)
     
     ener_month = [(total,heater,solar) for total,heater,solar in zip(monthProc,monthAux,monthSol)]
     ener_month = flat_list(ener_month)
     
     x_month = [(month,enr) for month in meses for enr in ener]
+    
     return ener_month, x_month
 
 
@@ -404,7 +420,7 @@ def TableEnerYear(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
 
     '''
     
-    heater_pow = df_temp.flow*dens_w*(Tout_h - Tin_h)*cp_w/3600
+    heater_pow = df_temp[['flow']]*dens_w*(Tout_h - Tin_h)*cp_w/3600 #W
     #Temperatura media del colector
     Tmean = (Tin_h + Tout_h)/2.
     # Eficiencia del colector
@@ -412,7 +428,7 @@ def TableEnerYear(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     # area de la planta solar peak
     peak_plant = heater_pow/eff_col * 1.1
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,year)
     
     procAnnual = monthProc.sum()
     auxAnnual = monthAux.sum()
@@ -421,18 +437,27 @@ def TableEnerYear(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     
     table_ener = pd.Series()
     table_ener['Caldera'] = ''
-    table_ener['Potencia caldera (kW)'] = "{:10.1f}".format(heater_pow)
-    table_ener['Potencia caldera (kcal/hr)'] = "{:10.1f}".format(heater_pow*3600/4.184)
-    table_ener['Potencia caldera (BHP)'] = "{:10.1f}".format(heater_pow*0.101942)
+    table_ener['Potencia caldera (kW)'] = heater_pow
+    table_ener['Potencia caldera (kcal/hr)'] =heater_pow*3600/4.184
+    table_ener['Potencia caldera (BHP)'] = heater_pow*0.101942
     table_ener['---------'] = '---------'
+    # table_ener['Caldera'] = ''
+    # table_ener['Potencia caldera (kW)'] = "{:10.1f}".format(heater_pow)
+    # table_ener['Potencia caldera (kcal/hr)'] = "{:10.1f}".format(list(heater_pow*3600/4.184))
+    # table_ener['Potencia caldera (BHP)'] = "{:10.1f}".format(list(heater_pow*0.101942))
+    # table_ener['---------'] = '---------'
     
     table_ener['Sistema solar']  = ''
     table_ener['Colector solar'] = Col
     table_ener['Eficiencia óptica'] = cst[Col]['n0']
     table_ener['Eficiencia térmica u1'] = cst[Col]['a1']
-    table_ener["Tamaño planta peak (m2)"] =    "{:10.1f}".format(peak_plant)
+    table_ener["Tamaño planta peak (m2)"] = peak_plant
     table_ener['Fracción solar: (%)'] = "{:10.1f}".format(colAnnual / procAnnual * 100)
     table_ener['----------'] = '----------'
+    
+    # table_ener["Tamaño planta peak (m2)"] =    "{:10.1f}".format(peak_plant)
+    # table_ener['Fracción solar: (%)'] = "{:10.1f}".format(colAnnual / procAnnual * 100)
+    # table_ener['----------'] = '----------'
     
     table_ener['Balance energía']  = ''
     table_ener['Demanda energía proceso (MWh/año): '] = "{:10.1f}".format(procAnnual)
@@ -445,7 +470,7 @@ def TableEnerYear(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     return table_ener
 
 
-def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col):
+def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     '''
     Genera una tabla (Pandas Serie) que contiene información respecto
     a la caldera, sistema solar y balance de energía 
@@ -479,7 +504,7 @@ def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col):
     # area de la planta solar peak
     peak_plant = heater_pow/eff_col * 1.1
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceYear(df_temp)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp, year)
     
     procAnnual = monthProc.sum()
     auxAnnual = monthAux.sum()
@@ -488,16 +513,21 @@ def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col):
     
     table_ener = pd.Series()
     table_ener['Caldera'] = ''
-    table_ener['Potencia caldera (kW)'] = "{:10.1f}".format(heater_pow)
-    table_ener['Potencia caldera (kcal/hr)'] = "{:10.1f}".format(heater_pow*3600/4.184)
-    table_ener['Potencia caldera (BHP)'] = "{:10.1f}".format(heater_pow*0.101942)
+    table_ener['Potencia caldera (kW)'] = heater_pow
+    table_ener['Potencia caldera (kcal/hr)'] = heater_pow*3600/4.184
+    table_ener['Potencia caldera (BHP)'] = heater_pow*0.101942
     table_ener['---------'] = '---------'
+    
+    # table_ener['Potencia caldera (kW)'] = "{:10.1f}".format(heater_pow)
+    # table_ener['Potencia caldera (kcal/hr)'] = "{:10.1f}".format(heater_pow*3600/4.184)
+    # table_ener['Potencia caldera (BHP)'] = "{:10.1f}".format(heater_pow*0.101942)
+    # table_ener['---------'] = '---------'
     
     table_ener['Sistema solar']  = ''
     table_ener['Colector solar'] = Col
     table_ener['Eficiencia óptica'] = cst[Col]['n0']
     table_ener['Eficiencia térmica u1'] = cst[Col]['a1']
-    table_ener["Tamaño planta peak (m2)"] =    "{:10.1f}".format(peak_plant)
+    table_ener["Tamaño planta peak (m2)"] =   peak_plant
     table_ener['Fracción solar: (%)'] = "{:10.1f}".format(colAnnual / procAnnual * 100)
     table_ener['----------'] = '----------'
     
@@ -512,11 +542,11 @@ def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col):
     return table_ener
 
 
-def TableFuel(df_temp,fuel,eff_heater):
+def TableFuel(df_temp,fuel,eff_heater,year):
     
     table_fuel = pd.Series()
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,year)
     
     procAnnual = monthProc.sum()
     auxAnnual = monthAux.sum()
