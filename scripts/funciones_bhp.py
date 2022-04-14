@@ -308,7 +308,7 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
     # return  enerProc_list, enerAux_list, enerSol_list, enerPeak_list, enerSto_list #, enerDis
 
-def BalanceMonth(df_temp,effheater,year):   
+def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos mensuales.
 
@@ -331,7 +331,8 @@ def BalanceMonth(df_temp,effheater,year):
         DESCRIPTION.
 
     '''
-    
+    df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year)
+
     # enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
     enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000 
     
@@ -379,13 +380,13 @@ def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
     return ener_year, x_year 
 
   
-def SystemMonth(df_temp,effheater, year):
+def SystemMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater, year):
     ener = ['Proceso','Caldera','Solar']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
 #    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,effheater, year)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater, year)
     
     ener_month = [(total,heater,solar) for total,heater,solar in zip(monthProc,monthAux,monthSol)]
     ener_month = flat_list(ener_month)

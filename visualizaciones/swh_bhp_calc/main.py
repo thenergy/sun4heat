@@ -138,6 +138,14 @@ turno = '24/7'
 #year
 year= '2024'
 
+##############################################
+#           BOTON AÑO
+##############################################
+
+years_button_group = RadioButtonGroup(labels=years_list, active=0)
+
+
+
 
 ###########################
 #    COLECTOR SOLAR
@@ -243,7 +251,7 @@ solFrac = totSol/totProc
 #########################################
 df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
-enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,effHeater,year)
+enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
 balance['enerHeater'] = balance.enerProc/(effHeater/100)
 balance['Meses'] = meses
@@ -258,16 +266,6 @@ totProc = enerProc.sum()
 totHeater = enerAux.sum()
 solFrac = totSol/totProc
 
-##############################################
-#           BOTON AÑO
-##############################################
-
-LABELS = years_list
-
-years_button_group = RadioButtonGroup(labels=LABELS, active=0)
-years_button_group.js_on_click(CustomJS(code="""
-    console.log('radio_button_group: active=' + this.active, this.toString())
-"""))
 
 
 # ###############################
@@ -457,7 +455,7 @@ table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,wid
 #GRAFICO BALANCE DE ENERGÍA MENSUAL
 ####################################
 ener = ['Proceso','Caldera','Solar']
-ener_month, x_month = SystemMonth(df,effHeater,year)
+ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 source_ener_month = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
 palette = ["red", "black","orange"]
     
@@ -852,7 +850,9 @@ def CalcSystem():
     effHeater = float(eff_heater.value)
     # fuel   = str(dropdownFuel.value)
     
-    year = str(dropdownYearData.value)
+    year = int(years_button_group.active)
+    year = years[year]
+    
 
     # p_steam = float(presion_vapor.value)
     # cond = float(perc_cond.value)
@@ -882,15 +882,15 @@ def CalcSystem():
     source_ener_year.data = new_data_year
     # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
-    enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,effHeater,year)
+    enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
     balance_month['enerHeater'] = balance_month.enerProc/(effHeater/100)
     balance_month['Meses'] = meses
     source_bal_month.data = balance_month
     
-    ener_month, x_month = SystemMonth(df,effHeater,year)
-    new_data=dict(x=x_month, ener=ener_month)
-    source_ener_month.data = new_data
+    ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    new_data_month=dict(x=x_month, ener=ener_month)
+    source_ener_month.data = new_data_month
     
     # table_ener = TableEner(df,flow_p, Tin_p, Tout_p,effHeater,Col)
     # infoEner.text = str(table_ener)
@@ -1090,7 +1090,6 @@ def CalcSystem():
 buttCalcRad.on_click(CalcRad)
 buttCalcEnergy.on_click(CalcSystem)
 
-years_button_group.on_click(CalcSystem())
 
 #############
 spc = 50
