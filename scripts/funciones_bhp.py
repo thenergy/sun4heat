@@ -222,7 +222,7 @@ def RadMonth(df_temp):
 #     return rad_month,x_month
 
 
-def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):   
+def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos anuales.
 
@@ -274,7 +274,8 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):
                 edis.append(0)
                     
         enerSol = pd.Series(esol,index=np.arange(2018,2019))
-        enerAux = enerProc - enerSol
+        # enerAux = enerProc - enerSol
+        enerAux = enerProc/(effheater/100)
         enerSto = df_temp['Qsto'].groupby(df_temp.index.year).sum()/1000
         enerPeak = df_temp['Qpeak'].groupby(df_temp.index.year).sum()/1000
         
@@ -301,13 +302,13 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):
     # enerProc = pd.Series(enerProc_list, name = 'Qproc')
 
 
-    bal_years.to_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv', index = None)
+    bal_years.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv', index = None)
         
 
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
     # return  enerProc_list, enerAux_list, enerSol_list, enerPeak_list, enerSto_list #, enerDis
 
-def BalanceMonth(df_temp,year):   
+def BalanceMonth(df_temp,effheater,year):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos mensuales.
 
@@ -347,7 +348,7 @@ def BalanceMonth(df_temp,year):
             edis.append(0)
                 
     enerSol = pd.Series(esol,index=np.arange(1,13))
-    enerAux = enerProc - enerSol
+    enerAux = enerProc/(effheater/100)
     enerSto = df_temp['Qsto'].groupby(df_temp.index.month).sum()/1000
     enerPeak = df_temp['Qpeak'].groupby(df_temp.index.month).sum()/1000
     
@@ -356,17 +357,17 @@ def BalanceMonth(df_temp,year):
     bal_month['SF'] = bal_month.Qsol / bal_month.Qproc * 100
     bal_month = bal_month.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
     
-    bal_month.to_csv(path + 'visualizaciones/swh_bhp_calc/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
+    bal_month.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
     
     return  enerProc, enerAux, enerSol, enerPeak, enerSto #, enerDis
  
-def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):
+def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
     ener = ['Proceso','Caldera','Solar']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
 #    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
     
-    yearProc, yearAux, yearSol, yearPeak, yearSto = BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year)
+    yearProc, yearAux, yearSol, yearPeak, yearSto = BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year)
     
     ener_year = [(total,heater,solar) for total,heater,solar in zip(yearProc,yearAux,yearSol)]
     ener_year = flat_list(ener_year)
@@ -378,13 +379,13 @@ def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year):
     return ener_year, x_year 
 
   
-def SystemMonth(df_temp, year):
+def SystemMonth(df_temp,effheater, year):
     ener = ['Proceso','Caldera','Solar']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
 #    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp, year)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,effheater, year)
     
     ener_month = [(total,heater,solar) for total,heater,solar in zip(monthProc,monthAux,monthSol)]
     ener_month = flat_list(ener_month)
@@ -459,13 +460,13 @@ def TableEnerYear(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     # table_ener['Fracción solar: (%)'] = "{:10.1f}".format(colAnnual / procAnnual * 100)
     # table_ener['----------'] = '----------'
     
-    table_ener['Balance energía']  = ''
+
     table_ener['Demanda energía proceso (MWh/año): '] = "{:10.1f}".format(procAnnual)
     table_ener['Demanda energía convencional(MWh/año): '] = "{:10.1f}".format(procAnnual/(eff_heater/100))
     table_ener['Generación caldera (MWh/año): '] = "{:10.1f}".format(auxAnnual/(eff_heater/100))
     table_ener['Generación solar (MWh/año): '] = "{:10.1f}".format(colAnnual)
     table_ener['Reemplazo solar equivalente (MWh/año): '] = "{:10.1f}".format(colAnnual/(eff_heater/100))
-#    table_ener['Energía solar disipada (MWh/año): '] = "{:10.1f}".format(disAnnual)
+    # table_ener['Energía solar disipada (MWh/año): '] = "{:10.1f}".format(disAnnual)
     
     return table_ener
 
@@ -546,7 +547,7 @@ def TableFuel(df_temp,fuel,eff_heater,year):
     
     table_fuel = pd.Series()
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,year)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = (df_temp,year)
     
     procAnnual = monthProc.sum()
     auxAnnual = monthAux.sum()
@@ -657,194 +658,194 @@ def TableProy(lcoh,solFrac,annSol,indSol,fuel,CFuel,indFuel,eff_heater,anho_cont
     return cProy, table_proy
 
 
-def TableSteam(df_temp,turno,flow_p, Tout_h, Tin_h,eff_heater,rec_cond,T_cond,p_vapor,fuel):
-    # Energía requerida kW
-    q_proc = flow_p*1000*(Tout_h - Tin_h)*cp_w/3600
-    dem = SetTurno(df_temp,turno,flow_p)
-    df_temp['flujo'] = dem.flujo
-    df_temp['demanda'] = dem.demanda
-    df_temp['q_proc'] = df_temp.flujo *(Tout_h - Tin_h)*cp_w/3600
+# def TableSteam(df_temp,turno,flow_p, Tout_h, Tin_h,eff_heater,rec_cond,T_cond,p_vapor,fuel):
+#     # Energía requerida kW
+#     q_proc = flow_p*1000*(Tout_h - Tin_h)*cp_w/3600
+#     dem = SetTurno(df_temp,turno,flow_p)
+#     df_temp['flujo'] = dem.flujo
+#     df_temp['demanda'] = dem.demanda
+#     df_temp['q_proc'] = df_temp.flujo *(Tout_h - Tin_h)*cp_w/3600
         
-    #presion en bar (gauge) y condiciones del vapor
-    presion_proc = p_vapor
-    # entalpía vapor saturado (kJ/kg)
-    sat_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=1)
-    # entalpía vapor humedo (kJ/kg)
-    wet_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
-    # calor latente de evaporación kJ/kg
-    lat_heat = sat_steam.h - wet_steam.h
+#     #presion en bar (gauge) y condiciones del vapor
+#     presion_proc = p_vapor
+#     # entalpía vapor saturado (kJ/kg)
+#     sat_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=1)
+#     # entalpía vapor humedo (kJ/kg)
+#     wet_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
+#     # calor latente de evaporación kJ/kg
+#     lat_heat = sat_steam.h - wet_steam.h
     
-    # flujo de vapor en segundos. Multiplicado por 3600 para tener kg/hr
-    steam = q_proc/lat_heat*3600
-    #steam = 15000
-    df_temp['steam'] = df_temp.demanda * df_temp.q_proc/lat_heat*3600
+#     # flujo de vapor en segundos. Multiplicado por 3600 para tener kg/hr
+#     steam = q_proc/lat_heat*3600
+#     #steam = 15000
+#     df_temp['steam'] = df_temp.demanda * df_temp.q_proc/lat_heat*3600
     
-    # porcentaje recuperación condensado. Temperatura y flujo másico
-    cond_rec = rec_cond
-#    T_cond = wet_steam.T - 273.5
-    m_cond = steam*cond_rec/100
+#     # porcentaje recuperación condensado. Temperatura y flujo másico
+#     cond_rec = rec_cond
+# #    T_cond = wet_steam.T - 273.5
+#     m_cond = steam*cond_rec/100
     
-    # Temperatura de red
-    T_red = 20
-    # temperatura make-up
-    T_makeup = (T_red*(steam-m_cond) + T_cond*m_cond)/steam
+#     # Temperatura de red
+#     T_red = 20
+#     # temperatura make-up
+#     T_makeup = (T_red*(steam-m_cond) + T_cond*m_cond)/steam
     
-    # flujo makeup (m3/hr)
-    m_makeup = (steam-m_cond)/1000
+#     # flujo makeup (m3/hr)
+#     m_makeup = (steam-m_cond)/1000
     
-    # condiciones del agua
-    sat_water_inic=IAPWS97(T=T_makeup+273.5,x=0)
-    sat_water_final=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
+#     # condiciones del agua
+#     sat_water_inic=IAPWS97(T=T_makeup+273.5,x=0)
+#     sat_water_final=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
     
-    # energía para calentar agua y producir vapor (kWh)
-    df_temp['ener_water'] = df_temp.demanda * m_makeup*1000 * (sat_water_final.h - sat_water_inic.h) / (3600)
-    df_temp['ener_vapor'] = df_temp.demanda * m_makeup*1000 * (sat_steam.h - sat_water_final.h) / (3600)
+#     # energía para calentar agua y producir vapor (kWh)
+#     df_temp['ener_water'] = df_temp.demanda * m_makeup*1000 * (sat_water_final.h - sat_water_inic.h) / (3600)
+#     df_temp['ener_vapor'] = df_temp.demanda * m_makeup*1000 * (sat_steam.h - sat_water_final.h) / (3600)
     
-    # total de energía demandada por el proceso
-    df_temp['tot_ener'] = (df_temp.ener_water + df_temp.ener_vapor)
+#     # total de energía demandada por el proceso
+#     df_temp['tot_ener'] = (df_temp.ener_water + df_temp.ener_vapor)
     
-    # energía necesaria del combustible (kWh)
-    df_temp['ener_fuel'] = df_temp.tot_ener/(eff_heater/100)
+#     # energía necesaria del combustible (kWh)
+#     df_temp['ener_fuel'] = df_temp.tot_ener/(eff_heater/100)
     
-    # fracción solar
-    enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
-    enerProc= df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
-    FS = enerSol.sum() / enerProc.sum()
+#     # fracción solar
+#     enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
+#     enerProc= df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
+#     FS = enerSol.sum() / enerProc.sum()
     
-    enerFuel = df_temp.ener_fuel.sum()/1000
-    enerHeater = df_temp.ener_fuel.sum()/1000 * (1-FS)
-    enerSolar = df_temp.ener_fuel.sum()/1000 * FS
+#     enerFuel = df_temp.ener_fuel.sum()/1000
+#     enerHeater = df_temp.ener_fuel.sum()/1000 * (1-FS)
+#     enerSolar = df_temp.ener_fuel.sum()/1000 * FS
     
-    table_steam = pd.Series()
-    table_steam['Temperatura vapor (ºC)'] = "{:10.1f}".format(T_cond)
-    table_steam['Calor latente evaporación (kJ/kg)'] = "{:10.1f}".format(lat_heat)
-    table_steam['Flujo vapor (kg/hr)'] = "{:10.1f}".format(steam)
-    table_steam['Flujo vapor (ton/año)'] = "{:10.1f}".format(df_temp.steam.sum()/1000)
-    table_steam['-----------'] = '-----------'
-    table_steam['Demanda energía convencional (MWh/año)'] = "{:10.1f}".format(enerFuel)
-    table_steam['Generación caldera (MWh/año)'] = "{:10.1f}".format(enerHeater)
-    table_steam['Reemplazo solar (MWh/año)'] = "{:10.1f}".format(enerSolar)
-    table_steam['----------'] = '----------'
+#     table_steam = pd.Series()
+#     table_steam['Temperatura vapor (ºC)'] = "{:10.1f}".format(T_cond)
+#     table_steam['Calor latente evaporación (kJ/kg)'] = "{:10.1f}".format(lat_heat)
+#     table_steam['Flujo vapor (kg/hr)'] = "{:10.1f}".format(steam)
+#     table_steam['Flujo vapor (ton/año)'] = "{:10.1f}".format(df_temp.steam.sum()/1000)
+#     table_steam['-----------'] = '-----------'
+#     table_steam['Demanda energía convencional (MWh/año)'] = "{:10.1f}".format(enerFuel)
+#     table_steam['Generación caldera (MWh/año)'] = "{:10.1f}".format(enerHeater)
+#     table_steam['Reemplazo solar (MWh/año)'] = "{:10.1f}".format(enerSolar)
+#     table_steam['----------'] = '----------'
     
-    f_em = cmb[fuel]['f_em']
-    PCI_kg = cmb[fuel]['PCI_kg']
-    dens = cmb[fuel]['dens']
+#     f_em = cmb[fuel]['f_em']
+#     PCI_kg = cmb[fuel]['PCI_kg']
+#     dens = cmb[fuel]['dens']
     
-    table_steam['Demanda ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerFuel/(PCI_kg*dens))
-    table_steam['Consumo ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerHeater/(PCI_kg*dens))
-    table_steam['Ahorro ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerSolar/(PCI_kg*dens))
+#     table_steam['Demanda ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerFuel/(PCI_kg*dens))
+#     table_steam['Consumo ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerHeater/(PCI_kg*dens))
+#     table_steam['Ahorro ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerSolar/(PCI_kg*dens))
     
-    table_steam['---------'] = '---------'
-    table_steam['Emisiones'] = ''
-    table_steam['Factor de emisión (kg CO2/kg ' + fuel + ')'] = f_em
-    table_steam['Total emisiones (ton/año)'] = "{:10.1f}".format(enerFuel/PCI_kg * f_em)
-    table_steam['Emisiones emitidas (ton/año)'] = "{:10.1f}".format(enerHeater/PCI_kg * f_em)
-    table_steam['Emisiones desplazadas (ton/año)'] = "{:10.1f}".format(enerSolar/PCI_kg * f_em)
+#     table_steam['---------'] = '---------'
+#     table_steam['Emisiones'] = ''
+#     table_steam['Factor de emisión (kg CO2/kg ' + fuel + ')'] = f_em
+#     table_steam['Total emisiones (ton/año)'] = "{:10.1f}".format(enerFuel/PCI_kg * f_em)
+#     table_steam['Emisiones emitidas (ton/año)'] = "{:10.1f}".format(enerHeater/PCI_kg * f_em)
+#     table_steam['Emisiones desplazadas (ton/año)'] = "{:10.1f}".format(enerSolar/PCI_kg * f_em)
         
-    df_temp['fuel_water'] = df_temp.q_proc/(eff_heater/100) / PCI_kg
-    df_temp['fuel_steam'] = df_temp.ener_fuel / PCI_kg
+#     df_temp['fuel_water'] = df_temp.q_proc/(eff_heater/100) / PCI_kg
+#     df_temp['fuel_steam'] = df_temp.ener_fuel / PCI_kg
     
-    return table_steam
+#     return table_steam
     
 
-def TestSteam(df_temp,turno,steam,eff_heater,cond_rec,T_cond,p_vapor,fuel,fuelCost):
-    dem = SetTurno(df_temp,turno,steam)
-    df_temp['flujo'] = dem.flujo
-    df_temp['demanda'] = dem.demanda
+# def TestSteam(df_temp,turno,steam,eff_heater,cond_rec,T_cond,p_vapor,fuel,fuelCost):
+#     dem = SetTurno(df_temp,turno,steam)
+#     df_temp['flujo'] = dem.flujo
+#     df_temp['demanda'] = dem.demanda
 
-    #presion en bar (gauge) y condiciones del vapor
-    presion_proc = p_vapor
-    # entalpía vapor saturado (kJ/kg)
-    sat_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=1)
-    # entalpía vapor humedo (kJ/kg)
-    wet_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
-    # calor latente de evaporación kJ/kg
-    lat_heat = sat_steam.h - wet_steam.h
+#     #presion en bar (gauge) y condiciones del vapor
+#     presion_proc = p_vapor
+#     # entalpía vapor saturado (kJ/kg)
+#     sat_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=1)
+#     # entalpía vapor humedo (kJ/kg)
+#     wet_steam=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
+#     # calor latente de evaporación kJ/kg
+#     lat_heat = sat_steam.h - wet_steam.h
     
-    # flujo de vapor en segundos. Multiplicado por 3600 para tener kg/hr
-#    steam = flow_steam
-    df_temp['steam'] = steam * df_temp.demanda
+#     # flujo de vapor en segundos. Multiplicado por 3600 para tener kg/hr
+# #    steam = flow_steam
+#     df_temp['steam'] = steam * df_temp.demanda
     
-    T_vapor = sat_steam.T - 273
+#     T_vapor = sat_steam.T - 273
     
-    # porcentaje recuperación condensado. Temperatura y flujo másico
-#    cond_rec = rec_cond
-    m_cond = steam*cond_rec/100
+#     # porcentaje recuperación condensado. Temperatura y flujo másico
+# #    cond_rec = rec_cond
+#     m_cond = steam*cond_rec/100
     
-    # Temperatura de red
-    T_red = 20
-    # temperatura make-up
-    T_makeup = (T_red*(steam-m_cond) + T_cond*m_cond)/steam
+#     # Temperatura de red
+#     T_red = 20
+#     # temperatura make-up
+#     T_makeup = (T_red*(steam-m_cond) + T_cond*m_cond)/steam
     
-    # flujo makeup (m3/hr)
-    m_makeup = (steam-m_cond)/1000
+#     # flujo makeup (m3/hr)
+#     m_makeup = (steam-m_cond)/1000
     
-    # condiciones del agua
-    sat_water_inic=IAPWS97(T=T_makeup+273.5,x=0)
-    sat_water_final=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
+#     # condiciones del agua
+#     sat_water_inic=IAPWS97(T=T_makeup+273.5,x=0)
+#     sat_water_final=IAPWS97(P=(presion_proc/10 + 1.033/10),x=0)
     
-    # energía para calentar agua y producir vapor (kWh)
-    df_temp['ener_water'] = df_temp.demanda * steam * (sat_water_final.h - sat_water_inic.h) / (3600)
-    df_temp['ener_vapor'] = df_temp.demanda * steam * (sat_steam.h - sat_water_final.h) / (3600)
-    # total de energía demandada por el proceso
-    df_temp['tot_ener'] = (df_temp.ener_water + df_temp.ener_vapor)
+#     # energía para calentar agua y producir vapor (kWh)
+#     df_temp['ener_water'] = df_temp.demanda * steam * (sat_water_final.h - sat_water_inic.h) / (3600)
+#     df_temp['ener_vapor'] = df_temp.demanda * steam * (sat_steam.h - sat_water_final.h) / (3600)
+#     # total de energía demandada por el proceso
+#     df_temp['tot_ener'] = (df_temp.ener_water + df_temp.ener_vapor)
     
-    # energía necesaria del combustible (kWh)
-    df_temp['ener_fuel'] = df_temp.tot_ener/(eff_heater/100)
+#     # energía necesaria del combustible (kWh)
+#     df_temp['ener_fuel'] = df_temp.tot_ener/(eff_heater/100)
     
-    ener_sens = steam * (sat_water_final.h - sat_water_inic.h) / (3600)/(eff_heater/100)
-    ener_lat =  steam * (sat_steam.h - sat_water_final.h) / (3600)/(eff_heater/100)
-    ener = ener_sens + ener_lat
+#     ener_sens = steam * (sat_water_final.h - sat_water_inic.h) / (3600)/(eff_heater/100)
+#     ener_lat =  steam * (sat_steam.h - sat_water_final.h) / (3600)/(eff_heater/100)
+#     ener = ener_sens + ener_lat
     
-    ener_sensTon = 1000 * (sat_water_final.h - sat_water_inic.h) / (3600)/(eff_heater/100)
-    ener_latTon =  1000 * (sat_steam.h - sat_water_final.h) / (3600)/(eff_heater/100)
-    enerTon = ener_sensTon + ener_latTon
+#     ener_sensTon = 1000 * (sat_water_final.h - sat_water_inic.h) / (3600)/(eff_heater/100)
+#     ener_latTon =  1000 * (sat_steam.h - sat_water_final.h) / (3600)/(eff_heater/100)
+#     enerTon = ener_sensTon + ener_latTon
         
-    enerProc = df_temp.tot_ener.sum()/1000
-    enerHeater = df_temp.ener_fuel.sum()/1000 
+#     enerProc = df_temp.tot_ener.sum()/1000
+#     enerHeater = df_temp.ener_fuel.sum()/1000 
     
-    f_em = cmb[fuel]['f_em']
-    PCI_kg = cmb[fuel]['PCI_kg']
-    dens = cmb[fuel]['dens']
+#     f_em = cmb[fuel]['f_em']
+#     PCI_kg = cmb[fuel]['PCI_kg']
+#     dens = cmb[fuel]['dens']
     
-    table_steam = pd.Series()
-    table_steam['Temperatura vapor (ºC)'] = "{:10.1f}".format(T_vapor)
-    table_steam['Calor latente evaporación (kJ/kg)'] = "{:10.1f}".format(lat_heat)
-    table_steam['Flujo vapor (kg/hr)'] = "{:10.1f}".format(steam)
-    table_steam['Consumo hora de ' + fuel + ' ' + '(' + cmb[fuel]['unidad'] + '/hr)'] = "{:10.1f}".format(ener/(PCI_kg*dens))
-    table_steam['Flujo vapor (ton/año)'] = "{:10.1f}".format(df_temp.steam.sum()/1000)
-    table_steam['-----------'] = '------------'
-    table_steam['Demanda energía proceso (MWh/año)'] = "{:10.1f}".format(enerProc)
-    table_steam['Generación caldera (MWh/año)'] = "{:10.1f}".format(enerHeater)
-    table_steam['-----------'] = '-----------'
-    table_steam['Temperatura make-up (ºC)'] = "{:10.1f}".format(T_makeup)
-    table_steam['Calor sensible (kWh/flujo vapor)'] = "{:10.1f}".format(ener_sens)
-    table_steam['Calor latente (kWh/flujo vapor)'] = "{:10.1f}".format(ener_lat)
-    table_steam['Energía (kWh/flujo vapor)'] = "{:10.1f}".format(ener)
-    table_steam['----------'] = '----------'
-    table_steam['Calor sensible caldera (kWh/ton vapor)'] = "{:10.1f}".format(ener_sensTon)
-    table_steam['Calor latente caldera (kWh/ton vapor)'] = "{:10.1f}".format(ener_latTon)
-    table_steam['Energía caldera (kWh/ton vapor)'] = "{:10.1f}".format(enerTon)
-    table_steam['Consumo ' + fuel + ' (ton/hr vapor)'] = "{:10.1f}".format(enerTon/(PCI_kg*dens))
-    table_steam['Costo vapor (US$/ton vapor)'] = "{:10.1f}".format(enerTon/(PCI_kg*dens) * fuelCost)
-    table_steam['Costo energía (US$/MWh)'] = "{:10.1f}".format(enerHeater/(PCI_kg*dens) * fuelCost / enerProc * 1000)
-    table_steam['Calor sensible (kWh/ton vapor)'] = "{:10.1f}".format(ener_sensTon*eff_heater/100)
-    table_steam['Calor latente (kWh/ton vapor)'] = "{:10.1f}".format(ener_latTon*eff_heater/100)
-    table_steam['Energía (kWh/ton vapor)'] = "{:10.1f}".format(enerTon*eff_heater/100)
-    table_steam['----------'] = '---------'
+#     table_steam = pd.Series()
+#     table_steam['Temperatura vapor (ºC)'] = "{:10.1f}".format(T_vapor)
+#     table_steam['Calor latente evaporación (kJ/kg)'] = "{:10.1f}".format(lat_heat)
+#     table_steam['Flujo vapor (kg/hr)'] = "{:10.1f}".format(steam)
+#     table_steam['Consumo hora de ' + fuel + ' ' + '(' + cmb[fuel]['unidad'] + '/hr)'] = "{:10.1f}".format(ener/(PCI_kg*dens))
+#     table_steam['Flujo vapor (ton/año)'] = "{:10.1f}".format(df_temp.steam.sum()/1000)
+#     table_steam['-----------'] = '------------'
+#     table_steam['Demanda energía proceso (MWh/año)'] = "{:10.1f}".format(enerProc)
+#     table_steam['Generación caldera (MWh/año)'] = "{:10.1f}".format(enerHeater)
+#     table_steam['-----------'] = '-----------'
+#     table_steam['Temperatura make-up (ºC)'] = "{:10.1f}".format(T_makeup)
+#     table_steam['Calor sensible (kWh/flujo vapor)'] = "{:10.1f}".format(ener_sens)
+#     table_steam['Calor latente (kWh/flujo vapor)'] = "{:10.1f}".format(ener_lat)
+#     table_steam['Energía (kWh/flujo vapor)'] = "{:10.1f}".format(ener)
+#     table_steam['----------'] = '----------'
+#     table_steam['Calor sensible caldera (kWh/ton vapor)'] = "{:10.1f}".format(ener_sensTon)
+#     table_steam['Calor latente caldera (kWh/ton vapor)'] = "{:10.1f}".format(ener_latTon)
+#     table_steam['Energía caldera (kWh/ton vapor)'] = "{:10.1f}".format(enerTon)
+#     table_steam['Consumo ' + fuel + ' (ton/hr vapor)'] = "{:10.1f}".format(enerTon/(PCI_kg*dens))
+#     table_steam['Costo vapor (US$/ton vapor)'] = "{:10.1f}".format(enerTon/(PCI_kg*dens) * fuelCost)
+#     table_steam['Costo energía (US$/MWh)'] = "{:10.1f}".format(enerHeater/(PCI_kg*dens) * fuelCost / enerProc * 1000)
+#     table_steam['Calor sensible (kWh/ton vapor)'] = "{:10.1f}".format(ener_sensTon*eff_heater/100)
+#     table_steam['Calor latente (kWh/ton vapor)'] = "{:10.1f}".format(ener_latTon*eff_heater/100)
+#     table_steam['Energía (kWh/ton vapor)'] = "{:10.1f}".format(enerTon*eff_heater/100)
+#     table_steam['----------'] = '---------'
         
-    table_steam['Consumo ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerHeater/(PCI_kg*dens))
+#     table_steam['Consumo ' + fuel + ' ' + cmb[fuel]['unidad']] = "{:10.1f}".format(enerHeater/(PCI_kg*dens))
     
-    table_steam['---------'] = '---------'
-    table_steam['Emisiones'] = ''
-    table_steam['Factor de emisión (kg CO2/kg ' + fuel + ')'] = f_em
-    table_steam['Emisiones (ton/año)'] = "{:10.1f}".format(enerHeater/PCI_kg * f_em)
-    table_steam['Horas al año'] = "{:10.1f}".format(df_temp.demanda.sum())
+#     table_steam['---------'] = '---------'
+#     table_steam['Emisiones'] = ''
+#     table_steam['Factor de emisión (kg CO2/kg ' + fuel + ')'] = f_em
+#     table_steam['Emisiones (ton/año)'] = "{:10.1f}".format(enerHeater/PCI_kg * f_em)
+#     table_steam['Horas al año'] = "{:10.1f}".format(df_temp.demanda.sum())
         
-#    df_temp['fuel_water'] = df_temp.q_proc/(eff_heater/100) / PCI_kg
-    df_temp['fuel_steam'] = df_temp.ener_fuel / PCI_kg
+# #    df_temp['fuel_water'] = df_temp.q_proc/(eff_heater/100) / PCI_kg
+#     df_temp['fuel_steam'] = df_temp.ener_fuel / PCI_kg
         
-    return table_steam
+#     return table_steam
 
 def PowerHeater(steam_flow,steam_press,Tin):
     

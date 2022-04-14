@@ -14,13 +14,13 @@ sys.path.append('/home/diego/Documentos/sun4heat/scripts')
 import numpy as np
 import pandas as pd
 
-from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel, TableSteam, BalanceYear, BalanceMonth, TableProy, TableEnerYear
+from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
 from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
 from funciones_econ import Pago, PagoPrinInt, Vector, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc
 
 from bokeh.plotting import Figure
 from bokeh.layouts import column, Spacer, row
-from bokeh.models import ColumnDataSource, HoverTool, FactorRange, DatetimeTickFormatter, TableColumn, DataTable, NumberFormatter
+from bokeh.models import ColumnDataSource, HoverTool, FactorRange, DatetimeTickFormatter, TableColumn, DataTable, NumberFormatter, CustomJS, RadioButtonGroup
 from bokeh.io import curdoc
 from bokeh.transform import factor_cmap
 from bokeh.models.widgets import Select, TextInput, Button, PreText
@@ -171,29 +171,29 @@ vol = 180
 sto_loss=10
 
 
-############################
-#   ECON COLECTOR SOLAR
-############################
+# ############################
+# #   ECON COLECTOR SOLAR
+# ############################
 
-# Indexacion del precio solar
-indSol = 2
+# # Indexacion del precio solar
+# indSol = 2
 
-# costo colector (US$/m2)
-costCol_m2 = 369.4
+# # costo colector (US$/m2)
+# costCol_m2 = 369.4
 
-#
-FIT_m2 = 0
-FIT = FIT_m2 * aCol
+# #
+# FIT_m2 = 0
+# FIT = FIT_m2 * aCol
 
-CPX = aCol * costCol_m2 
+# CPX = aCol * costCol_m2 
 
-perc_fee = 0
-fee = (CPX+FIT)*perc_fee/100
-CAPEX = CPX+ FIT + fee 
+# perc_fee = 0
+# fee = (CPX+FIT)*perc_fee/100
+# CAPEX = CPX+ FIT + fee 
 
-percOpex = 1.5
+# percOpex = 1.5
 
-OPEX = CPX * percOpex/100
+# OPEX = CPX * percOpex/100
 
 
 ###################################
@@ -213,22 +213,22 @@ df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
 
 # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)   
-enerProcYear, enerAuxYear, enerSolYear, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+enerProcYear, enerAuxYear, enerSolYear, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 # BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
 
 
-balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv')
+balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
 balance_year['enerHeater'] = balance_year.enerProc/(effHeater/100)
-balance_year['Años'] = years
+balance_year['Años'] = years_list
 # balance.drop(['Unnamed: 0'], axis = 1)
 
 source_bal_year = ColumnDataSource(data=balance_year)
     
-df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+# df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
-table_ener_year = TableEnerYear(df, Tout_h, Tin_h,effHeater,Col,year)
-table_fuel = TableFuel(df,fuel,effHeater,year)
+# table_ener_year = TableEnerYear(df, Tout_h, Tin_h,effHeater,Col,year)
+# table_fuel = TableFuel(df,fuel,effHeater,year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
     
 totSol = enerSolYear.sum()
@@ -243,20 +243,31 @@ solFrac = totSol/totProc
 #########################################
 df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
-enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,year)
-balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
+enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,effHeater,year)
+balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
 balance['enerHeater'] = balance.enerProc/(effHeater/100)
 balance['Meses'] = meses
 source_bal_month = ColumnDataSource(data=balance)
     
-table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
-table_fuel = TableFuel(df,fuel,effHeater,year)
+# table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
+# table_fuel = TableFuel(df,fuel,effHeater,year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
 totSol = enerSol.sum()
 totProc = enerProc.sum()
 totHeater = enerAux.sum()
 solFrac = totSol/totProc
+
+##############################################
+#           BOTON AÑO
+##############################################
+
+LABELS = years_list
+
+years_button_group = RadioButtonGroup(labels=LABELS, active=0)
+years_button_group.js_on_click(CustomJS(code="""
+    console.log('radio_button_group: active=' + this.active, this.toString())
+"""))
 
 
 # ###############################
@@ -386,9 +397,9 @@ infoRad = PreText(text=str(table_rad), width=600)
 ##################################
 Tin_proc = TextInput(value=str(Tin_p), title="Tin proceso:")
 Tout_proc = TextInput(value=str(Tout_p), title="Tout proceso:")        
-flow_proc = TextInput(value=str(flow_p), title="Flujo proceso (m3/hr):")
-Turnos = ['24/7','24/6','17/6','14/6', 'Agrosuper ACS','Agrosuper Sanit','Watts','Sopraval escaldado','Sopraval producción','Lucchetti']
-selectTurno = Select(value="Agrosuper Sanit", title="Turno de trabajo",options=Turnos)
+# flow_proc = TextInput(value=str(flow_p), title="Flujo proceso (m3/hr):")
+# Turnos = ['24/7','24/6','17/6','14/6', 'Agrosuper ACS','Agrosuper Sanit','Watts','Sopraval escaldado','Sopraval producción','Lucchetti']
+# selectTurno = Select(value="Agrosuper Sanit", title="Turno de trabajo",options=Turnos)
 
 eff_heater= TextInput(value=str(effHeater), title="Eficiencia caldera (%):")
 fuels = ['Diesel','GN','GLP','Kerosene','Petróleo 5','Petróleo 6','Carbón','Leña','Biomasa']
@@ -413,13 +424,13 @@ buttCalcEnergy = Button(label="Calcular", button_type="success",width=100)
 #GRAFICO BALANCE DE ENERGÍA ANUAL
 ####################################
 ener = ['Proceso','Caldera','Solar']
-ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,year) ####################
-source_ener = ColumnDataSource(data=dict(x=x_year, ener=ener_year))
+ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year) ####################
+source_ener_year = ColumnDataSource(data=dict(x=x_year, ener=ener_year))
 palette = ["red", "black","orange"]
     
 p_year = Figure(tools=TOOLS, x_range=FactorRange(*x_year),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
             y_axis_label="Energía (MWh/año)")
-p_year.vbar(x='x', top='ener', width=1.0, source=source_ener, 
+p_year.vbar(x='x', top='ener', width=1.0, source=source_ener_year, 
       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
       line_color='white')
 p_year.xaxis.major_label_orientation = 1
@@ -429,14 +440,14 @@ p_year.select_one(HoverTool).tooltips = [
 p_year.select_one(HoverTool).mode='vline'
 
 
-cols_balance = [
+cols_balance_year = [
         TableColumn(field="Años", title="Año",width=60),
         TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
         TableColumn(field="enerHeater", title="E caldera (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
         TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
         TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
-table_bal_year = DataTable(columns=cols_balance, source=source_bal_year,width=600, height=450,
+table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,width=600, height=450,
                       editable=True)
 
 
@@ -446,13 +457,13 @@ table_bal_year = DataTable(columns=cols_balance, source=source_bal_year,width=60
 #GRAFICO BALANCE DE ENERGÍA MENSUAL
 ####################################
 ener = ['Proceso','Caldera','Solar']
-ener_month, x_month = SystemMonth(df,year)
-source_ener = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
+ener_month, x_month = SystemMonth(df,effHeater,year)
+source_ener_month = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
 palette = ["red", "black","orange"]
     
 p_month = Figure(tools=TOOLS, x_range=FactorRange(*x_month),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
             y_axis_label="Energía (MWh/mes)")
-p_month.vbar(x='x', top='ener', width=1.0, source=source_ener, 
+p_month.vbar(x='x', top='ener', width=1.0, source=source_ener_month, 
       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
       line_color='white')
 p_month.xaxis.major_label_orientation = 1
@@ -462,14 +473,14 @@ p_month.select_one(HoverTool).tooltips = [
 p_month.select_one(HoverTool).mode='vline'
 
 
-cols_balance = [
+cols_balance_month = [
         TableColumn(field="Meses", title="Mes",width=60),
         TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
         TableColumn(field="enerHeater", title="E caldera (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
         TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
         TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
-table_bal_month = DataTable(columns=cols_balance, source=source_bal_month,width=600, height=450,
+table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,width=600, height=450,
                       editable=True)
 ###################################################
 #fs_mes = enerSol/enerProc*100
@@ -480,8 +491,8 @@ table_bal_month = DataTable(columns=cols_balance, source=source_bal_month,width=
 #       fill_color='orange', line_color='white')
 #p3.xaxis.major_label_orientation = 1
 #######
-infoEner = PreText(text=str(table_ener), width=550)
-infoFuel = PreText(text=str(table_fuel), width=480)
+# infoEner = PreText(text=str(table_ener), width=550)
+# infoFuel = PreText(text=str(table_fuel), width=480)
 # infoSteam = PreText(text=str(table_steam), width=480)
 #######################
 #DATOS TABLA ECONÓMICA
@@ -737,7 +748,7 @@ def CalcRad():
     df = CopyRadFile(lugar,dataSol)
     df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
-    
+    dropdownYearData
     rad_month, x_month = RadMonth(df)
     new_data=dict(x=x_month, rad=rad_month)
     source_rad.data = new_data
@@ -751,47 +762,47 @@ def CalcRad():
    
     return df
 
-def CalcRad_Year():
-    '''
-    Actualiza la simulación de radiación según los filtros de lugar,
-    datos solares, inclinación y orientación establecidos.
+# def CalcRad_Year():
+#     '''
+#     Actualiza la simulación de radiación según los filtros de lugar,
+#     datos solares, inclinación y orientación establecidos.
     
-    Variables a definir
-    --------------------
-    lugar: Lugar a evaluar.
-    dataSol: De donde se obtienen los datos solares (ej: explorador solar).
-    tilt: Inclinación campo solar.
-    azim: Azimuth.
+#     Variables a definir
+#     --------------------
+#     lugar: Lugar a evaluar.
+#     dataSol: De donde se obtienen los datos solares (ej: explorador solar).
+#     tilt: Inclinación campo solar.
+#     azim: Azimuth.
     
-    Returns
-    -------
-    df : DataFrame
-        DF con los filtros aplicados.
+#     Returns
+#     -------
+#     df : DataFrame
+#         DF con los filtros aplicados.
 
-    '''
-    ######################
-    lugar = dropdownData.value
-    dataSol = dropdownSolData.value
-    year = dropdownYearData.value
-    tilt = float(incl.value)
-    azim = float(orie.value)
+#     '''
+#     ######################
+#     lugar = dropdownData.value
+#     dataSol = dropdownSolData.value
+
+#     tilt = float(incl.value)
+#     azim = float(orie.value)
         
-    df = CopyRadFile(lugar,dataSol)
-    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+#     df = CopyRadFile(lugar,dataSol)
+#     df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
     
-    rad_month, x_month = RadMonth(df)
-    new_data=dict(x=x_month, rad=rad_month)
-    source_rad.data = new_data
+#     rad_month, x_month = RadMonth(df)
+#     new_data=dict(x=x_month, rad=rad_month)
+#     source_rad.data = new_data
 
-    table_rad = TableRad(df)
-    data_lugar = minas[minas.Mina == lugar]
-    ghi_sg = data_lugar.GHI_SG.iloc[0]
-    table_rad['GHI Solargis (kWh/m2/año)'] = ghi_sg
+#     table_rad = TableRad(df)
+#     data_lugar = minas[minas.Mina == lugar]
+#     ghi_sg = data_lugar.GHI_SG.iloc[0]
+#     table_rad['GHI Solargis (kWh/m2/año)'] = ghi_sg
     
-    infoRad.text = str(table_rad)
+#     infoRad.text = str(table_rad)
    
-    return df
+#     return df
 
 def CalcSystem():
     '''
@@ -835,11 +846,11 @@ def CalcSystem():
     
     Tin_p  = float(Tin_proc.value)
     Tout_p = float(Tout_proc.value)
-    flow_p = float(flow_proc.value)
+    # flow_p = float(flow_proc.value)
     # turno = str(selectTurno.value)
     
     effHeater = float(eff_heater.value)
-    fuel   = str(dropdownFuel.value)
+    # fuel   = str(dropdownFuel.value)
     
     year = str(dropdownYearData.value)
 
@@ -859,29 +870,33 @@ def CalcSystem():
     
     df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
-    enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,year)
-    balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balance_anual.csv')
-    balance['enerHeater'] = balance.enerProc/(effHeater/100)
-    balance['Meses'] = meses
-    source_bal_month.data = balance
+    enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     
-    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+    balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
+    balance_year['enerHeater'] = balance_year.enerProc/(effHeater/100)
+    balance_year['Años'] = years_list
+    source_bal_year.data = balance_year
     
-    enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,year)
-    balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
-    balance['enerHeater'] = balance.enerProc/(effHeater/100)
-    balance['Meses'] = meses
-    source_bal_month.data = balance
+    ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    new_data_year=dict(x=x_year, ener=ener_year)
+    source_ener_year.data = new_data_year
+    # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
-    ener_month, x_month = SystemMonth(df,year)
+    enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,effHeater,year)
+    balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
+    balance_month['enerHeater'] = balance_month.enerProc/(effHeater/100)
+    balance_month['Meses'] = meses
+    source_bal_month.data = balance_month
+    
+    ener_month, x_month = SystemMonth(df,effHeater,year)
     new_data=dict(x=x_month, ener=ener_month)
-    source_ener.data = new_data
+    source_ener_month.data = new_data
     
-    table_ener = TableEner(df,flow_p, Tin_p, Tout_p,effHeater,Col)
-    infoEner.text = str(table_ener)
+    # table_ener = TableEner(df,flow_p, Tin_p, Tout_p,effHeater,Col)
+    # infoEner.text = str(table_ener)
     
-    table_fuel = TableFuel(df,fuel,effHeater)
-    infoFuel.text = str(table_fuel)
+    # table_fuel = TableFuel(df,fuel,effHeater)
+    # infoFuel.text = str(table_fuel)
     
     # table_steam = TableSteam(df,turno,flow_p, Tin_p, Tout_p,effHeater,cond,T_cond,p_steam,fuel)
     # infoSteam.text = str(table_steam)
@@ -890,7 +905,7 @@ def CalcSystem():
 #    new_data=dict(x=meses,y=fs_mes)
 #    source_fs.data = new_data
     
-    new_data=dict(x=df.index,y=df.demanda)
+    # new_data=dict(x=df.index,y=df.demanda)
 #    source_dem.data = new_data
 
     #############################
@@ -1070,8 +1085,12 @@ def CalcSystem():
 #     src_cdf.data  = new_data
 
 
+
+
 buttCalcRad.on_click(CalcRad)
 buttCalcEnergy.on_click(CalcSystem)
+
+years_button_group.on_click(CalcSystem())
 
 #############
 spc = 50
@@ -1082,12 +1101,14 @@ layout = column(Spacer(height=spc),
                 row(p_rad,infoRad),
                 
                 
-                row(Tin_proc,Tout_proc,flow_proc),#,selectTurno),
-                row(eff_heater,dropdownFuel, dropdownYearData), #,dropdownFluid
+                row(Tin_proc,Tout_proc),#,flow_proc,selectTurno),
+                row(eff_heater,dropdownFuel), #,dropdownFluid
                 # row(presion_vapor,perc_cond),
                 row(selectCol,areaCol,vol_sto,loss_sto),
                 buttCalcEnergy,
                 row(p_year,Spacer(width=spc),table_bal_year),
+                Spacer(height=spc),
+                row(years_button_group),
                 row(p_month,Spacer(width=spc),table_bal_month),
                 # row(infoEner,infoFuel,infoSteam),
                 
