@@ -95,51 +95,61 @@ tiles = [
 ]
 
 
-cats = {'Otras actividades':1, 
-            'Producción de alimentos':2,
-            'Industria agropecuaria y silvicultura':3, 
-            'Gestor de residuos':4,
-            'Transporte':5, 'Industria manufacturera':6, 'Extracción de minerales':7,   
-           'Producción de metal':8, 'Municipio':9, 'Construcción e inmobiliarias':10,
-           'Generación de energía':11, 'Comercio':12, 'Pesca':13, 'Producción química':14,
-           'Suministro y tratamiento de aguas':15,
-           'Industria del papel y celulosa':16, 'Combustibles':17}
+cats = {
+    "Otras actividades": 1,
+    "Comercio minorista": 2,
+    "Captación, tratamiento y distribución de agua": 3,
+    "Otras industrias manufactureras": 4,
+    "Pesca y acuicultura": 5,
+    "Plantas de tratamiento de aguas servidas": 6,
+    "Comercio mayorista": 7,
+    "Producción agropecuaria": 8,
+    "Ventas y mantención de vehículos automotores": 9,
+    "Construcción": 10,
+    "Minería": 11,
+    "Termoeléctricas": 12,
+    "Otras centrales de generación eléctrica": 13,
+    "Industria del papel y celulosa": 14,
+    "Industria química, de plástico y caucho": 15,
+    "Industria de la madera y silvicultura": 16,
+    "Refinería de petróleo": 17,
+    "Gestores de residuos": 18,
+    "Producción de cemento, cal y yeso": 19,
+}
 
 
-# combs_1 = {
-#     "Carbón Bituminoso Pulverizado": 1,
-#     "Gas Natural": 2,
-#     "Gas de Coque": 3,
-#     "Carbón Sub Bituminoso": 4,
-#     "Licor Negro": 5,
-#     "Gas de Coque Diluido": 6,
-#     "Gas Licuado de Petróleo": 7,
-#     "Gas de Alto Horno": 8,
-#     "Carbón Coke": 9,
-#     "Coke de Petróleo (Petcoke)": 10,
-#     "Biomasa Combustible": 11,
-#     "Petróleo N 6": 12,
-#     "Carbón Bituminoso": 13,
-#     "Gas de Refinería": 14,
-#     "Aserrín": 15,
-#     "Viruta, Despuntes": 16,
-#     "Petróleo N 2 (Diesel)": 17,
-#     "Leña": 18,
-#     "Gas de Cañería": 19,
-#     "Petróleo N 5": 20,
-# }
+combs_1 = {
+    "Carbón Bituminoso Pulverizado": 1,
+    "Gas Natural": 2,
+    "Gas de Coque": 3,
+    "Carbón Sub Bituminoso": 4,
+    "Licor Negro": 5,
+    "Gas de Coque Diluido": 6,
+    "Gas Licuado de Petróleo": 7,
+    "Gas de Alto Horno": 8,
+    "Carbón Coke": 9,
+    "Coke de Petróleo (Petcoke)": 10,
+    "Biomasa Combustible": 11,
+    "Petróleo N 6": 12,
+    "Carbón Bituminoso": 13,
+    "Gas de Refinería": 14,
+    "Aserrín": 15,
+    "Viruta, Despuntes": 16,
+    "Petróleo N 2 (Diesel)": 17,
+    "Leña": 18,
+    "Gas de Cañería": 19,
+    "Petróleo N 5": 20,
+}
 
-# combs_2 = {
-#     "Kerosene": 1,
-#     "Metanol": 2,
-#     "Propano": 3,
-#     "Aceite Usado": 4,
-#     "Carbón de Leña": 5,
-#     "Bencina": 6,
-#     "Biogas": 7,
-# }
-
-
+combs_2 = {
+    "Kerosene": 1,
+    "Metanol": 2,
+    "Propano": 3,
+    "Aceite Usado": 4,
+    "Carbón de Leña": 5,
+    "Bencina": 6,
+    "Biogas": 7,
+}
 
 
 # paleta de colores para los gráficos
@@ -171,51 +181,87 @@ def ReadIndus():
     
     Headers DataFrame 
     -----------------
-      'raz_social', 'nombre', 'ID', 'rubro', 'ciiu4', 'fuente_emision', 
-      'tipo_contaminante', 'ton_emision', 'anho', 'region', 'provincia', 
-      'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
-  
+  'ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
+            ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
+            'Latitud', 'Longitud', 'fuente_emision', 'tipo_fuente, 'combustible_prim', 'ccf8',
+            'tipo_contaminante','EMISION PRIMARIO', 'combustible_sec', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
+            'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO'
+        
     """
-    header = ['raz_social','nombre','ID','rubro','ciiu4','fuente_emision','tipo_contaminante',
-      'ton_emision','anho','region','provincia','comuna','huso','coord_norte','coord_este','Longitud','Latitud']
+    header = [
+        "ano",
+        "ID",
+        "nombre",
+        "raz_social",
+        "ciiu4",
+        "ciiu6",
+        "rubro",
+        "region",
+        "provincia",
+        "comuna",
+        "huso",
+        "Latitud",
+        "Longitud",
+        "fuente_emision",
+        "tipo_fuente",
+        "combustible_prim",
+        "ccf8",
+        "tipo_contaminante",
+        "EMISION PRIMARIO",
+        "combustible_sec",
+        "CCF8 SECUNDARIO",
+        "CONTAMINANTE 2",
+        "EMISION SECUNDARIO",
+        "CCF8 MATERIA PRIMA",
+        "CONTAMINANTE 3",
+        "EMISION MATERIA PRIMA",
+        "ton_emision",
+        "ORIGEN",
+        "NIVEL ACTIVIDAD EXTERNO",
+    ]
 
-
-    indus = pd.read_csv(path + 'datos/RETC/emisiones_aire_2018_cart.csv', encoding="utf-8",names=header,skiprows=1,sep=',',decimal='.')
-
+    indus = pd.read_csv(
+        path + "datos/RETC/ruea_2020_ckan_final.csv",
+        sep=";",
+        decimal=",",
+        thousands=".",
+        encoding="utf-8-sig",
+        names=header,
+    )
     # indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", sep =';', decimal=',', thousands= '.', encoding = 'utf-8-sig', names = header)
 
     # indus = indus.drop(0, axis=0)
 
-    # indus = indus.drop(
-    #     [
-    #         "ano",
-    #         "CCF8 SECUNDARIO",
-    #         "CONTAMINANTE 2",
-    #         "EMISION SECUNDARIO",
-    #         "CCF8 MATERIA PRIMA",
-    #         "CONTAMINANTE 3",
-    #         "ORIGEN",
-    #         "NIVEL ACTIVIDAD EXTERNO",
-    #     ],
-    #     axis=1,
-    # )
+    indus = indus.drop(
+        [
+            "ano",
+            "CCF8 SECUNDARIO",
+            "CONTAMINANTE 2",
+            "EMISION SECUNDARIO",
+            "CCF8 MATERIA PRIMA",
+            "CONTAMINANTE 3",
+            "ORIGEN",
+            "NIVEL ACTIVIDAD EXTERNO",
+        ],
+        axis=1,
+    )
 
     # Se necesita reemplazar los puntos por nada, y las comas por puntos (ya que los decimales en python son con puntos.)
 
-    # indus["ton_emision"] = indus["ton_emision"].str.replace(".", "")
-    # indus["ton_emision"] = indus["ton_emision"].str.replace(",", ".")
+    indus["ton_emision"] = indus["ton_emision"].str.replace(".", "")
+    indus["ton_emision"] = indus["ton_emision"].str.replace(",", ".")
 
-    # indus["Latitud"] = indus["Latitud"].str.replace(",", ".")
-    # indus["Longitud"] = indus["Longitud"].str.replace(",", ".")
+    indus["Latitud"] = indus["Latitud"].str.replace(",", ".")
+    indus["Longitud"] = indus["Longitud"].str.replace(",", ".")
 
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
-    indus = indus.dropna()  
-    # indus.ccf8 = pd.to_numeric(indus.ccf8, errors="coerce")
 
-    # indus.Longitud = pd.to_numeric(indus.Longitud, errors="coerce")
-    # indus.Latitud = pd.to_numeric(indus.Latitud, errors="coerce")
+    indus.ccf8 = pd.to_numeric(indus.ccf8, errors="coerce")
 
-    # indus = indus.dropna(subset=(["ton_emision", "Longitud", "Latitud"]))
+    indus.Longitud = pd.to_numeric(indus.Longitud, errors="coerce")
+    indus.Latitud = pd.to_numeric(indus.Latitud, errors="coerce")
+
+    indus = indus.dropna(subset=(["ton_emision", "Longitud", "Latitud"]))
     # indus = indus['longitud'].dropna()
     # indus = indus['latitud'].dropna()
     # indus = indus['huso'].dropna()
@@ -223,32 +269,6 @@ def ReadIndus():
     # indus.huso = pd.to_numeric(indus.huso, errors='coerce')
 
     return indus
-
-def ReadComb():
-    '''
-    Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
-
-    Returns
-    -------
-    cmb : DataFrame
-        DF con métricas de consumo anual, promedio y desviación estandar calculadas.
-        
-
-    '''
-    cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
-    cmb['f_index'] = cmb.fuente
-    cmb = cmb.set_index('f_index')
-    cmb = cmb[cmb.estado == 'Activa']
-    cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
-    cmb['promedio'] = cmb.con_anual/12
-    cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
-                        (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
-                        (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
-                        (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2 
-   
-    cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
-    return cmb
-
 
 
 def readccf8():
@@ -570,32 +590,7 @@ def FiltRegion(df, rgn, latNor, latSur):
 
     return df_filt
 
-# conversion de escala de latitud y longitud    
-def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
-    '''
-    Función que convierte las escalas de longitud en una variable 'x' y latitud
-    en una variable 'y', generando nuevas columnas 'x' 'y' en el DF entregado.
 
-    Parameters
-    ----------
-    df : DataFrame
-        DF en el que se generará las variables 'x', 'y' ('emisiones_aire_año_cart.csv').
-    lon : Column
-        Pertenece a la columna "Longitud" del DF.
-    lat : Column
-        Pertenece a la columna "Latitud" del DF.
-
-    Returns
-    -------
-    df : DataFrame
-        DF con las nuevas columnas 'x', 'y' generadas.
-
-    '''
-    k = 6378137
-    df["x"] = df[lon] * (k * np.pi/180.0)
-    df["y"] = np.log(np.tan((90 + df[lat]) * np.pi/360.0)) * k
-
-    return df
 # # Convertir UTM a wgs84
 # def convert_UTM_to_WGS84(coord_este, coord_norte, huso):
 #     outProj = Proj(init='epsg:4326')
@@ -675,6 +670,12 @@ def emission_to_energy(df, df2):
 indus = ReadIndus()
 base = readccf8()
 
+# crear lista de combustibles
+comb_list = list(indus.combustible_prim.unique())
+comb_list.remove("Null")
+comb_list.remove(comb_list[8])
+# comb_list.sort()
+comb_list = ["Todo"] + comb_list
 
 
 # crear lista de contaminantes
@@ -682,12 +683,8 @@ ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
 ctms.sort()
 ctms_opt = ["Todo"] + ctms
 
-ctm = 'Dióxido de carbono (CO2)'
+ctm = "Carbon dioxide"
 indus = indus[indus.tipo_contaminante == ctm]
-
-# # ##leer archivo de combustibles y juntar df indus
-cmb_indus = ReadComb()
-indus_cmb = indus.join(cmb_indus)
 
 # definición factor emisión/energía para grupo electrogenos
 
@@ -728,7 +725,8 @@ max_empr = 1000
 
 # definir categoría
 rbr = ["Todo"]
-rindus_ft = Filtrbr(
+catg = ["rubro"]
+indus_ft = Filtrbr(
     indus_ft, rbr, max_empr
 )  # Cruza la base agrupada con la categoría de actividad
 
@@ -752,7 +750,9 @@ indus = indus.set_index("f_ind")
 indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
 
 
-
+# # ##leer archivo de combustibles y juntar df indus
+# # cmb_indus = ReadComb()
+# # indus_cmb = indus.join(cmb_indus)
 
 ########################################################################################
 # crear un ColumnDataSource (ds)
