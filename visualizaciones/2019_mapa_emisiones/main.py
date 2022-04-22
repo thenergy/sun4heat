@@ -176,46 +176,25 @@ def ReadIndus():
       'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
   
     """
-    header = ['raz_social','nombre','ID','rubro','ciiu4','fuente_emision','tipo_contaminante',
-      'ton_emision','anho','region','provincia','comuna','huso','coord_norte','coord_este','Longitud','Latitud']
+    # header = ['raz_social','nombre','ID','rubro','ciiu4','fuente_emision','tipo_contaminante',
+    #   'ton_emision','anho','region','provincia','comuna','huso','coord_norte','coord_este','Longitud','Latitud']
 
+    header = ['ID', 'raz_social', 'nombre','rubro','ciiu6','ciiu4','region','provincia',
+              'comuna','coord_este','coord_norte', 'huso', 'fuente_emision', 'tipo_fuente','combustible_prim', 
+              'EMISION PRIMARIO', 'combustible_sec','EMISION SECUNDARIO','EMISION MATERIA PRIMA','tipo_contaminante',
+              'ton_emision','ORIGEN', 'Longitud','Latitud']
+    
+    indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", sep =';', decimal=',', thousands= '.', names = header)
 
-    indus = pd.read_csv(path + 'datos/RETC/emisiones_aire_2018_cart.csv', encoding="utf-8",names=header,skiprows=1,sep=',',decimal='.')
-
-    # indus = pd.read_csv(path + "datos/RETC/indus_ll.csv", sep =';', decimal=',', thousands= '.', encoding = 'utf-8-sig', names = header)
-
-    # indus = indus.drop(0, axis=0)
-
-    # indus = indus.drop(
-    #     [
-    #         "ano",
-    #         "CCF8 SECUNDARIO",
-    #         "CONTAMINANTE 2",
-    #         "EMISION SECUNDARIO",
-    #         "CCF8 MATERIA PRIMA",
-    #         "CONTAMINANTE 3",
-    #         "ORIGEN",
-    #         "NIVEL ACTIVIDAD EXTERNO",
-    #     ],
-    #     axis=1,
-    # )
-
-    # Se necesita reemplazar los puntos por nada, y las comas por puntos (ya que los decimales en python son con puntos.)
-
-    # indus["ton_emision"] = indus["ton_emision"].str.replace(".", "")
-    # indus["ton_emision"] = indus["ton_emision"].str.replace(",", ".")
-
-    # indus["Latitud"] = indus["Latitud"].str.replace(",", ".")
-    # indus["Longitud"] = indus["Longitud"].str.replace(",", ".")
 
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce")
-    indus = indus.dropna()  
+    # indus = indus.dropna()  
     # indus.ccf8 = pd.to_numeric(indus.ccf8, errors="coerce")
 
-    # indus.Longitud = pd.to_numeric(indus.Longitud, errors="coerce")
-    # indus.Latitud = pd.to_numeric(indus.Latitud, errors="coerce")
+    indus.Longitud = pd.to_numeric(indus.Longitud, errors="coerce")
+    indus.Latitud = pd.to_numeric(indus.Latitud, errors="coerce")
 
-    # indus = indus.dropna(subset=(["ton_emision", "Longitud", "Latitud"]))
+    indus = indus.dropna(subset=(["ton_emision", "coord_este", "coord_norte",'tipo_fuente']))
     # indus = indus['longitud'].dropna()
     # indus = indus['latitud'].dropna()
     # indus = indus['huso'].dropna()
@@ -224,47 +203,37 @@ def ReadIndus():
 
     return indus
 
-def ReadComb():
-    '''
-    Esta función lee csv con información de combustibles, en donde se calculan las métricas de consumom anual, promedio y deviación estandar.
-
-    Returns
-    -------
-    cmb : DataFrame
-        DF con métricas de consumo anual, promedio y desviación estandar calculadas.
-        
-
-    '''
-    cmb = pd.read_csv(path + 'datos/RETC/info_combustibles.csv', encoding="utf-8",sep=';',decimal=',')
-    cmb['f_index'] = cmb.fuente
-    cmb = cmb.set_index('f_index')
-    cmb = cmb[cmb.estado == 'Activa']
-    cmb['con_anual'] = cmb.ene + cmb.feb + cmb.mar + cmb.abr + cmb.may + cmb.jun + cmb.jul + cmb.ago + cmb.sep + cmb.oct + cmb.nov + cmb.dic
-    cmb['promedio'] = cmb.con_anual/12
-    cmb['desv_std1'] = (cmb.ene-cmb.promedio)**2 + (cmb.feb-cmb.promedio)**2 + (cmb.mar-cmb.promedio)**2 + \
-                        (cmb.abr-cmb.promedio)**2 + (cmb.may-cmb.promedio)**2 + (cmb.jun-cmb.promedio)**2 + \
-                        (cmb.jul-cmb.promedio)**2 + (cmb.ago-cmb.promedio)**2 + (cmb.sep-cmb.promedio)**2 + \
-                        (cmb.oct-cmb.promedio)**2 + (cmb.nov-cmb.promedio)**2 + (cmb.dic-cmb.promedio)**2 
-   
-    cmb['desv_std'] = np.sqrt(cmb.desv_std1/12)
-    return cmb
-
-
 
 def readccf8():
 
     header = ["ccf8", "ener_emis"]
+    header_fc = ['fuente','ccf8']
     base = pd.read_csv(
-        path + "datos/RETC/ccf8.csv", sep=";", names=header
-    )
+        path + "datos/RETC/ccf8.csv", sep=";", names=header    )
+    
+    fuente_ccf8 = pd.read_excel(path + "datos/RETC/fuente_ccf8.xlsx", names=header_fc   )
 
     base = base.drop([0, 1], axis=0)
+    
 
     base["ccf8"] = base["ccf8"].str.replace("-", "")
     base["ener_emis"] = base["ener_emis"].str.replace(",", ".")
 
     base.ccf8 = pd.to_numeric(base.ccf8, errors="coerce")
     base.ener_emis = pd.to_numeric(base.ener_emis, errors="coerce")
+    
+ 
+    base = pd.merge(base,fuente_ccf8, on = 'ccf8')
+    
+    # base = base.groupby(["fuente"]).agg(
+    #     {
+    #         "ccf8": "first",
+    #         'ener_emis': 'first',
+            
+    #         })
+    
+
+    
 
     return base
 
@@ -411,7 +380,7 @@ def FiltEquip(df, mkt):
             nl.append("IN", "CF", "CA")
 
         if  "Mercado H2" in mkt:
-            nl.append("IN", "CF", "CA", "PC", "PS")
+            nl.append("IN", "CF", "CA", "PS")
 
         df = df[df.equipo.isin(nl)]
 
@@ -592,31 +561,59 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
 
     '''
     k = 6378137
+    df[lon].to_n
     df["x"] = df[lon] * (k * np.pi/180.0)
     df["y"] = np.log(np.tan((90 + df[lat]) * np.pi/360.0)) * k
 
     return df
-# # Convertir UTM a wgs84
-# def convert_UTM_to_WGS84(coord_este, coord_norte, huso):
-#     outProj = Proj(init='epsg:4326')
-#     lt = []
-#     lg = []
-#     for coord_este, coord_norte, huso in zip(indus.coord_este, indus.coord_norte, indus.huso):
-#         if huso == 18:
-#             inProj = Proj(init='epsg:32718')
-#         elif huso == 19:
-#             inProj = Proj(init='epsg:32719')
-#         elif huso == 12:
-#             inProj = Proj(init='epsg:32712')
 
-#         x2,y2 = transform(inProj,outProj,coord_este,coord_norte)
-#         lg.append(x2)
-#         lt.append(y2)
 
-#     indus['Longitud'] = lg
-#     indus['Latitud'] = lt
+def FiltCatg(df,catg,max_empr):
+    '''
+    Función que filtra según las categorias presentes en 'emisiones_aire_año_cart.csv'.
+    
+    Categorias
+    ----------
+            'Otras actividades'
+            'Producción de alimentos'
+            'Industria agropecuaria y silvicultura'
+            'Gestor de residuos'
+            'Transporte'
+            'Industria manufacturera'
+            'Extracción de minerales'   
+            'Producción de metal'
+            'Municipio'
+            'Construcción e inmobiliarias'
+            'Generación de energía'
+            'Comercio'            
+            'Pesca'
+            'Producción química'
+            'Suministro y tratamiento de aguas'
+            'Industria del papel y celulosa'
+            'Combustibles'
 
-# conversion de escala de latitud y longitud
+    Parameters
+    ----------
+    df : DataFrame
+        DF en donde se filtra la categoría correspondiente.
+    catg : List
+        Lista de strings que contiene las categorías a filtrar.
+    max_empr : int
+        Por ahora ninguna función.
+
+    Returns
+    -------
+    df : DataFrame
+        DF con la categoría filtrada.
+
+    '''
+
+    df['catg'] = df.rubro.map(cats)    
+    df = df[df.rubro.isin(catg)]
+            
+    return df
+
+
 def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
     """
     Función que convierte las escalas de longitud en una variable 'x' y latitud
@@ -662,9 +659,11 @@ def emission_to_energy(df, df2):
 
     """
 
-    map_dict = df2.set_index('ccf8').T.to_dict('index')
+    map_dict = df2.set_index('fuente').T.to_dict('index')
     
-    df['fc_emis_prim'] = df.ccf8.map(map_dict['ener_emis'])   
+    # merge = pd.merge(df,df2, left_on=('fuente_emision'), right_on=('fuente') )
+    
+    df['fc_emis_prim'] = df.fuente_emision.map(map_dict['ener_emis'])   
     df['ener_cons_CO2'] = df.ton_emision/df.fc_emis_prim
     
     return df
@@ -682,14 +681,17 @@ ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
 ctms.sort()
 ctms_opt = ["Todo"] + ctms
 
-ctm = 'Dióxido de carbono (CO2)'
+comb_list = list(indus.combustible_prim.unique())
+# comb_list.remove("Null")
+comb_list.remove(comb_list[2])
+comb_list.sort()
+comb_list = ["Todo"] + comb_list
+
+
+ctm = 'Carbon dioxide'
 indus = indus[indus.tipo_contaminante == ctm]
 
-# # ##leer archivo de combustibles y juntar df indus
-cmb_indus = ReadComb()
-indus_cmb = indus.join(cmb_indus)
-
-# definición factor emisión/energía para grupo electrogenos
+# # definición factor emisión/energía para grupo electrogenos
 
 
 # definir contaminante inicial a analizar y filtrar df indus
@@ -701,9 +703,7 @@ else:
     indus = indus[indus.combustible_prim.isin(comb)]
 
 # filtrar df indus según equipo a analizar
-indus = IDequipo(
-    indus
-)  # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
+indus = IDequipo(indus)  # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
 # convierte emisiones a factor energético
 indus = emission_to_energy(indus,base)
@@ -728,7 +728,7 @@ max_empr = 1000
 
 # definir categoría
 rbr = ["Todo"]
-rindus_ft = Filtrbr(
+indus_ft = Filtrbr(
     indus_ft, rbr, max_empr
 )  # Cruza la base agrupada con la categoría de actividad
 
@@ -941,9 +941,10 @@ buttCalcUpdate.js_on_click(
 
 dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
-dropDownComb = MultiChoice(
-    value=["Todo"], title="Combustible Primario", options=comb_list, width=300
-)
+dropDownComb = MultiChoice(    value=["Todo"], 
+                           title="Combustible Primario", 
+                           options=comb_list,
+                           width=300)
 
 
 #############################################################################################
