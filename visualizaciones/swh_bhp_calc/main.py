@@ -416,7 +416,9 @@ areaCol = TextInput(value=str(aCol), title="Área colectores:")
 vol_sto = TextInput(value=str(vol), title="Volumen acumulación (m3):")
 loss_sto= TextInput(value=str(sto_loss), title="Pérdidas almacenamiento (%):")
 
-buttCalcEnergy = Button(label="Calcular", button_type="success",width=100)
+buttCalcEnergyYear = Button(label="Calcular balance anual", button_type="success",width=100)
+
+buttCalcEnergyMonth = Button(label="Calcular balance mensual", button_type="success",width=100)
 
 ####################################
 #GRAFICO BALANCE DE ENERGÍA ANUAL
@@ -802,7 +804,85 @@ def CalcRad():
    
 #     return df
 
-def CalcSystem():
+def CalcSystemMonth():
+    '''
+    A través de la simulación en SAM hecha por CallSWH calcula la 
+    energía en función del sistema y variables seleccionadas.
+    
+    Variables a definir.
+    ----------------------
+    tilt:Inclinación campo solar.
+    azim: Azimuth.
+    
+    Tin_p: Temperatura de entrada al proceso.
+    Tout_p: Temperatura de salida del proceso.
+    
+    flow_p: Flujo de agua en el proceso.
+    p_steam: Presión de vapor.
+    
+    T_cond: Temperatura de condensado.
+    cond: % de condensación del vapor.
+    
+    Col: Colector.
+    aCol: Área de colector.
+    
+    Vol: Volumen de almacenamiento.    
+    sto_loss: % Pérdida de almacenamiento.    
+    
+    turno: Turno de trabajo de la empresa.
+    
+    effHeater: Eficiencia Caldera.
+    fuel: Combustible.
+    
+    
+    Returns
+    -------
+    None.
+
+    '''
+    df   = CalcRad()
+    tilt = float(incl.value)
+    azim = float(orie.value)
+    
+    Tin_p  = float(Tin_proc.value)
+    Tout_p = float(Tout_proc.value)
+    # flow_p = float(flow_proc.value)
+    # turno = str(selectTurno.value)
+    
+    effHeater = float(eff_heater.value)
+    # fuel   = str(dropdownFuel.value)
+    
+    year = int(years_button_group.active)
+    year = years[year]
+    
+
+    # p_steam = float(presion_vapor.value)
+    # cond = float(perc_cond.value)
+    # T_cond = float(temp_cond.value)
+    
+    Col = selectCol.value
+    aCol = float(areaCol.value)
+    vol  = float(vol_sto.value)
+    sto_loss = float(loss_sto.value)
+    # year = 
+    
+    # SetTurno(df,turno)
+    SetTMains(df,Tout_p)
+    SetTSet(df,Tin_p)
+    
+    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+   
+    enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
+    balance_month['enerHeater'] = balance_month.enerProc/(effHeater/100)
+    balance_month['Meses'] = meses
+    source_bal_month.data = balance_month
+    
+    ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    new_data_month=dict(x=x_month, ener=ener_month)
+    source_ener_month.data = new_data_month
+    
+def CalcSystemYear():
     '''
     A través de la simulación en SAM hecha por CallSWH calcula la 
     energía en función del sistema y variables seleccionadas.
@@ -1088,7 +1168,8 @@ def CalcSystem():
 
 
 buttCalcRad.on_click(CalcRad)
-buttCalcEnergy.on_click(CalcSystem)
+buttCalcEnergyYear.on_click(CalcSystemYear)
+buttCalcEnergyMonth.on_click(CalcSystemMonth)
 
 
 #############
@@ -1104,10 +1185,11 @@ layout = column(Spacer(height=spc),
                 row(eff_heater,dropdownFuel), #,dropdownFluid
                 # row(presion_vapor,perc_cond),
                 row(selectCol,areaCol,vol_sto,loss_sto),
-                buttCalcEnergy,
+                buttCalcEnergyYear,
                 row(p_year,Spacer(width=spc),table_bal_year),
                 Spacer(height=spc),
                 row(years_button_group),
+                buttCalcEnergyMonth,
                 row(p_month,Spacer(width=spc),table_bal_month),
                 # row(infoEner,infoFuel,infoSteam),
                 

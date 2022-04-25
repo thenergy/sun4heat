@@ -201,7 +201,7 @@ def ReadIndus():
               'EMISION PRIMARIO', 'combustible_sec','EMISION SECUNDARIO','EMISION MATERIA PRIMA','tipo_contaminante',
               'ton_emision','ORIGEN', 'Longitud','Latitud']
     
-    indus = pd.read_csv(path + "datos/RETC/indus_ll.csv",names=header, encoding="utf-8",skiprows=1,sep=';',decimal=',') #sep =';', decimal=',', thousands= '.', names = header)
+    indus = pd.read_csv(path + "datos/RETC/indus_ll.csv",names=header, encoding="utf-8-sig",skiprows=1,sep=';',decimal=',') #sep =';', decimal=',', thousands= '.', names = header)
     # indus = pd.read_excel(path + "datos/RETC/2019_vfinal_v3.xlsx.csv", names = header)
 
 
@@ -242,7 +242,7 @@ def readccf8():
     header = ["ccf8", "ener_emis"]
     header_fc = ['fuente','ccf8']
     base = pd.read_csv(
-        path + "datos/RETC/ccf8.csv", names=header, encoding="utf-8",skiprows=1,sep=';',decimal=','  )
+        path + "datos/RETC/ccf8.csv", names=header, encoding="utf-8-sig",skiprows=1,sep=';',decimal=','  )
     
     fuente_ccf8 = pd.read_excel(path + "datos/RETC/fuente_ccf8.xlsx", names=header_fc   )
        
