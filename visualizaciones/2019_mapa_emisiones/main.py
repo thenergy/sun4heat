@@ -73,9 +73,9 @@ from os.path import dirname, join
 
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+path = "/home/ubuntu/Thenergy/diego/sun4heat/"
 # path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
-path = '/home/diego/Documentos/sun4heat/'
+# path = '/home/diego/Documentos/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -120,38 +120,38 @@ cats = {
 }
 
 
-combs_1 = {
-    "Carbón Bituminoso Pulverizado": 1,
-    "Gas Natural": 2,
-    "Gas de Coque": 3,
-    "Carbón Sub Bituminoso": 4,
-    "Licor Negro": 5,
-    "Gas de Coque Diluido": 6,
-    "Gas Licuado de Petróleo": 7,
-    "Gas de Alto Horno": 8,
-    "Carbón Coke": 9,
-    "Coke de Petróleo (Petcoke)": 10,
-    "Biomasa Combustible": 11,
-    "Petróleo N 6": 12,
-    "Carbón Bituminoso": 13,
-    "Gas de Refinería": 14,
-    "Aserrín": 15,
-    "Viruta, Despuntes": 16,
-    "Petróleo N 2 (Diesel)": 17,
-    "Leña": 18,
-    "Gas de Cañería": 19,
-    "Petróleo N 5": 20,
-}
+# combs_1 = {
+#     "Carbón Bituminoso Pulverizado": 1,
+#     "Gas Natural": 2,
+#     "Gas de Coque": 3,
+#     "Carbón Sub Bituminoso": 4,
+#     "Licor Negro": 5,
+#     "Gas de Coque Diluido": 6,
+#     "Gas Licuado de Petróleo": 7,
+#     "Gas de Alto Horno": 8,
+#     "Carbón Coke": 9,
+#     "Coke de Petróleo (Petcoke)": 10,
+#     "Biomasa Combustible": 11,
+#     "Petróleo N 6": 12,
+#     "Carbón Bituminoso": 13,
+#     "Gas de Refinería": 14,
+#     "Aserrín": 15,
+#     "Viruta, Despuntes": 16,
+#     "Petróleo N 2 (Diesel)": 17,
+#     "Leña": 18,
+#     "Gas de Cañería": 19,
+#     "Petróleo N 5": 20,
+# }
 
-combs_2 = {
-    "Kerosene": 1,
-    "Metanol": 2,
-    "Propano": 3,
-    "Aceite Usado": 4,
-    "Carbón de Leña": 5,
-    "Bencina": 6,
-    "Biogas": 7,
-}
+# combs_2 = {
+#     "Kerosene": 1,
+#     "Metanol": 2,
+#     "Propano": 3,
+#     "Aceite Usado": 4,
+#     "Carbón de Leña": 5,
+#     "Bencina": 6,
+#     "Biogas": 7,
+# }
 
 
 # paleta de colores para los gráficos
