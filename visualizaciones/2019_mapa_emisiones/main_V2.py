@@ -1,19 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr 25 12:22:12 2022
 
-@author: diego
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 16 13:41:53 2021
-
-@author: diieg
-"""
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Wed May 20 08:11:42 2020
 
@@ -103,61 +88,51 @@ tiles = [
 ]
 
 
-cats = {
-    "Otras actividades": 1,
-    "Comercio minorista": 2,
-    "Captación, tratamiento y distribución de agua": 3,
-    "Otras industrias manufactureras": 4,
-    "Pesca y acuicultura": 5,
-    "Plantas de tratamiento de aguas servidas": 6,
-    "Comercio mayorista": 7,
-    "Producción agropecuaria": 8,
-    "Ventas y mantención de vehículos automotores": 9,
-    "Construcción": 10,
-    "Minería": 11,
-    "Termoeléctricas": 12,
-    "Otras centrales de generación eléctrica": 13,
-    "Industria del papel y celulosa": 14,
-    "Industria química, de plástico y caucho": 15,
-    "Industria de la madera y silvicultura": 16,
-    "Refinería de petróleo": 17,
-    "Gestores de residuos": 18,
-    "Producción de cemento, cal y yeso": 19,
-}
+cats = {'Otras actividades':1, 
+            'Producción de alimentos':2,
+            'Industria agropecuaria y silvicultura':3, 
+            'Gestor de residuos':4,
+            'Transporte':5, 'Industria manufacturera':6, 'Extracción de minerales':7,   
+           'Producción de metal':8, 'Municipio':9, 'Construcción e inmobiliarias':10,
+           'Generación de energía':11, 'Comercio':12, 'Pesca':13, 'Producción química':14,
+           'Suministro y tratamiento de aguas':15,
+           'Industria del papel y celulosa':16, 'Combustibles':17}
 
 
-combs_1 = {
-    "Carbón Bituminoso Pulverizado": 1,
-    "Gas Natural": 2,
-    "Gas de Coque": 3,
-    "Carbón Sub Bituminoso": 4,
-    "Licor Negro": 5,
-    "Gas de Coque Diluido": 6,
-    "Gas Licuado de Petróleo": 7,
-    "Gas de Alto Horno": 8,
-    "Carbón Coke": 9,
-    "Coke de Petróleo (Petcoke)": 10,
-    "Biomasa Combustible": 11,
-    "Petróleo N 6": 12,
-    "Carbón Bituminoso": 13,
-    "Gas de Refinería": 14,
-    "Aserrín": 15,
-    "Viruta, Despuntes": 16,
-    "Petróleo N 2 (Diesel)": 17,
-    "Leña": 18,
-    "Gas de Cañería": 19,
-    "Petróleo N 5": 20,
-}
+# combs_1 = {
+#     "Carbón Bituminoso Pulverizado": 1,
+#     "Gas Natural": 2,
+#     "Gas de Coque": 3,
+#     "Carbón Sub Bituminoso": 4,
+#     "Licor Negro": 5,
+#     "Gas de Coque Diluido": 6,
+#     "Gas Licuado de Petróleo": 7,
+#     "Gas de Alto Horno": 8,
+#     "Carbón Coke": 9,
+#     "Coke de Petróleo (Petcoke)": 10,
+#     "Biomasa Combustible": 11,
+#     "Petróleo N 6": 12,
+#     "Carbón Bituminoso": 13,
+#     "Gas de Refinería": 14,
+#     "Aserrín": 15,
+#     "Viruta, Despuntes": 16,
+#     "Petróleo N 2 (Diesel)": 17,
+#     "Leña": 18,
+#     "Gas de Cañería": 19,
+#     "Petróleo N 5": 20,
+# }
 
-combs_2 = {
-    "Kerosene": 1,
-    "Metanol": 2,
-    "Propano": 3,
-    "Aceite Usado": 4,
-    "Carbón de Leña": 5,
-    "Bencina": 6,
-    "Biogas": 7,
-}
+# combs_2 = {
+#     "Kerosene": 1,
+#     "Metanol": 2,
+#     "Propano": 3,
+#     "Aceite Usado": 4,
+#     "Carbón de Leña": 5,
+#     "Bencina": 6,
+#     "Biogas": 7,
+# }
+
+
 
 
 # paleta de colores para los gráficos
@@ -189,13 +164,14 @@ def ReadIndus():
     
     Headers DataFrame 
     -----------------
-  'ano','ID', 'nombre', 'raz_social', 'ciiu4', 'ciiu6'
-            ,	'rubro', 'region', 'provincia', 'comuna', 'huso',
-            'Latitud', 'Longitud', 'fuente_emision', 'tipo_fuente, 'combustible_prim', 'ccf8',
-            'tipo_contaminante','EMISION PRIMARIO', 'combustible_sec', 'CCF8 SECUNDARIO', 'CONTAMINANTE 2', 'EMISION SECUNDARIO', 
-            'CCF8 MATERIA PRIMA','CONTAMINANTE 3',  'EMISION MATERIA PRIMA', 'ton_emision', 'ORIGEN', 'NIVEL ACTIVIDAD EXTERNO'
-        
+      'raz_social', 'nombre', 'ID', 'rubro', 'ciiu4', 'fuente_emision', 
+      'tipo_contaminante', 'ton_emision', 'anho', 'region', 'provincia', 
+      'comuna', 'huso', 'coord_norte', 'coord_este','Longitud','Latitud'.
+  
     """
+    # header = ['raz_social','nombre','ID','rubro','ciiu4','fuente_emision','tipo_contaminante',
+    #   'ton_emision','anho','region','provincia','comuna','huso','coord_norte','coord_este','Longitud','Latitud']
+
     header = ['ID', 'raz_social', 'nombre','rubro','ciiu6','ciiu4','region','provincia',
               'comuna','coord_este','coord_norte', 'huso', 'fuente_emision', 'tipo_fuente','combustible_prim', 
               'EMISION PRIMARIO', 'combustible_sec','EMISION SECUNDARIO','EMISION MATERIA PRIMA','tipo_contaminante',
@@ -207,27 +183,13 @@ def ReadIndus():
 
 
     indus.ton_emision = pd.to_numeric(indus.ton_emision, errors="coerce") 
+    # indus = indus.dropna()  
+    # indus.ccf8 = pd.to_numeric(indus.ccf8, errors="coerce")
 
     indus.Longitud = pd.to_numeric(indus.Longitud, errors="coerce")
     indus.Latitud = pd.to_numeric(indus.Latitud, errors="coerce")
 
     indus = indus.dropna(subset=(["ton_emision", "coord_este", "coord_norte",'tipo_fuente']))#,"ener_cons_CO2"]))
-
-
-    indus = indus.drop(
-        [
-            'EMISION PRIMARIO',
-            "EMISION SECUNDARIO",
-            'EMISION MATERIA PRIMA',
-            "ORIGEN",
-
-        ],
-        axis=1,
-    )
-
-    # Se necesita reemplazar los puntos por nada, y las comas por puntos (ya que los decimales en python son con puntos.)
-
-    indus = indus.dropna(subset=(["ton_emision", "Longitud", "Latitud"]))
     # indus = indus['longitud'].dropna()
     # indus = indus['latitud'].dropna()
     # indus = indus['huso'].dropna()
@@ -245,18 +207,29 @@ def readccf8():
         path + "datos/RETC/ccf8.csv", names=header, encoding="utf-8",skiprows=1,sep=';',decimal=','  )
     
     fuente_ccf8 = pd.read_excel(path + "datos/RETC/fuente_ccf8.xlsx", names=header_fc   )
-       
+
     base = base.drop([0, 1], axis=0)
     
-       
+
     base["ccf8"] = base["ccf8"].str.replace("-", "")
     base["ener_emis"] = base["ener_emis"].str.replace(",", ".")
-       
+
     base.ccf8 = pd.to_numeric(base.ccf8, errors="coerce")
     base.ener_emis = pd.to_numeric(base.ener_emis, errors="coerce")
     
-       
+ 
     base = pd.merge(base,fuente_ccf8, on = 'ccf8')
+    
+    # base = base.groupby(["fuente"]).agg(
+    #     {
+    #         "ccf8": "first",
+    #         'ener_emis': 'first',
+            
+    #         })
+    
+
+    
+
     return base
 
 
@@ -402,7 +375,7 @@ def FiltEquip(df, mkt):
             nl.append("IN", "CF", "CA")
 
         if  "Mercado H2" in mkt:
-            nl.append("IN", "CF", "CA", "PC", "PS")
+            nl.append("IN", "CF", "CA", "PS")
 
         df = df[df.equipo.isin(nl)]
 
@@ -561,28 +534,81 @@ def FiltRegion(df, rgn, latNor, latSur):
 
     return df_filt
 
+# conversion de escala de latitud y longitud    
+def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
+    '''
+    Función que convierte las escalas de longitud en una variable 'x' y latitud
+    en una variable 'y', generando nuevas columnas 'x' 'y' en el DF entregado.
 
-# # Convertir UTM a wgs84
-# def convert_UTM_to_WGS84(coord_este, coord_norte, huso):
-#     outProj = Proj(init='epsg:4326')
-#     lt = []
-#     lg = []
-#     for coord_este, coord_norte, huso in zip(indus.coord_este, indus.coord_norte, indus.huso):
-#         if huso == 18:
-#             inProj = Proj(init='epsg:32718')
-#         elif huso == 19:
-#             inProj = Proj(init='epsg:32719')
-#         elif huso == 12:
-#             inProj = Proj(init='epsg:32712')
+    Parameters
+    ----------
+    df : DataFrame
+        DF en el que se generará las variables 'x', 'y' ('emisiones_aire_año_cart.csv').
+    lon : Column
+        Pertenece a la columna "Longitud" del DF.
+    lat : Column
+        Pertenece a la columna "Latitud" del DF.
 
-#         x2,y2 = transform(inProj,outProj,coord_este,coord_norte)
-#         lg.append(x2)
-#         lt.append(y2)
+    Returns
+    -------
+    df : DataFrame
+        DF con las nuevas columnas 'x', 'y' generadas.
 
-#     indus['Longitud'] = lg
-#     indus['Latitud'] = lt
+    '''
+    k = 6378137
+    df[lon].to_n
+    df["x"] = df[lon] * (k * np.pi/180.0)
+    df["y"] = np.log(np.tan((90 + df[lat]) * np.pi/360.0)) * k
 
-# conversion de escala de latitud y longitud
+    return df
+
+
+def FiltCatg(df,catg,max_empr):
+    '''
+    Función que filtra según las categorias presentes en 'emisiones_aire_año_cart.csv'.
+    
+    Categorias
+    ----------
+            'Otras actividades'
+            'Producción de alimentos'
+            'Industria agropecuaria y silvicultura'
+            'Gestor de residuos'
+            'Transporte'
+            'Industria manufacturera'
+            'Extracción de minerales'   
+            'Producción de metal'
+            'Municipio'
+            'Construcción e inmobiliarias'
+            'Generación de energía'
+            'Comercio'            
+            'Pesca'
+            'Producción química'
+            'Suministro y tratamiento de aguas'
+            'Industria del papel y celulosa'
+            'Combustibles'
+
+    Parameters
+    ----------
+    df : DataFrame
+        DF en donde se filtra la categoría correspondiente.
+    catg : List
+        Lista de strings que contiene las categorías a filtrar.
+    max_empr : int
+        Por ahora ninguna función.
+
+    Returns
+    -------
+    df : DataFrame
+        DF con la categoría filtrada.
+
+    '''
+
+    df['catg'] = df.rubro.map(cats)    
+    df = df[df.rubro.isin(catg)]
+            
+    return df
+
+
 def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
     """
     Función que convierte las escalas de longitud en una variable 'x' y latitud
@@ -635,9 +661,9 @@ def emission_to_energy(df, df2):
     df['fc_emis_prim'] = df.fuente_emision.map(map_dict['ener_emis'])   
     df['ener_cons_CO2'] = df.ton_emision/df.fc_emis_prim
     
-    # indus = indus.dropna(subset=(["ton_emision", "coord_este", "coord_norte",'tipo_fuente']))#,"ener_cons_CO2"]))  
+    # indus = indus.dropna(subset=(["ton_emision", "coord_este", "coord_norte",'tipo_fuente']))#,"ener_cons_CO2"]))
     df.fillna(int('0'))
-
+    
     return df
 
 
@@ -646,22 +672,23 @@ def emission_to_energy(df, df2):
 indus = ReadIndus()
 base = readccf8()
 
-# crear lista de combustibles
-comb_list = list(indus.combustible_prim.unique())
-comb_list.remove(comb_list[2])
-# comb_list.sort()
-comb_list = ["Todo"] + comb_list
-
 
 # crear lista de contaminantes
 ctms = list(indus.tipo_contaminante.unique())  # saca uno de cada contaminante
 ctms.sort()
 ctms_opt = ["Todo"] + ctms
 
-ctm = "Carbon dioxide"
+comb_list = list(indus.combustible_prim.unique())
+# comb_list.remove("Null")
+comb_list.remove(comb_list[2])
+comb_list.sort()
+comb_list = ["Todo"] + comb_list
+
+
+ctm = 'Carbon dioxide'
 indus = indus[indus.tipo_contaminante == ctm]
 
-# definición factor emisión/energía para grupo electrogenos
+# # definición factor emisión/energía para grupo electrogenos
 
 
 # definir contaminante inicial a analizar y filtrar df indus
@@ -673,12 +700,12 @@ else:
     indus = indus[indus.combustible_prim.isin(comb)]
 
 # filtrar df indus según equipo a analizar
-indus = IDequipo(
-    indus
-)  # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
+indus = IDequipo(indus)  # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
 # convierte emisiones a factor energético
 indus = emission_to_energy(indus,base)
+
+# indus = indus.fillna(int('0'))
 
 
 # lista de equipos a analizar
@@ -700,7 +727,6 @@ max_empr = 1000
 
 # definir categoría
 rbr = ["Todo"]
-catg = ["rubro"]
 indus_ft = Filtrbr(
     indus_ft, rbr, max_empr
 )  # Cruza la base agrupada con la categoría de actividad
@@ -722,12 +748,13 @@ indus["f_ind"] = indus.fuente_emision
 indus = indus.set_index("f_ind")
 
 #
-indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
+# indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
+
+indus = indus.fillna(int('0'))
 
 
-# # ##leer archivo de combustibles y juntar df indus
-# # cmb_indus = ReadComb()
-# # indus_cmb = indus.join(cmb_indus)
+
+
 
 ########################################################################################
 # crear un ColumnDataSource (ds)
@@ -745,7 +772,7 @@ columns = [
         width=30,
         formatter=NumberFormatter(format="0.0"),
     ),
-    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TJ/año)", width=30, formatter=NumberFormatter(format="0.0"),),
+    # TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TJ/año)", width=30, formatter=NumberFormatter(format="0.0"),),
     TableColumn(field="region", title="Región", width=50),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
@@ -823,7 +850,7 @@ columns_empr = [
         formatter=NumberFormatter(format="0.0"),
     ),
     TableColumn(
-        field="ener_cons_CO2",
+        # field="ener_cons_CO2",
         title="Energía consumida anual (TJ/año)",
         width=25,
         formatter=NumberFormatter(format="0.0"),
@@ -916,9 +943,10 @@ buttCalcUpdate.js_on_click(
 
 dropDownTiles = Select(value="ESRI_IMAGERY", title="Tipo mapa", options=tiles)
 
-dropDownComb = MultiChoice(
-    value=["Todo"], title="Combustible Primario", options=comb_list, width=300
-)
+dropDownComb = MultiChoice(    value=["Todo"], 
+                           title="Combustible Primario", 
+                           options=comb_list,
+                           width=300)
 
 
 #############################################################################################
@@ -1039,6 +1067,8 @@ def UpdateTable():
     indus = IDequipo(indus)
 
     indus = emission_to_energy(indus, base)
+    
+    # indus = indus.fillna(int('0'))
 
     # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
     # indus = indus[indus.equipo.isin(eqp_ft)]
@@ -1101,6 +1131,8 @@ def DownloadButton():
     indus_D = ReadIndus()
     base_D = readccf8()
     
+
+    
     ctm = dropDownCtms.value
 
     indus_D = indus_D[indus_D.tipo_contaminante == ctm]
@@ -1115,9 +1147,12 @@ def DownloadButton():
     indus_D = IDequipo(indus_D)
 
     indus_D = emission_to_energy(indus_D, base_D)
-
+    
+    indus_D = indus_D.fillna(int('0'))
+    
     mkt = dropdownEquip.value
     indus_tmp = FiltEquip(indus_D, mkt)
+    
 
     min_ton = float(minTon.value)
     max_ton = float(maxTon.value)
