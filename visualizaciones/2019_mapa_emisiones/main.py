@@ -73,9 +73,9 @@ from os.path import dirname, join
 
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
 # path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
-# path = '/home/diego/Documentos/sun4heat/'
+path = '/home/diego/Documentos/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -104,25 +104,19 @@ tiles = [
 
 
 cats = {
-    "Otras actividades": 1,
-    "Comercio minorista": 2,
-    "Captación, tratamiento y distribución de agua": 3,
-    "Otras industrias manufactureras": 4,
-    "Pesca y acuicultura": 5,
-    "Plantas de tratamiento de aguas servidas": 6,
-    "Comercio mayorista": 7,
-    "Producción agropecuaria": 8,
-    "Ventas y mantención de vehículos automotores": 9,
-    "Construcción": 10,
-    "Minería": 11,
-    "Termoeléctricas": 12,
-    "Otras centrales de generación eléctrica": 13,
-    "Industria del papel y celulosa": 14,
-    "Industria química, de plástico y caucho": 15,
-    "Industria de la madera y silvicultura": 16,
-    "Refinería de petróleo": 17,
-    "Gestores de residuos": 18,
-    "Producción de cemento, cal y yeso": 19,
+'Termoeléctricas':1, 'Industria del papel y celulosa':2,
+       'Otras industrias manufactureras':3, 'Fundiciones de cobre':4,
+       'Otras actividades':5, 'Minería':6,
+       'Producción de cemento, cal y yeso':7,
+       'Industria de la madera y Silvicultura':8,
+       'Industria química, del plástico y caucho':9,
+       'Otras centrales de generación eléctrica':10, 'Refinería de petróleo':11,
+       'Pesca y Acuicultura':12, 'Construcción':13, 'Gestores de residuos':14,
+       'Plantas de tratamiento de aguas servidas':15,
+       'Producción agropecuaria':16, 'Comercio minorista':17,
+       'Captación, tratamiento y distribución de agua':18,
+       'Comercio mayorista':19,
+       'Ventas y reparaciones de vehículos automotores':20
 }
 
 
