@@ -179,29 +179,29 @@ vol = 180
 sto_loss=10
 
 
-# ############################
-# #   ECON COLECTOR SOLAR
-# ############################
+############################
+#   ECON COLECTOR SOLAR
+############################
 
-# # Indexacion del precio solar
-# indSol = 2
+# Indexacion del precio solar
+indSol = 2
 
-# # costo colector (US$/m2)
-# costCol_m2 = 369.4
+# costo colector (US$/m2)
+costCol_m2 = 369.4
 
-# #
-# FIT_m2 = 0
-# FIT = FIT_m2 * aCol
+#
+FIT_m2 = 0
+FIT = FIT_m2 * aCol
 
-# CPX = aCol * costCol_m2 
+CPX = aCol * costCol_m2 
 
-# perc_fee = 0
-# fee = (CPX+FIT)*perc_fee/100
-# CAPEX = CPX+ FIT + fee 
+perc_fee = 0
+fee = (CPX+FIT)*perc_fee/100
+CAPEX = CPX+ FIT + fee 
 
-# percOpex = 1.5
+percOpex = 1.5
 
-# OPEX = CPX * percOpex/100
+OPEX = CPX * percOpex/100
 
 
 ###################################
@@ -229,6 +229,11 @@ enerProcYear, enerAuxYear, enerSolYear, enerPeakYear, enerStoYear = BalanceYear(
 balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
 balance_year['enerHeater'] = balance_year.enerProc/(effHeater/100)
 balance_year['Años'] = years_list
+balance_year.loc['Total TWh/año'] = balance_year.sum(numeric_only=True, axis = 0)*10**(-6)
+# balance_year.Total.astype(str)
+# balance_year.Total = balance_year.Total + 'TW'
+
+# balance_year['Total',:1] = 20
 # balance.drop(['Unnamed: 0'], axis = 1)
 
 source_bal_year = ColumnDataSource(data=balance_year)
@@ -236,7 +241,7 @@ source_bal_year = ColumnDataSource(data=balance_year)
 # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
 # table_ener_year = TableEnerYear(df, Tout_h, Tin_h,effHeater,Col,year)
-# table_fuel = TableFuel(df,fuel,effHeater,year)
+table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
     
 totSol = enerSolYear.sum()
@@ -255,10 +260,12 @@ enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aC
 balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
 balance['enerHeater'] = balance.enerProc/(effHeater/100)
 balance['Meses'] = meses
+balance.loc['Total'] = balance.sum(numeric_only=True, axis = 0)
+
 source_bal_month = ColumnDataSource(data=balance)
     
 # table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
-# table_fuel = TableFuel(df,fuel,effHeater,year)
+table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
 totSol = enerSol.sum()
@@ -268,89 +275,89 @@ solFrac = totSol/totProc
 
 
 
-# ###############################
-# # INFORMACION EVALUACION ECONOMICA
-# #################################
+###############################
+# INFORMACION EVALUACION ECONOMICA
+#################################
 
-# # años del contrato
-# anho_contr = 20
-# # años evaluación proyecto
-# anho_proy = 25
-# # años a depreciar el equipo
-# anho_depr = 8
-# # valor depreciable
-# val_depr = CAPEX/anho_depr
-# # porcentaje deuda
-# perc_deuda = 0
-# # monto de la deuda
-# deuda = perc_deuda/100 * CAPEX
-# # porcentaje equity
-# perc_equi = 100 - perc_deuda
-# # tasa anual de la deuda
-# tasa_deuda = 2
-# # años para pagar la deuda
-# pago_deuda = 8
-# # tasa anual equity
-# tasa_equi = 8
-# # impuesto primera categoría
-# impuesto = 27   
-# # inflacion USA
-# infl_usa = 2
-# # inflación Chile
-# infl_cl = 2
-# # diferencial inflacionario
-# dif_infl = (1+infl_usa/100) / (1+infl_cl/100) 
+# años del contrato
+anho_contr = 20
+# años evaluación proyecto
+anho_proy = 25
+# años a depreciar el equipo
+anho_depr = 8
+# valor depreciable
+val_depr = CAPEX/anho_depr
+# porcentaje deuda
+perc_deuda = 0
+# monto de la deuda
+deuda = perc_deuda/100 * CAPEX
+# porcentaje equity
+perc_equi = 100 - perc_deuda
+# tasa anual de la deuda
+tasa_deuda = 2
+# años para pagar la deuda
+pago_deuda = 8
+# tasa anual equity
+tasa_equi = 8
+# impuesto primera categoría
+impuesto = 27   
+# inflacion USA
+infl_usa = 2
+# inflación Chile
+infl_cl = 2
+# diferencial inflacionario
+dif_infl = (1+infl_usa/100) / (1+infl_cl/100) 
 
-# table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
-#                                   anho_contr,anho_proy,val_depr,anho_depr,totSol,indSol,indFuel,costFuel)
+table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
+                                  anho_contr,anho_proy,val_depr,anho_depr,totSol,indSol,indFuel,costFuel)
 
-# annual_res.costSol[0] = np.nan
-# an=pd.date_range('2021-01',freq='A',periods=len(annual_res))
-# annual_res.index = an
+annual_res.costSol[0] = np.nan
+an=pd.date_range('2021-01',freq='A',periods=len(annual_res))
+annual_res.index = an
 
-# lcoh_f = float(table_fuel[2])
+lcoh_f = float(table_fuel[2])
 
-# cfuel = Vector(lcoh_f,anho_proy,indFuel)
-# an=pd.date_range('2021-01',freq='A',periods=len(cfuel))
-# cfuel = pd.DataFrame(cfuel,index=an)
-# cfuel = cfuel.rename(columns={0:'costFuel'})
-# cfuel = cfuel.rename_axis(None, axis=1).rename_axis('date', axis=0)
+cfuel = Vector(lcoh_f,anho_proy,indFuel)
+an=pd.date_range('2021-01',freq='A',periods=len(cfuel))
+cfuel = pd.DataFrame(cfuel,index=an)
+cfuel = cfuel.rename(columns={0:'costFuel'})
+cfuel = cfuel.rename_axis(None, axis=1).rename_axis('date', axis=0)
 
-# csol=annual_res.costSol
-# ener_cst = pd.concat([cfuel,csol], axis=1)
+csol=annual_res.costSol
+ener_cst = pd.concat([cfuel,csol], axis=1)
 
 
-# lcoh = float(table_eval['LCOH (US$/MWh)'])
-# source_flujo = ColumnDataSource(data=dict(x1=annual_res.index.year,ingEner=annual_res.ing_ener,
-#                                           opex=annual_res.opex,utils=annual_res.utilidades,
-#                                           perd=annual_res.perdidas,base_imp=annual_res.base_imp,
-#                                           imp_pc=annual_res.imp_PC,util_imp=annual_res.util_imp,
-#                                           fljNeto=annual_res.flujo_neto,fljAcum=annual_res.flujo_acum,
-#                                           van_vect=annual_res.vect_VAN))
+lcoh = float(table_eval['LCOH (US$/MWh)'])
+source_flujo = ColumnDataSource(data=dict(x1=annual_res.index.year,ingEner=annual_res.ing_ener,
+                                          opex=annual_res.opex,utils=annual_res.utilidades,
+                                          perd=annual_res.perdidas,base_imp=annual_res.base_imp,
+                                          imp_pc=annual_res.imp_PC,util_imp=annual_res.util_imp,
+                                          fljNeto=annual_res.flujo_neto,fljAcum=annual_res.flujo_acum,
+                                          van_vect=annual_res.vect_VAN))
 
-# source_cost = ColumnDataSource(data=ener_cst)
+source_cost = ColumnDataSource(data=ener_cst)
     
-# columns = [
-#     TableColumn(field="x1", title="Año",width=25),
-#     TableColumn(field="ingEner", title="Ingreso Energía (kUS$)", formatter=NumberFormatter(format="0.00")),
-#     TableColumn(field="opex", title="OPEX (kUS$)", formatter=NumberFormatter(format="0.00")),
-#     TableColumn(field="utils", title="Utilidades (kUS$)", formatter=NumberFormatter(format="0.00")),
-#     TableColumn(field="base_imp", title="Base impuesto (kUS$)", formatter=NumberFormatter(format="0.00")),
-#     TableColumn(field="util_imp", title="Utilidades despues impuesto (kUS$)", formatter=NumberFormatter(format="0.00")),
-#     TableColumn(field="fljNeto", title="Flujo neto (kUS$)", formatter=NumberFormatter(format="0.00")),
-#     TableColumn(field="fljAcum", title="Flujo acumulado (kUS$)", formatter=NumberFormatter(format="0.00"))
-# ]
+columns = [
+    TableColumn(field="x1", title="Año",width=25),
+    TableColumn(field="ingEner", title="Ingreso Energía (kUS$)", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="opex", title="OPEX (kUS$)", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="utils", title="Utilidades (kUS$)", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="base_imp", title="Base impuesto (kUS$)", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="util_imp", title="Utilidades despues impuesto (kUS$)", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="fljNeto", title="Flujo neto (kUS$)", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="fljAcum", title="Flujo acumulado (kUS$)", formatter=NumberFormatter(format="0.00"))
+]
 
-# data_table = DataTable(columns=columns, source=source_flujo,width=700, height=480)
+data_table = DataTable(columns=columns, source=source_flujo,width=700, height=480)
 
-# #################################
-# cProy,table_proy = TableProy(lcoh,solFrac,totSol,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
-# anhoProyect = np.arange(0,anho_proy+1,1)
-# an=pd.date_range('2021-01',freq='A',periods=len(cProy))
-# cProy.index = an
-# source_proy = ColumnDataSource(data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST))
+#################################
+cProy,table_proy = TableProy(lcoh,solFrac,totSol,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
+anhoProyect = np.arange(0,anho_proy+1,1)
+an=pd.date_range('2021-01',freq='A',periods=len(cProy))
+cProy.index = an
+source_proy = ColumnDataSource(data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST))
 
-################################################################################################                    
+###############################################################################################                    
 TOOLS="hover,crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,save"
 
 fill=0.2
@@ -442,9 +449,9 @@ p_year.select_one(HoverTool).mode='vline'
 
 cols_balance_year = [
         TableColumn(field="Años", title="Año",width=60),
-        TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
-        TableColumn(field="enerHeater", title="E caldera (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
-        TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
+        TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
+        TableColumn(field="enerHeater", title="E caldera (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
+        TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
 table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,width=600, height=450,
@@ -475,9 +482,9 @@ p_month.select_one(HoverTool).mode='vline'
 
 cols_balance_month = [
         TableColumn(field="Meses", title="Mes",width=60),
-        TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
-        TableColumn(field="enerHeater", title="E caldera (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
-        TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0")),
+        TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
+        TableColumn(field="enerHeater", title="E caldera (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
+        TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
 table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,width=600, height=450,
@@ -494,32 +501,32 @@ table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,
 # infoEner = PreText(text=str(table_ener), width=550)
 # infoFuel = PreText(text=str(table_fuel), width=480)
 # infoSteam = PreText(text=str(table_steam), width=480)
-#######################
-#DATOS TABLA ECONÓMICA
-#######################
-# wdt = 250
-# CCol = TextInput(value=str(costCol_m2), title="Costo SST (US$/m2):",width=wdt)
-# fitm2 = TextInput(value=str(FIT_m2), title="Envío, seguro e impuesto (US$/m2)",width=wdt)
-# percFee = TextInput(value=str(perc_fee), title="Fee desarrollador (% CAPEX)",width=wdt)
-# POPEX = TextInput(value=str(percOpex), title="OPEX (% CAPEX):",width=wdt)
-# indexSolar = TextInput(value=str(indSol), title="Indexación solar (%)",width=wdt)
+######################
+# DATOS TABLA ECONÓMICA
+######################
+wdt = 250
+CCol = TextInput(value=str(costCol_m2), title="Costo SST (US$/m2):",width=wdt)
+fitm2 = TextInput(value=str(FIT_m2), title="Envío, seguro e impuesto (US$/m2)",width=wdt)
+percFee = TextInput(value=str(perc_fee), title="Fee desarrollador (% CAPEX)",width=wdt)
+POPEX = TextInput(value=str(percOpex), title="OPEX (% CAPEX):",width=wdt)
+indexSolar = TextInput(value=str(indSol), title="Indexación solar (%)",width=wdt)
 
-# CFuel = TextInput(value=str(costFuel), title="Precio combustible (US$/unidad):",width=wdt)
-# indexFuel = TextInput(value=str(indFuel), title="Indexación combustible (%)",width=wdt)
-# # Evaluación económica
-# anhoContr = TextInput(value=str(anho_contr), title="Años de contrato ESCO",width=wdt)
-# anhoProy = TextInput(value=str(anho_proy), title="Años evaluación escenario",width=wdt)
-# anhoDepr = TextInput(value=str(anho_depr), title="Años depreciación",width=wdt)
-# percDeuda = TextInput(value=str(perc_deuda), title="Porcentaje deuda",width=wdt)
-# tasaDeuda = TextInput(value=str(tasa_deuda), title="Tasa deuda (%)",width=wdt)
-# pagoDeuda = TextInput(value=str(pago_deuda), title="Años pago deuda",width=wdt)
-# tasaEqui = TextInput(value=str(tasa_equi), title="Tasa capital propio (%)",width=wdt)
-# inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%)",width=wdt)
-# #####################
-# buttCalcEcon = Button(label="Calcular", button_type="success",width=wdt)
-# infoEval = PreText(text=str(table_eval), width=320)
+CFuel = TextInput(value=str(costFuel), title="Precio combustible (US$/unidad):",width=wdt)
+indexFuel = TextInput(value=str(indFuel), title="Indexación combustible (%)",width=wdt)
+# Evaluación económica
+anhoContr = TextInput(value=str(anho_contr), title="Años de contrato ESCO",width=wdt)
+anhoProy = TextInput(value=str(anho_proy), title="Años evaluación escenario",width=wdt)
+anhoDepr = TextInput(value=str(anho_depr), title="Años depreciación",width=wdt)
+percDeuda = TextInput(value=str(perc_deuda), title="Porcentaje deuda",width=wdt)
+tasaDeuda = TextInput(value=str(tasa_deuda), title="Tasa deuda (%)",width=wdt)
+pagoDeuda = TextInput(value=str(pago_deuda), title="Años pago deuda",width=wdt)
+tasaEqui = TextInput(value=str(tasa_equi), title="Tasa capital propio (%)",width=wdt)
+inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%)",width=wdt)
+#####################
+buttCalcEcon = Button(label="Calcular", button_type="success",width=wdt)
+infoEval = PreText(text=str(table_eval), width=320)
 
-# infoProy = PreText(text=str(table_proy), width=320)
+infoProy = PreText(text=str(table_proy), width=320)
 ################################################
 TOOLS="crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,save"
 plot_w = 700
@@ -955,6 +962,8 @@ def CalcSystemYear():
     balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
     balance_year['enerHeater'] = balance_year.enerProc/(effHeater/100)
     balance_year['Años'] = years_list
+    balance_year.loc['Total TWh/año'] = balance_year.sum(numeric_only=True, axis = 0)*10**(-6)
+    balance_year.iloc[21:22,4:5] = "TWh/año"
     source_bal_year.data = balance_year
     
     ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
@@ -966,6 +975,8 @@ def CalcSystemYear():
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
     balance_month['enerHeater'] = balance_month.enerProc/(effHeater/100)
     balance_month['Meses'] = meses
+    balance_month.loc['Total TW/año'] = balance_month.sum(numeric_only=True, axis = 0)*10**(-6)
+    # balance_year.iloc[21:22,4:5] = "TWh/año"
     source_bal_month.data = balance_month
     
     ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
@@ -1187,7 +1198,9 @@ layout = column(Spacer(height=spc),
                 row(selectCol,areaCol,vol_sto,loss_sto),
                 buttCalcEnergyYear,
                 row(p_year,Spacer(width=spc),table_bal_year),
-                Spacer(height=spc),
+                
+                
+                Spacer(height=spc+30),
                 row(years_button_group),
                 buttCalcEnergyMonth,
                 row(p_month,Spacer(width=spc),table_bal_month),
@@ -1198,13 +1211,13 @@ layout = column(Spacer(height=spc),
                 # row(CCol,fitm2,percFee,POPEX,indexSolar),
                 # row(CFuel,indexFuel),
 
-                # Spacer(height=spc),
-                # row(anhoContr,anhoProy,anhoDepr,pagoDeuda),
-                # row(percDeuda,tasaDeuda,tasaEqui,inflChile),
-                # buttCalcEcon,
+                Spacer(height=spc+30),
+                row(anhoContr,anhoProy,anhoDepr,pagoDeuda),
+                row(percDeuda,tasaDeuda,tasaEqui,inflChile),
+                buttCalcEcon,
                 
-                # Spacer(height=spc),
-                # row(data_table,infoEval),                 
+                Spacer(height=spc+30),
+                row(data_table,infoEval),                 
                 # row(p1,p2,infoProy),
                 
                 # Spacer(height=spc),

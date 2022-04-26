@@ -544,11 +544,11 @@ def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     return table_ener
 
 
-def TableFuel(df_temp,fuel,eff_heater,year):
+def TableFuel(df_temp,fuel,tilt,azim,Col,aCol,vol,sto_loss,eff_heater, year,):
     
     table_fuel = pd.Series()
     
-    monthProc, monthAux, monthSol, monthPeak, monthSto = (df_temp,year)
+    monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,eff_heater, year)
     
     procAnnual = monthProc.sum()
     auxAnnual = monthAux.sum()
