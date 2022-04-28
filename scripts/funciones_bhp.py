@@ -129,11 +129,13 @@ def Col_eff_val(Col, Tmean, Tamb, GHI):
 
 def Vector(val,contrato,infl):
     n = contrato+1
-    vct = np.zeros(n).reshape(n,1) #??
+    vct = []
+    vct = pd.Series()
     anhos = np.arange(1,n)
+
     for anho in anhos:
         if anho == 1:
-            vct[anho] = val
+            vct[anho] = val[1]
         else:
             vct[anho] = vct[anho-1]*(1+infl/100)
         

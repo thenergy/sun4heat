@@ -16,7 +16,7 @@ import pandas as pd
 
 from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
 from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
-from funciones_econ import Pago, PagoPrinInt, Vector, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc
+from funciones_econ_bhp import Pago, PagoPrinInt, Vector, Vector_20, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc
 
 from bokeh.plotting import Figure
 from bokeh.layouts import column, Spacer, row
@@ -244,10 +244,16 @@ source_bal_year = ColumnDataSource(data=balance_year)
 table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
     
-totSol = enerSolYear.sum()
-totProc = enerProcYear.sum()
-totHeater = enerAuxYear.sum()
-solFrac = totSol/totProc
+totSol_year = enerSolYear
+totProc_year = enerProcYear
+totHeater_year = enerAuxYear
+solFrac_year = totSol_year/totProc_year
+
+    
+# totSol_year = enerSolYear.sum()
+# totProc_year = enerProcYear.sum()
+# totHeater_year = enerAuxYear.sum()
+# solFrac_year = totSol_year/totProc_year
 
 
 
@@ -258,7 +264,7 @@ df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
 enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
-balance['enerHeater'] = balance.enerProc/(effHeater/100)
+balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
 balance['Meses'] = meses
 balance.loc['Total'] = balance.sum(numeric_only=True, axis = 0)
 
@@ -268,10 +274,10 @@ source_bal_month = ColumnDataSource(data=balance)
 table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
-totSol = enerSol.sum()
-totProc = enerProc.sum()
-totHeater = enerAux.sum()
-solFrac = totSol/totProc
+# totSol = enerSol #enerSol.sum()
+# totProc = enerProc.sum()
+# totHeater = enerAux.sum()
+# solFrac = totSol/totProc
 
 
 
@@ -309,7 +315,9 @@ infl_cl = 2
 dif_infl = (1+infl_usa/100) / (1+infl_cl/100) 
 
 table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
-                                  anho_contr,anho_proy,val_depr,anho_depr,totSol,indSol,indFuel,costFuel)
+                                  anho_contr,anho_proy,val_depr,anho_depr,totSol_year,indSol,indFuel,costFuel)
+
+
 
 annual_res.costSol[0] = np.nan
 an=pd.date_range('2021-01',freq='A',periods=len(annual_res))
@@ -351,11 +359,11 @@ columns = [
 data_table = DataTable(columns=columns, source=source_flujo,width=700, height=480)
 
 #################################
-cProy,table_proy = TableProy(lcoh,solFrac,totSol,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
-anhoProyect = np.arange(0,anho_proy+1,1)
-an=pd.date_range('2021-01',freq='A',periods=len(cProy))
-cProy.index = an
-source_proy = ColumnDataSource(data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST))
+# cProy,table_proy = TableProy(lcoh,solFrac_year,totSol_year,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
+# anhoProyect = np.arange(0,anho_proy+1,1)
+# an=pd.date_range('2021-01',freq='A',periods=len(cProy))
+# cProy.index = an
+# source_proy = ColumnDataSource(data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST))
 
 ###############################################################################################                    
 TOOLS="hover,crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,save"
@@ -443,7 +451,7 @@ p_year.vbar(x='x', top='ener', width=1.0, source=source_ener_year,
 p_year.xaxis.major_label_orientation = 1
 
 p_year.select_one(HoverTool).tooltips = [
-    ('Energía (MWh/mes)', '@ener{0.0}')]
+    ('Energía (MWh/año)', '@ener{0.0}')]
 p_year.select_one(HoverTool).mode='vline'
 
 
@@ -526,7 +534,7 @@ inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%)",width=wdt
 buttCalcEcon = Button(label="Calcular", button_type="success",width=wdt)
 infoEval = PreText(text=str(table_eval), width=320)
 
-infoProy = PreText(text=str(table_proy), width=320)
+# infoProy = PreText(text=str(table_proy), width=320)
 ################################################
 TOOLS="crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,save"
 plot_w = 700
@@ -881,7 +889,7 @@ def CalcSystemMonth():
    
     enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
-    balance_month['enerHeater'] = balance_month.enerProc/(effHeater/100)
+    balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
     balance_month['Meses'] = meses
     source_bal_month.data = balance_month
     
@@ -960,7 +968,7 @@ def CalcSystemYear():
     enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     
     balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
-    balance_year['enerHeater'] = balance_year.enerProc/(effHeater/100)
+    balance_year['enerHeater'] = (balance_year.enerProc-balance_year.enerSol)/(effHeater/100)
     balance_year['Años'] = years_list
     balance_year.loc['Total TWh/año'] = balance_year.sum(numeric_only=True, axis = 0)*10**(-6)
     balance_year.iloc[21:22,4:5] = "TWh/año"
@@ -973,7 +981,7 @@ def CalcSystemYear():
     
     enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
-    balance_month['enerHeater'] = balance_month.enerProc/(effHeater/100)
+    balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
     balance_month['Meses'] = meses
     balance_month.loc['Total TW/año'] = balance_month.sum(numeric_only=True, axis = 0)*10**(-6)
     # balance_year.iloc[21:22,4:5] = "TWh/año"
@@ -1071,7 +1079,7 @@ def CalcSystemYear():
 #     infoEval.text = str(table_eval)
     
 # #    table_fuel = TableFuel_LCOH(fuel,costFuel,effHeater,enerCol,solFrac)
-#     infoFuel.text = str(table_fuel)
+#     # infoFuel.text = str(table_fuel)
 
 
     
@@ -1095,7 +1103,7 @@ def CalcSystemYear():
 #     cProy.index = an
 #     new_data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST)
 #     source_proy.data = new_data
-#     infoProy.text = str(table_proy)
+#     # infoProy.text = str(table_proy)
     
 #     return lcoh
 

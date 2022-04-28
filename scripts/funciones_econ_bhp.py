@@ -148,10 +148,32 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
 #    lcoh = 120.42
     vm = []
     lc = []
+    
+    anhos = np.arange(0,anho_contr+1)    
+    inSol =[]
+    inSol = pd.Series(inSol)
+    ing_enrg = []
+    ing_enrg = pd.Series(ing_enrg)
+    utilidades = []
+    utilidades = pd.Series(utilidades)
+    perdidas = []
+    perdidas = pd.Series(perdidas)
+
+
+    
+
     for n,lcoh in enumerate(np.arange(1,1000,1)):
         inSol = enerYield * lcoh
         
-        ing_enrg = Vector(inSol,anho_contr,indSol)
+        cost_index = Vector_20(inSol,anho_contr,indSol,lcoh)
+
+        
+        
+        enerYield_Values = enerYield.values.reshape((anho_contr+1,1))
+        cost_index = cost_index.reshape((anho_contr+1,1))
+        
+        ing_enrg = cost_index*enerYield_Values       
+        
         depr = Depr(val_depr,anho_depr,anho_contr)
         
         utilidades = ing_enrg - opex - interes - depr
@@ -163,7 +185,7 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
         util_impuesto = utilidades + impuestoPrimCat
         
         flujo_neto = -inversion + debt + depr + util_impuesto - amrt
-        flujo_acum = FlujoAcum(flujo_neto)
+        flujo_acum= FlujoAcum(flujo_neto)
         vn = Van(wacc_cl,flujo_neto)
         VAN = vn.sum()/1000
         
@@ -182,7 +204,13 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
 
         inSol = enerYield * l
         
-        ing_enrg = Vector(inSol,anho_contr,indSol)
+        ing_enrg, cost_index = Vector_20(inSol,anho_contr,indSol,l)
+        
+        enerYield_Values = enerYield.values.reshape((anho_contr+1,1))
+        cost_index = cost_index.reshape((anho_contr+1,1))
+        
+        ing_energ_temp = cost_index*enerYield
+        
         depr = Depr(val_depr,anho_depr,anho_contr)
         
         utilidades = ing_enrg - opex - interes - depr
@@ -422,6 +450,26 @@ def Vector(val,contrato,infl):
         
     return vct
 
+def Vector_20(val,contrato,infl,lcoh):
+    n = contrato+1
+    
+    # vct = np.zeros(n).reshape(n,1)
+    costo_indexado = np.zeros(n).reshape(n,1)
+    
+    anhos = np.arange(1,n)
+    
+    val = pd.Series(val)
+        
+    for anho in anhos:
+        if anho == 1:
+            # vct[anho] = val.iloc[anho-1]
+            costo_indexado[anho] = lcoh
+        else:
+            # vct[anho] = val[anho-1]*(1+infl/100)**(anho-1)
+            costo_indexado[anho] = costo_indexado[anho-1]*(1+infl/100)
+        
+    return costo_indexado
+
 def Depr(val,per,contrato):
     n = contrato+1
     vct = np.zeros(n).reshape(n,1)
@@ -441,7 +489,7 @@ def Perdidas(util):
                 perdidas[num] = 0
                 
         else:
-            if perdidas[num-1]+val<val:
+            if perdidas[num-1]+val < val:
                 perdidas[num]=perdidas[num-1]+val
             else:
                 0   

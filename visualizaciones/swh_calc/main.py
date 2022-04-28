@@ -173,7 +173,7 @@ df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss)
 
 enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df)
 balance = pd.read_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
-balance['enerHeater'] = balance.enerProc/(effHeater/100)
+balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
 balance['Meses'] = meses
 source_bal = ColumnDataSource(data=balance)
     
@@ -701,7 +701,7 @@ def CalcSystem():
     
     enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df)
     balance = pd.read_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
-    balance['enerHeater'] = balance.enerProc/(effHeater/100)
+    balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
     balance['Meses'] = meses
     source_bal.data = balance
     
@@ -749,7 +749,7 @@ def CalcEcon():
 #    pry = dropdownProy.value
     aCol = int(areaCol.value)
     balance = pd.read_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
-    balance['enerHeater'] = balance.enerProc/(effHeater/100)
+    balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
     balance['Meses'] = meses
     enerCol = balance.enerSol.sum()
     solFrac = enerCol / balance.enerProc.sum() * 100
