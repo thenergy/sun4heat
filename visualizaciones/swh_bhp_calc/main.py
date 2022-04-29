@@ -7,8 +7,8 @@ Created on Tue Aug 13 15:33:06 2019
 """
 import sys
 sys.path
-#sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/scripts')
-sys.path.append('/home/diego/Documentos/sun4heat/scripts')
+#sys.path.append('/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/visualizaciones/swh_bhp_calc/scripts')
+sys.path.append('/home/diego/Documentos/sun4heat/visualizaciones/swh_bhp_calc/scripts')
 # sys.path.append('/home/ubuntu/Thenergy/diego/sun4heat/scripts')
 
 import numpy as np
@@ -220,14 +220,13 @@ df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 #########################################
 
 
-# df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)   
 enerProcYear, enerAuxYear, enerSolYear, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 # BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
 
 
 balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
-balance_year['enerHeater'] = balance_year.enerProc/(effHeater/100)
+balance_year['enerHeater'] = (balance_year.enerProc-balance_year.enerSol)/(effHeater/100)
 balance_year['Años'] = years_list
 balance_year.loc['Total TWh/año'] = balance_year.sum(numeric_only=True, axis = 0)*10**(-6)
 # balance_year.Total.astype(str)
@@ -260,7 +259,7 @@ solFrac_year = totSol_year/totProc_year
 #########################################
 #           BALANCE MENSUAL
 #########################################
-df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+# df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
 enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
@@ -271,7 +270,7 @@ balance.loc['Total'] = balance.sum(numeric_only=True, axis = 0)
 source_bal_month = ColumnDataSource(data=balance)
     
 # table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
-table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
+# table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
 # totSol = enerSol #enerSol.sum()
@@ -885,7 +884,7 @@ def CalcSystemMonth():
     SetTMains(df,Tout_p)
     SetTSet(df,Tin_p)
     
-    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+    # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
    
     enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
@@ -896,6 +895,7 @@ def CalcSystemMonth():
     ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     new_data_month=dict(x=x_month, ener=ener_month)
     source_ener_month.data = new_data_month
+    
     
 def CalcSystemYear():
     '''
@@ -963,7 +963,7 @@ def CalcSystemYear():
     SetTMains(df,Tout_p)
     SetTSet(df,Tin_p)
     
-    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+    # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
     enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     
@@ -994,7 +994,7 @@ def CalcSystemYear():
     # table_ener = TableEner(df,flow_p, Tin_p, Tout_p,effHeater,Col)
     # infoEner.text = str(table_ener)
     
-    # table_fuel = TableFuel(df,fuel,effHeater)
+    table_fuel = TableFuel(df,fuel,effHeater)
     # infoFuel.text = str(table_fuel)
     
     # table_steam = TableSteam(df,turno,flow_p, Tin_p, Tout_p,effHeater,cond,T_cond,p_steam,fuel)
