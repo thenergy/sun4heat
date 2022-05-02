@@ -157,6 +157,22 @@ Col = 'GreenOneTec GK_SG'
 #Area de colector
 aCol = 1800
 
+# Volumen almacenamiento
+vol = 180
+
+#########################
+
+# Producción específica colector
+yield_m2 = 1.4
+
+# Largo del piping interconexión (m)
+Lpipe = 2000
+
+# número de intercambiadores de calor
+nHEX = 5
+
+#########################
+
 #Temperatura media del colector
 Tmean = (Tin_h + Tout_h)/2.
 
@@ -172,8 +188,6 @@ tilt = 0
 #azimuth campos solar
 azim = 0
 
-# Volumen almacenamiento
-vol = 180
 
 # Porcentaje pérdidas del almacenamiento
 sto_loss=10
@@ -189,20 +203,81 @@ indSol = 2
 # costo colector (US$/m2)
 costCol_m2 = 369.4
 
-#
+# costo instalación colector (US$/m2)
+cost_instCol_m2 = 100
+
+# costo balance de planta (US$/m2)
+costBOP = 100
+
+# costo instalación balance de planta (US$/m2)
+cost_instBOP = 100
+
+# costo storage (US$/m3)
+costSto = 100
+
+# costo instalación storage (US$)
+cost_instSto = 100
+
+# costo caldera eléctrica (US$)
+costCald = 100
+
+# costo instalación caldera eléctrica (US$)
+cost_instCald = 100
+
+# costo piping (US$/m)
+costPiping = 100
+
+# costo instalación piping (US$/m)
+cost_instPiping = 100
+
+# costo HEX (US$)
+costHEX = 100
+
+# costo instalación HEX (US$)
+cost_instHEX = 100
+
+# costo preparación terreno (US$/m2)
+cost_prepTerr = 30
+
+# costo ingeniería (US$)
+CostIng = 200000
+
+# costo desarrollo (US$)
+CostDev = 200000
+
+# Freight, Insurance and Transport
 FIT_m2 = 0
 FIT = FIT_m2 * aCol
 
-CPX = aCol * costCol_m2 
+# CAPEX de equipos
+CAPEX_eq = (aCol * costCol_m2) + (aCol * costBOP) + costSto + costCald + (costPiping * Lpipe) + (costHEX * nHEX)
+
+# CAPEX instalación
+CAPEX_inst = (aCol * cost_instCol_m2) + cost_instBOP + cost_instSto + cost_instCald + (Lpipe * cost_instPiping) + (nHEX * cost_instHEX) + (aCol * cost_prepTerr)
+
+# CAPEX desarrollo (US$)
+CAPEX_dev = CostIng + CostDev
+
+# Contingencias (% CAPEX)
+Cont = 10
+Cont_tot = (CAPEX_eq + CAPEX_inst + CAPEX_dev) * Cont/100
+
+# Utilidades (% CAPEX)
+Util = 10
+Util_tot = (CAPEX_eq + CAPEX_inst + CAPEX_dev) * Util/100
+
+CAPEX = CAPEX_eq + CAPEX_inst + CAPEX_dev + Cont_tot + Util_tot + FIT
+#############
+# CPX = aCol * costCol_m2 
 
 perc_fee = 0
-fee = (CPX+FIT)*perc_fee/100
-CAPEX = CPX+ FIT + fee 
+fee = (CAPEX+FIT)*perc_fee/100
+# CAPEX = CPX+ FIT + fee 
 
 percOpex = 1.5
 
-OPEX = CPX * percOpex/100
 
+OPEX = CAPEX * percOpex/100
 
 ###################################
 #   Condiciones para Calculadora
@@ -513,22 +588,63 @@ table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,
 ######################
 wdt = 250
 CCol = TextInput(value=str(costCol_m2), title="Costo SST (US$/m2):",width=wdt)
+
+CCol_inst = TextInput(value=str(cost_instCol_m2), title="Costo SST (US$/m2):",width=wdt)
+
+CBOP = TextInput(value=str(costBOP), title="Costo instalación colector (US$/m2):",width=wdt)
+
+C_instBOP = TextInput(value=str(cost_instBOP), title="Costo instalación balance de planta (US$/m2):",width=wdt)
+
+CSto = TextInput(value=str(costSto), title="Costo almacenamiento (US$/m3):",width=wdt)
+
+Cinst_Sto = TextInput(value=str(cost_instSto), title="Costo instalación storage (US$):",width=wdt)
+
+CCald = TextInput(value=str(costCald), title="Costo caldera eléctrica (US$):",width=wdt)
+
+C_instCald = TextInput(value=str(cost_instCald), title="Costo instalación caldera eléctrica (US$):",width=wdt)
+
+CPiping = TextInput(value=str(costPiping), title="Costo piping (US$/m):",width=wdt)
+
+C_instPiping = TextInput(value=str(cost_instPiping), title="Costo instalación piping (US$/m):",width=wdt)
+
+CHEX = TextInput(value=str(costHEX), title="Costo HEX (US$):",width=wdt)
+
+C_instHEX = TextInput(value=str(cost_instHEX), title="Costo instalación HEX (US$):",width=wdt)
+
+C_prepTerr = TextInput(value=str(cost_prepTerr), title="Costo preparación terreno (US$/m2):",width=wdt)
+
+CIng = TextInput(value=str(CostIng), title="Costo ingeniería (US$):",width=wdt)
+
+CDev = TextInput(value=str(CostDev), title="Costo desarrollo (US$):",width=wdt)
+
 fitm2 = TextInput(value=str(FIT_m2), title="Envío, seguro e impuesto (US$/m2)",width=wdt)
+
 percFee = TextInput(value=str(perc_fee), title="Fee desarrollador (% CAPEX)",width=wdt)
+
 POPEX = TextInput(value=str(percOpex), title="OPEX (% CAPEX):",width=wdt)
+
 indexSolar = TextInput(value=str(indSol), title="Indexación solar (%)",width=wdt)
 
 CFuel = TextInput(value=str(costFuel), title="Precio combustible (US$/unidad):",width=wdt)
+
 indexFuel = TextInput(value=str(indFuel), title="Indexación combustible (%)",width=wdt)
-# Evaluación económica
+
 anhoContr = TextInput(value=str(anho_contr), title="Años de contrato ESCO",width=wdt)
+
 anhoProy = TextInput(value=str(anho_proy), title="Años evaluación escenario",width=wdt)
+
 anhoDepr = TextInput(value=str(anho_depr), title="Años depreciación",width=wdt)
+
 percDeuda = TextInput(value=str(perc_deuda), title="Porcentaje deuda",width=wdt)
+
 tasaDeuda = TextInput(value=str(tasa_deuda), title="Tasa deuda (%)",width=wdt)
+
 pagoDeuda = TextInput(value=str(pago_deuda), title="Años pago deuda",width=wdt)
+
 tasaEqui = TextInput(value=str(tasa_equi), title="Tasa capital propio (%)",width=wdt)
+
 inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%)",width=wdt)
+
 #####################
 buttCalcEcon = Button(label="Calcular", button_type="success",width=wdt)
 infoEval = PreText(text=str(table_eval), width=320)
@@ -1215,13 +1331,21 @@ layout = column(Spacer(height=spc),
                 # row(infoEner,infoFuel,infoSteam),
                 
                 
-                # Spacer(height=spc),
-                # row(CCol,fitm2,percFee,POPEX,indexSolar),
-                # row(CFuel,indexFuel),
+                Spacer(height=spc),
+                
+                row(CCol,CCol_inst,CBOP,C_instBOP,CSto),
+                row(Cinst_Sto,CCald,C_instCald,CPiping,C_instPiping),
+                Spacer(height=spc),
+                row(CHEX,C_instHEX,C_prepTerr,CIng,CDev),
+                row(fitm2,percFee,POPEX,CIng,CDev),
+                row(indexSolar,CFuel,indexFuel),
+
+                
 
                 Spacer(height=spc+30),
-                row(anhoContr,anhoProy,anhoDepr,pagoDeuda),
-                row(percDeuda,tasaDeuda,tasaEqui,inflChile),
+                row(anhoContr,anhoProy,anhoDepr,percDeuda,tasaDeuda),
+                row(pagoDeuda,tasaEqui,inflChile),
+
                 buttCalcEcon,
                 
                 Spacer(height=spc+30),

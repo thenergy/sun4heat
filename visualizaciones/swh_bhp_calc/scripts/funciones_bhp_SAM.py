@@ -13,7 +13,7 @@ import os
 from PySSC import PySSC
 
 
-#path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
+# path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
 # path = '/home/diegonaranjo/Documentos/Thenergy/sun4heat/'
 # path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 
