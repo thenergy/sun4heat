@@ -97,6 +97,22 @@ def TableRad(df_tmp):
     table_rad['DNI (kWh/m2/año): '] = "{:10.1f}".format(df_tmp.dni.sum()/1000)    
     return table_rad
 
+def MaxFlujo(df,tilt,azim,Col,aCol,vol,sto_loss,anho):
+    r = 0
+    yr = 0
+    mh = 0
+    for anho in np.arange(2024,2045):
+        df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,anho) 
+        list_df = list(df.flow.unique())
+
+        for i in np.arange(0,12):
+            if r < list_df[i]:
+                r = list_df[i]
+                yr = anho
+                mh = i
+            else:
+                pass
+    print('máximo flujo es: ' + str(r) + ' en el mes: ' + str(mh)+ ' del año: ' +str(yr))
     
 
 def Col_eff_val(Col, Tmean, Tamb, GHI):
@@ -129,13 +145,18 @@ def Col_eff_val(Col, Tmean, Tamb, GHI):
 
 def Vector(val,contrato,infl):
     n = contrato+1
-    vct = []
-    vct = pd.Series()
+    # vct = []
+    # vct = pd.Series()
+    vct = np.zeros(n).reshape(n,1)
+
     anhos = np.arange(1,n)
+
+    val = pd.Series(val)
+
 
     for anho in anhos:
         if anho == 1:
-            vct[anho] = val[1]
+            vct[anho] = val[anho-1]
         else:
             vct[anho] = vct[anho-1]*(1+infl/100)
         
@@ -533,12 +554,18 @@ def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     None.
 
     '''
+    flow = 1264576.2692455237 #mayor flujo existente perteneciente al mes 6 del año 2027
     
-    heater_pow = df_temp.flow*dens_w*(Tout_h - Tin_h)*cp_w/3600
+    # heater_pow = df_temp.flow*dens_w*(Tout_h - Tin_h)*cp_w/3600
+    heater_pow = flow*dens_w*(Tout_h - Tin_h)*cp_w/3600
+    # heater_pow = heater_pow.unique()
+    
     #Temperatura media del colector
     Tmean = (Tin_h + Tout_h)/2.
+    
     # Eficiencia del colector
     eff_col = Col_eff_val(Col,Tmean,25,1000)
+    
     # area de la planta solar peak
     peak_plant = heater_pow/eff_col * 1.1
     
@@ -555,9 +582,10 @@ def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     colAnnual = monthSol.sum()
 #    disAnnual = monthDis.sum()
     
+
     table_ener = pd.Series()
     table_ener['Caldera'] = ''
-    table_ener['Potencia caldera (kW)'] = heater_pow
+    table_ener['Potencia caldera(kW)'] = heater_pow
     table_ener['Potencia caldera (kcal/hr)'] = heater_pow*3600/4.184
     table_ener['Potencia caldera (BHP)'] = heater_pow*0.101942
     table_ener['---------'] = '---------'
@@ -586,10 +614,10 @@ def TableEner(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     return table_ener
 
 
-def TableFuel(df_temp,fuel,tilt,azim,Col,aCol,vol,sto_loss,eff_heater, year,):
+def TableFuel(df_temp,fuel,tilt,azim,Col,aCol,vol,sto_loss,eff_heater,year):
     
     table_fuel = pd.Series()
-    
+       
     # monthProc, monthAux, monthSol, monthPeak, monthSto = BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,eff_heater, year)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_' + str(year) +'.csv')
     
@@ -604,6 +632,7 @@ def TableFuel(df_temp,fuel,tilt,azim,Col,aCol,vol,sto_loss,eff_heater, year,):
     f_em = cmb[fuel]['f_em']
     PCI_kg = cmb[fuel]['PCI_kg']
     dens = cmb[fuel]['dens']
+    
     
     dem_fuel = procAnnual/(eff_heater/100)/(PCI_kg*dens)
     cons_fuel = auxAnnual/(eff_heater/100)/(PCI_kg*dens)
@@ -674,7 +703,7 @@ def TableProy(lcoh,solFrac,annSol,indSol,fuel,CFuel,indFuel,eff_heater,anho_cont
     dem_fuel = procAnnual/(eff_heater/100)/(PCI_kg*dens)
     cons_fuel = auxAnnual/(PCI_kg*dens)
     ahor_fuel = colAnnual/(eff_heater/100)/(PCI_kg*dens)
-    
+       
     lcoh_conv = CFuel/(eff_heater/100)/(PCI_kg*dens)*1000
     
     ingSolar_1 = lcoh * colAnnual/1000

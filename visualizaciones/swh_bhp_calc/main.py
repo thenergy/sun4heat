@@ -270,14 +270,38 @@ CAPEX = CAPEX_eq + CAPEX_inst + CAPEX_dev + Cont_tot + Util_tot + FIT
 #############
 # CPX = aCol * costCol_m2 
 
-perc_fee = 0
-fee = (CAPEX+FIT)*perc_fee/100
+# perc_fee = 0
+# fee = (CAPEX+FIT)*perc_fee/100
 # CAPEX = CPX+ FIT + fee 
 
 percOpex = 1.5
 
 
 OPEX = CAPEX * percOpex/100
+
+###################################
+#   TABLA CAPEX
+###################################
+
+SCAPEX_eq = pd.Series([CAPEX_eq])
+SCAPEX_inst = pd.Series([CAPEX_inst])
+SCAPEX_dev = pd.Series([CAPEX_dev])
+SCAPEX = pd.Series([CAPEX])
+source_capex = ColumnDataSource(data=dict(capex_eq = SCAPEX_eq, capex_inst = SCAPEX_inst,
+                                          capex_dev = SCAPEX_dev, capex_tot = SCAPEX))
+
+
+
+
+columns_capex = [
+    TableColumn(field="capex_eq", title="CAPEX Equipo",formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="capex_inst", title="CAPEX Instalación", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="capex_dev", title="CAPEX Desarrollo", formatter=NumberFormatter(format="0.00")),
+    TableColumn(field="capex_tot", title="CAPEX TOTAL", formatter=NumberFormatter(format="0.00"))
+]
+
+table_CAPEX = DataTable(columns=columns_capex, source=source_capex,width=600, height=450,
+                      editable=True)
 
 ###################################
 #   Condiciones para Calculadora
@@ -344,8 +368,8 @@ balance.loc['Total'] = balance.sum(numeric_only=True, axis = 0)
 
 source_bal_month = ColumnDataSource(data=balance)
     
-# table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
-# table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
+table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
+table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
 # totSol = enerSol #enerSol.sum()
@@ -415,7 +439,7 @@ source_flujo = ColumnDataSource(data=dict(x1=annual_res.index.year,ingEner=annua
                                           perd=annual_res.perdidas,base_imp=annual_res.base_imp,
                                           imp_pc=annual_res.imp_PC,util_imp=annual_res.util_imp,
                                           fljNeto=annual_res.flujo_neto,fljAcum=annual_res.flujo_acum,
-                                          van_vect=annual_res.vect_VAN))
+                                          van_vect=annual_res.vect_VAN)) 
 
 source_cost = ColumnDataSource(data=ener_cst)
     
@@ -432,12 +456,13 @@ columns = [
 
 data_table = DataTable(columns=columns, source=source_flujo,width=700, height=480)
 
+
 #################################
-# cProy,table_proy = TableProy(lcoh,solFrac_year,totSol_year,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
-# anhoProyect = np.arange(0,anho_proy+1,1)
-# an=pd.date_range('2021-01',freq='A',periods=len(cProy))
-# cProy.index = an
-# source_proy = ColumnDataSource(data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST))
+cProy,table_proy = TableProy(lcoh,solFrac_year,totSol_year,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
+anhoProyect = np.arange(0,anho_proy+1,1)
+an=pd.date_range('2021-01',freq='A',periods=len(cProy))
+cProy.index = an
+source_proy = ColumnDataSource(data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST))
 
 ###############################################################################################                    
 TOOLS="hover,crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,save"
@@ -580,13 +605,14 @@ table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,
 #       fill_color='orange', line_color='white')
 #p3.xaxis.major_label_orientation = 1
 #######
-# infoEner = PreText(text=str(table_ener), width=550)
-# infoFuel = PreText(text=str(table_fuel), width=480)
+infoEner = PreText(text=str(table_ener), width=550)
+infoFuel = PreText(text=str(table_fuel), width=480)
 # infoSteam = PreText(text=str(table_steam), width=480)
 ######################
 # DATOS TABLA ECONÓMICA
 ######################
 wdt = 250
+
 CCol = TextInput(value=str(costCol_m2), title="Costo SST (US$/m2):",width=wdt)
 
 CCol_inst = TextInput(value=str(cost_instCol_m2), title="Costo SST (US$/m2):",width=wdt)
@@ -619,7 +645,7 @@ CDev = TextInput(value=str(CostDev), title="Costo desarrollo (US$):",width=wdt)
 
 fitm2 = TextInput(value=str(FIT_m2), title="Envío, seguro e impuesto (US$/m2)",width=wdt)
 
-percFee = TextInput(value=str(perc_fee), title="Fee desarrollador (% CAPEX)",width=wdt)
+# percFee = TextInput(value=str(perc_fee), title="Fee desarrollador (% CAPEX)",width=wdt)
 
 POPEX = TextInput(value=str(percOpex), title="OPEX (% CAPEX):",width=wdt)
 
@@ -1073,6 +1099,9 @@ def CalcSystemYear():
     aCol = float(areaCol.value)
     vol  = float(vol_sto.value)
     sto_loss = float(loss_sto.value)
+    
+
+    
     # year = 
     
     # SetTurno(df,turno)
@@ -1124,104 +1153,167 @@ def CalcSystemYear():
 #    source_dem.data = new_data
 
     #############################
-# def CalcEcon():
-#     '''
+def CalcEcon():
+    '''
     
 
-#     Returns
-#     -------
-#     None.
+    Returns
+    -------
+    None.
 
-#     '''
+    '''
+    #####
+    costCol_m2 =    float(CCol.value)
+    cost_instCol_m2 =    float(CCol_inst.value)
+    costBOP=    float(CBOP.value)
+    cost_instBOP=    float(C_instBOP.value)
+    costSto=       float(CSto.value)
+    cost_instSto=float(Cinst_Sto.value)
+    costCald=    float(CCald.value)
+    cost_instCald=    float(C_instCald.value)
+    costPiping=    float(CPiping.value)
+    cost_instPiping=    float(C_instPiping.value)
+    costHEX=    float(CHEX.value)
+    cost_instHEX=    float(C_instHEX.value)
+    cost_prepTerr =  float(C_prepTerr.value)
+    CostIng =    float(CIng.value)
+    CostDev =    float(CDev.value)
+    FIT_m2 =     float(fitm2.value)
+    # perc_fee =float(percFee.value)
+    percOpex =float(POPEX.value)
+    indSol =float(indexSolar.value)
+    costFuel = float(CFuel.value)
+    indFuel = float(indexFuel.value)
+    anho_contr = int(anhoContr.value)
+    anho_proy = int(anhoProy.value)
+    anho_depr = int(anhoDepr.value)
+    perc_deuda = int(percDeuda.value)
+    tasa_deuda = float(tasaDeuda.value)
+    pago_deuda = float(pagoDeuda.value)
+    tasa_equi = float(tasaEqui.value)
+    infl_cl = float(inflChile.value)
+    effHeater = float(eff_heater.value)
+ 
     
-#     FIT_m2 = float(fitm2.value) 
-#     perc_fee = float(percFee.value)
-#     percOpex = float(POPEX.value)
-#     indSol = float(indexSolar.value)
+    #####
     
-#     effHeater = float(eff_heater.value)
-#     fuel = dropdownFuel.value
-#     costFuel = float(CFuel.value)
-#     indFuel = float(indexFuel.value)
-    
-# #    pry = dropdownProy.value
-#     aCol = int(areaCol.value)
-#     balance = pd.read_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
-#     balance['enerHeater'] = balance.enerProc/(effHeater/100)
-#     balance['Meses'] = meses
-#     enerCol = balance.enerSol.sum()
-#     solFrac = enerCol / balance.enerProc.sum() * 100
-# #    enerCol = sum(prys[pry]['enerSol'])
-# #    solFrac = sum(prys[pry]['enerSol'])/sum(prys[pry]['enerProc']) *100
-#     costCol_m2 = float(CCol.value)
-    
-#     FIT = FIT_m2 * aCol
-#     CPX = areaCol * costCol_m2 
-    
-#     fee = (CPX+FIT)*perc_fee/100
-#     CAPEX = CPX+ FIT + fee 
-    
-#     OPEX = CPX * percOpex/100
 
-#     anho_contr = int(anhoContr.value)
-#     anho_proy = int(anhoProy.value)
-#     anho_depr = int(anhoDepr.value)
-#     pago_deuda = int(pagoDeuda.value)
-    
-#     perc_deuda = float(percDeuda.value)
-#     tasa_deuda = float(tasaDeuda.value)
-#     tasa_equi = float(tasaEqui.value)
-#     infl_cl = float(inflChile.value)
-    
-#     infl_usa = 2
-#     val_depr = CAPEX/anho_depr
-#     dif_infl = (1+infl_usa/100) / (1+infl_cl/100) 
-    
-#     table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
-#                                       anho_contr,anho_proy,val_depr,anho_depr,enerCol,indSol,indFuel,costFuel)
-
-
-#     annual_res.costSol[0] = np.nan
-#     an=pd.date_range('2021-01',freq='A',periods=len(annual_res))
-#     annual_res.index = an
-    
-#     new_data=dict(x1=annual_res.index.year,ingEner=annual_res.ing_ener,
-#                                           opex=annual_res.opex,utils=annual_res.utilidades,
-#                                           perd=annual_res.perdidas,base_imp=annual_res.base_imp,
-#                                           imp_pc=annual_res.imp_PC,util_imp=annual_res.util_imp,
-#                                           fljNeto=annual_res.flujo_neto,fljAcum=annual_res.flujo_acum,
-#                                           van_vect=annual_res.vect_VAN)
-#     source_flujo.data = new_data
-#     infoEval.text = str(table_eval)
-    
-# #    table_fuel = TableFuel_LCOH(fuel,costFuel,effHeater,enerCol,solFrac)
-#     # infoFuel.text = str(table_fuel)
-
+    fuel = dropdownFuel.value
 
     
-#     lcoh_f = float(table_fuel[2])
+#    pry = dropdownProy.value
+    aCol = int(areaCol.value)
     
-#     cfuel = Vector(lcoh_f,anho_proy,indFuel)
-#     an=pd.date_range('2021-01',freq='A',periods=len(cfuel))
-#     cfuel = pd.DataFrame(cfuel,index=an)
-#     cfuel = cfuel.rename(columns={0:'costFuel'})
-#     cfuel = cfuel.rename_axis(None, axis=1).rename_axis('date', axis=0)
+    balance = pd.read_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
+    balance['enerHeater'] = balance.enerProc/(effHeater/100)
+    balance['Meses'] = meses
+    enerCol = balance.enerSol.sum()
+    solFrac = enerCol / balance.enerProc.sum() * 100
+#    enerCol = sum(prys[pry]['enerSol'])
+#    solFrac = sum(prys[pry]['enerSol'])/sum(prys[pry]['enerProc']) *100
+    costCol_m2 = float(CCol.value)
     
-#     csol=annual_res.costSol
-#     ener_cst = pd.concat([cfuel,csol], axis=1)
+    FIT = FIT_m2 * aCol
+    # CPX = areaCol * costCol_m2 
     
-#     source_cost.data = ener_cst
+    # CAPEX de equipos
+    CAPEX_eq = (aCol * costCol_m2) + (aCol * costBOP) + costSto + costCald + (costPiping * Lpipe) + (costHEX * nHEX)
+
+    # CAPEX instalación
+    CAPEX_inst = (aCol * cost_instCol_m2) + cost_instBOP + cost_instSto + cost_instCald + (Lpipe * cost_instPiping) + (nHEX * cost_instHEX) + (aCol * cost_prepTerr)
+
+    # CAPEX desarrollo (US$)
+    CAPEX_dev = CostIng + CostDev
+
+    # Contingencias (% CAPEX)
+    Cont = 10
+    Cont_tot = (CAPEX_eq + CAPEX_inst + CAPEX_dev) * Cont/100
+
+    # Utilidades (% CAPEX)
+    Util = 10
+    Util_tot = (CAPEX_eq + CAPEX_inst + CAPEX_dev) * Util/100
+
+    CAPEX = CAPEX_eq + CAPEX_inst + CAPEX_dev + Cont_tot + Util_tot + FIT
+  
+    OPEX = CAPEX * percOpex/100
     
-#     lcoh = float(table_eval['LCOH (US$/MWh)'])
+    new_data_capex = dict(capex_eq = CAPEX_eq, capex_inst = CAPEX_inst,
+                                              capex_dev = CAPEX_dev, capex_tot = CAPEX)
     
-#     cProy,table_proy = TableProy(lcoh,solFrac,enerCol,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
-#     an=pd.date_range('2021-01',freq='A',periods=len(cProy))
-#     cProy.index = an
-#     new_data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST)
-#     source_proy.data = new_data
-#     # infoProy.text = str(table_proy)
+    source_capex.data = new_data_capex
     
-#     return lcoh
+    
+
+         
+
+
+    
+
+
+#########################
+
+
+
+#########################
+    # anho_contr = int(anhoContr.value)
+    # anho_proy = int(anhoProy.value)
+    # anho_depr = int(anhoDepr.value)
+    # pago_deuda = int(pagoDeuda.value)
+    
+    # perc_deuda = float(percDeuda.value)
+    # tasa_deuda = float(tasaDeuda.value)
+    # tasa_equi = float(tasaEqui.value)
+    # infl_cl = float(inflChile.value)
+    
+    infl_usa = 2
+    val_depr = CAPEX/anho_depr
+    dif_infl = (1+infl_usa/100) / (1+infl_cl/100) 
+    
+    table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
+                                      anho_contr,anho_proy,val_depr,anho_depr,enerCol,indSol,indFuel,costFuel)
+
+
+    annual_res.costSol[0] = np.nan
+    an=pd.date_range('2021-01',freq='A',periods=len(annual_res))
+    annual_res.index = an
+    
+    new_data=dict(x1=annual_res.index.year,ingEner=annual_res.ing_ener,
+                                          opex=annual_res.opex,utils=annual_res.utilidades,
+                                          perd=annual_res.perdidas,base_imp=annual_res.base_imp,
+                                          imp_pc=annual_res.imp_PC,util_imp=annual_res.util_imp,
+                                          fljNeto=annual_res.flujo_neto,fljAcum=annual_res.flujo_acum,
+                                          van_vect=annual_res.vect_VAN)
+    source_flujo.data = new_data
+    infoEval.text = str(table_eval)
+    
+#    table_fuel = TableFuel_LCOH(fuel,costFuel,effHeater,enerCol,solFrac)
+    # infoFuel.text = str(table_fuel)
+
+
+    
+    lcoh_f = float(table_fuel[2])
+    
+    cfuel = Vector(lcoh_f,anho_proy,indFuel)
+    an=pd.date_range('2021-01',freq='A',periods=len(cfuel))
+    cfuel = pd.DataFrame(cfuel,index=an)
+    cfuel = cfuel.rename(columns={0:'costFuel'})
+    cfuel = cfuel.rename_axis(None, axis=1).rename_axis('date', axis=0)
+    
+    csol=annual_res.costSol
+    ener_cst = pd.concat([cfuel,csol], axis=1)
+    
+    source_cost.data = ener_cst
+    
+    lcoh = float(table_eval['LCOH (US$/MWh)'])
+    
+    cProy,table_proy = TableProy(lcoh,solFrac,enerCol,indSol,fuel,costFuel,indFuel,effHeater,anho_contr,anho_proy)
+    an=pd.date_range('2021-01',freq='A',periods=len(cProy))
+    cProy.index = an
+    new_data=dict(x1=cProy.index,CSol=cProy.csol,CFuel=cProy.cfuel,CFoss=cProy.cfoss,CSST=cProy.SST)
+    source_proy.data = new_data
+    # infoProy.text = str(table_proy)
+    
+    return lcoh
 
 # def CreateWalk():
 #     df = pd.DataFrame()
@@ -1322,13 +1414,14 @@ layout = column(Spacer(height=spc),
                 row(selectCol,areaCol,vol_sto,loss_sto),
                 buttCalcEnergyYear,
                 row(p_year,Spacer(width=spc),table_bal_year),
+                row(infoEner,infoFuel),#infoSteam),
                 
                 
                 Spacer(height=spc+30),
                 row(years_button_group),
                 buttCalcEnergyMonth,
                 row(p_month,Spacer(width=spc),table_bal_month),
-                # row(infoEner,infoFuel,infoSteam),
+
                 
                 
                 Spacer(height=spc),
@@ -1337,7 +1430,7 @@ layout = column(Spacer(height=spc),
                 row(Cinst_Sto,CCald,C_instCald,CPiping,C_instPiping),
                 Spacer(height=spc),
                 row(CHEX,C_instHEX,C_prepTerr,CIng,CDev),
-                row(fitm2,percFee,POPEX,CIng,CDev),
+                row(fitm2,POPEX,CIng,CDev),
                 row(indexSolar,CFuel,indexFuel),
 
                 
@@ -1349,7 +1442,8 @@ layout = column(Spacer(height=spc),
                 buttCalcEcon,
                 
                 Spacer(height=spc+30),
-                row(data_table,infoEval),                 
+                row(data_table,infoEval),  
+                row(table_CAPEX)
                 # row(p1,p2,infoProy),
                 
                 # Spacer(height=spc),
