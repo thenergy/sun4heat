@@ -134,10 +134,11 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
 #    wacc_us = (1+wacc_cl)*dif_infl - 1
     
 #    print (wacc_cl,wacc_us)
-    
-    inversion = np.zeros(anho_contr+1).reshape(anho_contr+1,1) 
+    anho_contr_int = int(anho_contr)
+    inversion = np.zeros(anho_contr_int+1).reshape(anho_contr_int+1,1) 
     inversion[0] = Capex
-    debt = np.zeros(anho_contr+1).reshape(anho_contr+1,1) 
+    
+    debt = np.zeros(anho_contr_int+1).reshape(anho_contr_int+1,1) 
     debt[0] = deuda
     
 #    print ("check 1")
@@ -278,6 +279,167 @@ def LCOH_calc(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,di
     annual_proy['cost_sol'] = lc_vect
     
     return table_eval, annual_table, annual_proy
+
+def LCOH_calc_upt(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
+              anho_contr,anho_proy,val_depr,anho_depr,enerYield,indSol,indFuel,CFuel):
+#    print ("funcion eval")
+    # monto de la deuda
+    deuda = perc_deuda/100 * Capex
+    # porcentaje equity
+    perc_equi = 100 - perc_deuda
+    # anualidad deuda
+    pg = Pago(tasa_deuda/100,pago_deuda,deuda)
+    #wacc chile
+    wacc_cl = perc_deuda/100 * tasa_deuda/100 * (1-impuesto/100) + perc_equi/100 * tasa_equi/100
+#    wacc_us = (1+wacc_cl)*dif_infl - 1
+    
+#    print (wacc_cl,wacc_us)
+    anho_contr_int = int(anho_contr)
+    inversion = np.zeros(anho_contr_int+1).reshape(anho_contr_int+1,1) 
+    inversion[0] = Capex
+    
+    debt = np.zeros(anho_contr_int+1).reshape(anho_contr_int+1,1) 
+    debt[0] = deuda
+    
+#    print ("check 1")
+    amrt,interes = PagoPrinInt(pg,tasa_deuda/100,pago_deuda,deuda,anho_contr)
+#    print ("check 2")
+    opex = Vector(OPEX,anho_contr,infl_cl)
+    
+#    lcoh = 120.42
+    vm = []
+    lc = []
+    
+    anhos = np.arange(0,anho_contr+1)    
+    inSol =[]
+    inSol = pd.Series(inSol)
+    ing_enrg = []
+    ing_enrg = pd.Series(ing_enrg)
+    utilidades = []
+    utilidades = pd.Series(utilidades)
+    perdidas = []
+    perdidas = pd.Series(perdidas)
+
+
+    
+
+    for n,lcoh in enumerate(np.arange(1,1000,1)):
+        inSol = enerYield * lcoh
+        
+        cost_index = Vector_20(inSol,anho_contr,indSol,lcoh)
+
+        
+        
+        # enerYield_Values = enerYield.values.reshape((anho_contr+1,1))
+        cost_index = cost_index.reshape((anho_contr+1,1))
+        
+        ing_enrg = cost_index*enerYield   
+        
+        depr = Depr(val_depr,anho_depr,anho_contr)
+        
+        utilidades = ing_enrg - opex - interes - depr
+        
+        perdidas = Perdidas(utilidades)
+        base_impuesto = BaseImpuesto(utilidades,perdidas)
+        impuestoPrimCat = -base_impuesto * impuesto/100
+    #    impuestoPrimCat = ImpuestoPrimCat(utilidades,impuesto)
+        util_impuesto = utilidades + impuestoPrimCat
+        
+        flujo_neto = -inversion + debt + depr + util_impuesto - amrt
+        flujo_acum= FlujoAcum(flujo_neto)
+        vn = Van(wacc_cl,flujo_neto)
+        VAN = vn.sum()/1000
+        
+        vm.append(VAN)
+        lc.append(lcoh)
+        
+        if n == 0:
+            pass
+        
+        else:
+            vn_tmp = vm[n] * vm[n-1]
+            if vn_tmp < 0:
+                break
+    
+    for n,l in enumerate(np.arange(lc[-2],lc[-1],0.001)):
+
+        inSol = enerYield * l
+        
+        cost_index = Vector_20(inSol,anho_contr,indSol,l)
+        
+        # enerYield_Values = enerYield.values.reshape((anho_contr+1,1))
+        cost_index = cost_index.reshape((anho_contr+1,1))
+        
+        ing_enrg = cost_index*enerYield
+        
+        depr = Depr(val_depr,anho_depr,anho_contr)
+        
+        utilidades = ing_enrg - opex - interes - depr
+        
+        perdidas = Perdidas(utilidades)
+        base_impuesto = BaseImpuesto(utilidades,perdidas)
+        impuestoPrimCat = -base_impuesto * impuesto/100
+    #    impuestoPrimCat = ImpuestoPrimCat(utilidades,impuesto)
+        util_impuesto = utilidades + impuestoPrimCat
+        
+        flujo_neto = -inversion + debt + depr + util_impuesto - amrt
+        flujo_acum = FlujoAcum(flujo_neto)
+        vn = Van(wacc_cl,flujo_neto)
+        VAN = vn.sum()/1000        
+
+        if (VAN < 0.5 and VAN > -0.5):
+            lcoh = l
+            break
+    
+    TIR = Tir(flujo_neto)*100
+    payback = Payback(flujo_acum)   
+    
+    costSolar = Vector(lcoh,anho_contr,indSol)
+    costFuel = Vector(CFuel,anho_contr,indFuel)
+    
+    table_eval = pd.Series()
+    table_eval['LCOH (US$/MWh)'] = "{:10.1f}".format(lcoh)
+    table_eval['CAPEX (kUS$)'] = "{:10.1f}".format(Capex/1000)
+    table_eval['OPEX (kUS$)'] = "{:10.1f}".format(OPEX/1000)
+    table_eval['VAN (kUS$)'] = "{:10.1f}".format(VAN)
+    table_eval['TIR (%)'] = "{:10.1f}".format(TIR)
+    table_eval['Payback (Años)'] = "{:10.1f}".format(payback)
+    
+    anhos = np.arange(0,anho_contr+1)    
+    annual_table = pd.DataFrame(index=anhos)
+    annual_table['ing_ener'] = ing_enrg/1000
+    annual_table['opex'] = opex/1000
+    annual_table['utilidades'] = utilidades/1000
+    annual_table['perdidas'] = perdidas/1000
+    annual_table['base_imp'] = base_impuesto/1000
+    annual_table['imp_PC'] = impuestoPrimCat/1000
+    annual_table['util_imp'] = util_impuesto/1000
+    annual_table['flujo_neto'] = flujo_neto/1000
+    annual_table['flujo_acum'] = flujo_acum/1000
+    annual_table['vect_VAN'] = vn/1000
+    annual_table['costFuel'] = costFuel
+    annual_table['costSol'] = costSolar
+    
+    anhosPr = np.arange(0,anho_proy+1)    
+    annual_proy = pd.DataFrame(index=anhosPr)
+    costFl = Vector(CFuel,anho_proy,indFuel)
+    costSlr = Vector(lcoh,anho_proy,indSol)
+    oym = Vector(OPEX,anho_proy,infl_cl)
+    annual_proy['cost_fuel'] = costFl
+    annual_proy['cost_sol'] = costSlr
+    annual_proy['oym'] = oym
+    
+    lc_vect = []
+    for n,lc in enumerate(annual_proy.cost_sol):
+        if n < anho_contr:
+            lc_vect.append(lc)
+        else:
+            lc_vect.append(0)
+            
+    annual_proy['cost_sol'] = lc_vect
+    
+    return table_eval, annual_table, annual_proy
+
 
 
 
@@ -424,6 +586,7 @@ def Pago(tasa,periodo,monto):
     return pago    
 
 def PagoPrinInt(pago,tasa,periodo,monto,contrato):
+    contrato = int(contrato)
     n = contrato+1
     vct = np.zeros(n).reshape(n,1)
     vctInt = np.zeros(n).reshape(n,1)

@@ -14,9 +14,9 @@ sys.path.append('/home/diego/Documentos/sun4heat/visualizaciones/swh_bhp_calc/sc
 import numpy as np
 import pandas as pd
 
-from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
+from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel, TableCapexU, TableFuel_LCOH, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
 from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
-from funciones_econ_bhp import Pago, PagoPrinInt, Vector, Vector_20, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc
+from funciones_econ_bhp import Pago, PagoPrinInt, Vector, Vector_20, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc, LCOH_calc_upt
 
 from bokeh.plotting import Figure
 from bokeh.layouts import column, Spacer, row
@@ -245,18 +245,43 @@ CostIng = 200000
 # costo desarrollo (US$)
 CostDev = 200000
 
+# costo energía (US$)
+Ecost = 1
+
 # Freight, Insurance and Transport
 FIT_m2 = 0
 FIT = FIT_m2 * aCol
 
+#Costos independientes capex equipos capex
+CEQ_1 = (aCol * costCol_m2)
+CEQ_2 = (aCol * costBOP)
+CEQ_3 = costSto
+CEQ_4 = costCald
+CEQ_5 = (costPiping * Lpipe)
+CEQ_6 =(costHEX * nHEX)
+
 # CAPEX de equipos
-CAPEX_eq = (aCol * costCol_m2) + (aCol * costBOP) + costSto + costCald + (costPiping * Lpipe) + (costHEX * nHEX)
+CAPEX_eq = CEQ_1 + CEQ_2 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6
+ 
+#Costos independientes instalación capex
+CIN_1 = (aCol * cost_instCol_m2)
+CIN_2 = cost_instBOP
+CIN_3 = cost_instSto
+CIN_4 = cost_instCald
+CIN_5 = (Lpipe * cost_instPiping)
+CIN_6 = (nHEX * cost_instHEX)
+CIN_7 = (aCol * cost_prepTerr)
+
 
 # CAPEX instalación
-CAPEX_inst = (aCol * cost_instCol_m2) + cost_instBOP + cost_instSto + cost_instCald + (Lpipe * cost_instPiping) + (nHEX * cost_instHEX) + (aCol * cost_prepTerr)
+CAPEX_inst =  CIN_1 + CIN_2 + CIN_3 + CIN_4 + CIN_5 + CIN_6 + CIN_7
+
+#Costos independientes 
+CDE_1 = CostIng
+CDE_2 = CostDev
 
 # CAPEX desarrollo (US$)
-CAPEX_dev = CostIng + CostDev
+CAPEX_dev = CDE_1 + CDE_2
 
 # Contingencias (% CAPEX)
 Cont = 10
@@ -370,6 +395,9 @@ source_bal_month = ColumnDataSource(data=balance)
     
 table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
 table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
+table_capexu = TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
+                CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
+                CDE_1, CDE_2)
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
 # totSol = enerSol #enerSol.sum()
@@ -607,6 +635,8 @@ table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,
 #######
 infoEner = PreText(text=str(table_ener), width=550)
 infoFuel = PreText(text=str(table_fuel), width=480)
+infoCapexu = PreText(text=str(table_capexu), width=550)
+
 # infoSteam = PreText(text=str(table_steam), width=480)
 ######################
 # DATOS TABLA ECONÓMICA
@@ -670,6 +700,8 @@ pagoDeuda = TextInput(value=str(pago_deuda), title="Años pago deuda",width=wdt)
 tasaEqui = TextInput(value=str(tasa_equi), title="Tasa capital propio (%)",width=wdt)
 
 inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%)",width=wdt)
+
+CostE = TextInput(value=str(Ecost), title="Costo energía:",width=wdt)
 
 #####################
 buttCalcEcon = Button(label="Calcular", button_type="success",width=wdt)
@@ -1136,11 +1168,11 @@ def CalcSystemYear():
     new_data_month=dict(x=x_month, ener=ener_month)
     source_ener_month.data = new_data_month
     
-    # table_ener = TableEner(df,flow_p, Tin_p, Tout_p,effHeater,Col)
-    # infoEner.text = str(table_ener)
+    table_ener = TableEner(df,flow_p, Tin_p, Tout_p,effHeater,Col)
+    infoEner.text = str(table_ener)
     
     table_fuel = TableFuel(df,fuel,effHeater)
-    # infoFuel.text = str(table_fuel)
+    infoFuel.text = str(table_fuel)
     
     # table_steam = TableSteam(df,turno,flow_p, Tin_p, Tout_p,effHeater,cond,T_cond,p_steam,fuel)
     # infoSteam.text = str(table_steam)
@@ -1185,15 +1217,16 @@ def CalcEcon():
     costFuel = float(CFuel.value)
     indFuel = float(indexFuel.value)
     anho_contr = int(anhoContr.value)
+    # anho_contr = 20
     anho_proy = int(anhoProy.value)
     anho_depr = int(anhoDepr.value)
-    perc_deuda = int(percDeuda.value)
+    perc_deuda = float(percDeuda.value)
     tasa_deuda = float(tasaDeuda.value)
-    pago_deuda = float(pagoDeuda.value)
+    pago_deuda = int(pagoDeuda.value)
     tasa_equi = float(tasaEqui.value)
     infl_cl = float(inflChile.value)
     effHeater = float(eff_heater.value)
- 
+    aCol = float(areaCol.value)
     
     #####
     
@@ -1202,28 +1235,55 @@ def CalcEcon():
 
     
 #    pry = dropdownProy.value
-    aCol = int(areaCol.value)
+
     
-    balance = pd.read_csv(path + 'visualizaciones/swh_calc/balance_mensual.csv')
-    balance['enerHeater'] = balance.enerProc/(effHeater/100)
+    balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+str(year)+'.csv')
+    balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
     balance['Meses'] = meses
     enerCol = balance.enerSol.sum()
     solFrac = enerCol / balance.enerProc.sum() * 100
 #    enerCol = sum(prys[pry]['enerSol'])
 #    solFrac = sum(prys[pry]['enerSol'])/sum(prys[pry]['enerProc']) *100
-    costCol_m2 = float(CCol.value)
     
     FIT = FIT_m2 * aCol
     # CPX = areaCol * costCol_m2 
     
+    #Costos independientes capex equipos capex
+    CEQ_1 = (aCol * costCol_m2)
+    CEQ_2 = (aCol * costBOP)
+    CEQ_3 = costSto
+    CEQ_4 = costCald
+    CEQ_5 = (costPiping * Lpipe)
+    CEQ_6 =(costHEX * nHEX)
+    
     # CAPEX de equipos
-    CAPEX_eq = (aCol * costCol_m2) + (aCol * costBOP) + costSto + costCald + (costPiping * Lpipe) + (costHEX * nHEX)
-
+    CAPEX_eq = CEQ_1 + CEQ_2 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6
+     
+    #Costos independientes instalación capex
+    CIN_1 = (aCol * cost_instCol_m2)
+    CIN_2 = cost_instBOP
+    CIN_3 = cost_instSto
+    CIN_4 = cost_instCald
+    CIN_5 = (Lpipe * cost_instPiping)
+    CIN_6 = (nHEX * cost_instHEX)
+    CIN_7 = (aCol * cost_prepTerr)
+    
+    
     # CAPEX instalación
-    CAPEX_inst = (aCol * cost_instCol_m2) + cost_instBOP + cost_instSto + cost_instCald + (Lpipe * cost_instPiping) + (nHEX * cost_instHEX) + (aCol * cost_prepTerr)
+    CAPEX_inst =  CIN_1 + CIN_2 + CIN_3 + CIN_4 + CIN_5 + CIN_6 + CIN_7
 
+    #Costos independientes 
+    CDE_1 = CostIng
+    CDE_2 = CostDev
+    
     # CAPEX desarrollo (US$)
-    CAPEX_dev = CostIng + CostDev
+    CAPEX_dev = CDE_1 + CDE_2
+    
+    table_capexu = TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
+                    CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
+                    CDE_1, CDE_2)
+    infoCapexu.text = str(table_capexu)
+    
 
     # Contingencias (% CAPEX)
     Cont = 10
@@ -1237,39 +1297,23 @@ def CalcEcon():
   
     OPEX = CAPEX * percOpex/100
     
-    new_data_capex = dict(capex_eq = CAPEX_eq, capex_inst = CAPEX_inst,
-                                              capex_dev = CAPEX_dev, capex_tot = CAPEX)
+    
+    
+    SCAPEX_eq = pd.Series([CAPEX_eq])
+    SCAPEX_inst = pd.Series([CAPEX_inst])
+    SCAPEX_dev = pd.Series([CAPEX_dev])
+    SCAPEX = pd.Series([CAPEX])
+    
+    new_data_capex = dict(capex_eq = SCAPEX_eq, capex_inst = SCAPEX_inst,
+                                              capex_dev = SCAPEX_dev, capex_tot = SCAPEX)
     
     source_capex.data = new_data_capex
-    
-    
-
-         
-
-
-    
-
-
-#########################
-
-
-
-#########################
-    # anho_contr = int(anhoContr.value)
-    # anho_proy = int(anhoProy.value)
-    # anho_depr = int(anhoDepr.value)
-    # pago_deuda = int(pagoDeuda.value)
-    
-    # perc_deuda = float(percDeuda.value)
-    # tasa_deuda = float(tasaDeuda.value)
-    # tasa_equi = float(tasaEqui.value)
-    # infl_cl = float(inflChile.value)
-    
+      
     infl_usa = 2
     val_depr = CAPEX/anho_depr
     dif_infl = (1+infl_usa/100) / (1+infl_cl/100) 
     
-    table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
+    table_eval,annual_res, annual_proy = LCOH_calc_upt(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
                                       anho_contr,anho_proy,val_depr,anho_depr,enerCol,indSol,indFuel,costFuel)
 
 
@@ -1286,8 +1330,8 @@ def CalcEcon():
     source_flujo.data = new_data
     infoEval.text = str(table_eval)
     
-#    table_fuel = TableFuel_LCOH(fuel,costFuel,effHeater,enerCol,solFrac)
-    # infoFuel.text = str(table_fuel)
+    table_fuel = TableFuel_LCOH(fuel,costFuel,effHeater,enerCol,solFrac)
+    infoFuel.text = str(table_fuel)
 
 
     
@@ -1397,6 +1441,7 @@ def CalcEcon():
 buttCalcRad.on_click(CalcRad)
 buttCalcEnergyYear.on_click(CalcSystemYear)
 buttCalcEnergyMonth.on_click(CalcSystemMonth)
+buttCalcEcon.on_click(CalcEcon)
 
 
 #############
@@ -1421,6 +1466,7 @@ layout = column(Spacer(height=spc),
                 row(years_button_group),
                 buttCalcEnergyMonth,
                 row(p_month,Spacer(width=spc),table_bal_month),
+              
 
                 
                 
@@ -1438,12 +1484,12 @@ layout = column(Spacer(height=spc),
                 Spacer(height=spc+30),
                 row(anhoContr,anhoProy,anhoDepr,percDeuda,tasaDeuda),
                 row(pagoDeuda,tasaEqui,inflChile),
+                row (buttCalcEcon),
 
-                buttCalcEcon,
-                
                 Spacer(height=spc+30),
                 row(data_table,infoEval),  
-                row(table_CAPEX)
+                row(infoCapexu),
+
                 # row(p1,p2,infoProy),
                 
                 # Spacer(height=spc),
