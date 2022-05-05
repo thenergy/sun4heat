@@ -63,6 +63,65 @@ def TableOpex(aCol,costCol_m2,SF_refresh,PM,consElectrico,costElectrico,nLimp,co
     
     return table_opex
 
+def TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
+                CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
+                CDE_1, CDE_2):
+    
+    CAPEX_eq = CEQ_1 + CEQ_2 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6
+    CAPEX_inst =  CIN_1 + CIN_2 + CIN_3 + CIN_4 + CIN_5 + CIN_6 + CIN_7
+    CAPEX_dev = CDE_1 + CDE_2
+    
+    table_capexu = pd.Series()
+    table_capexu['CAPEX'] = ''
+    
+    table_capexu['-----------'] = '----------'
+    table_capexu['CAPEX Equipos'] = ''
+    table_capexu['Costo total equipos'] = CEQ_1
+    table_capexu['Costo 2'] = CEQ_2
+    table_capexu['Costo almacenador'] = CEQ_3
+    table_capexu['Costo caldera eléctrica'] = CEQ_4
+    table_capexu['Costo total piping'] = CEQ_5
+    table_capexu['Costo HEX'] = CEQ_6
+    table_capexu['CAPEX TOT EQUIPOS'] = CAPEX_eq
+    
+    table_capexu['------------'] = '----------'
+    table_capexu['CAPEX Instalación'] = ''
+    table_capexu['Costo instalación colectores']  = CIN_1
+    table_capexu['Costo inst 2'] = CIN_2
+    table_capexu['Costo instalación almacenador'] = CIN_3
+    table_capexu['Costo instalación caldera'] = CIN_4
+    table_capexu["Costo instalación piping"] = CIN_5
+    table_capexu["Costo instalación HEX"] = CIN_6
+    table_capexu["Costo preparación terreno para colectores"] = CIN_7
+    table_capexu['CAPEX TOT INSTALACIÓN'] = CAPEX_inst
+    
+    table_capexu['-------------'] = '----------'
+    table_capexu['CAPEX Desarrollo'] = ''
+    table_capexu['Costo ingeniería']  = CDE_1
+    table_capexu['Costo desarrollo'] = CDE_2
+    table_capexu['CAPEX TOT Desarrollo'] = CAPEX_dev
+
+       
+    # table_capexu['Fracción solar: (%)'] = "{:10.1f}".format(colAnnual / procAnnual * 100)
+    table_capexu['-------'] = '----------'
+    
+    return table_capexu
+
+def TableOpexY(Ecost,EnerHeater):
+    Opex_cald = Ecost*EnerHeater
+    
+    Opex_tot = Opex_cald
+    
+    table_opex = pd.Series()
+    table_opex['OPEX'] = ''
+    table_opex['Costo energía (US$)'] = Ecost
+    table_opex['Energía sum por caldera anual (kW)'] = EnerHeater
+    table_opex['OPEX Caldera (US$/kW)'] = Opex_cald
+    table_opex['OPEX total anual'] = Opex_tot
+    
+    return table_opex
+
+
 
 #table_eval,flujo_acum,vals_econ,eje_anho = TableEval(Capex,OPEX,tasa_deuda, pago_deuda,perc_deuda,
 #                                                                              impuesto,tasa_equi,dif_infl,anho_contr,val_depr,anho_depr,inSol)

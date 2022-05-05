@@ -14,9 +14,9 @@ sys.path.append('/home/diego/Documentos/sun4heat/visualizaciones/swh_bhp_calc/sc
 import numpy as np
 import pandas as pd
 
-from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel, TableCapexU, TableFuel_LCOH, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
+from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel,  TableFuel_LCOH, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
 from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
-from funciones_econ_bhp import Pago, PagoPrinInt, Vector, Vector_20, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex, TableOpex, TableEval, LCOH_calc, LCOH_calc_upt
+from funciones_econ_bhp import Pago, PagoPrinInt, Vector, Vector_20, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex,TableCapexU, TableOpex, TableOpexY, TableEval, LCOH_calc, LCOH_calc_upt
 
 from bokeh.plotting import Figure
 from bokeh.layouts import column, Spacer, row
@@ -245,8 +245,8 @@ CostIng = 200000
 # costo desarrollo (US$)
 CostDev = 200000
 
-# costo energía (US$)
-Ecost = 1
+# costo energía (US$/kW)
+Ecost = 70
 
 # Freight, Insurance and Transport
 FIT_m2 = 0
@@ -393,11 +393,15 @@ balance.loc['Total'] = balance.sum(numeric_only=True, axis = 0)
 
 source_bal_month = ColumnDataSource(data=balance)
     
+EnerHeaterOp = balance.enerHeater.sum()
+
 table_ener = TableEner(df, Tout_h, Tin_h,effHeater,Col,year)
 table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
 table_capexu = TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
                 CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
                 CDE_1, CDE_2)
+table_opex = TableOpexY(Ecost,EnerHeaterOp)
+
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
 # totSol = enerSol #enerSol.sum()
@@ -636,6 +640,7 @@ table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,
 infoEner = PreText(text=str(table_ener), width=550)
 infoFuel = PreText(text=str(table_fuel), width=480)
 infoCapexu = PreText(text=str(table_capexu), width=550)
+infoOpex = PreText(text=str(table_opex), width=550)
 
 # infoSteam = PreText(text=str(table_steam), width=480)
 ######################
@@ -701,7 +706,7 @@ tasaEqui = TextInput(value=str(tasa_equi), title="Tasa capital propio (%)",width
 
 inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%)",width=wdt)
 
-CostE = TextInput(value=str(Ecost), title="Costo energía:",width=wdt)
+CostE = TextInput(value=str(Ecost), title="Costo energía (US$/kW):",width=wdt)
 
 #####################
 buttCalcEcon = Button(label="Calcular", button_type="success",width=wdt)
@@ -1227,6 +1232,7 @@ def CalcEcon():
     infl_cl = float(inflChile.value)
     effHeater = float(eff_heater.value)
     aCol = float(areaCol.value)
+    Ecost = float(CostE.value)
     
     #####
     
@@ -1294,8 +1300,16 @@ def CalcEcon():
     Util_tot = (CAPEX_eq + CAPEX_inst + CAPEX_dev) * Util/100
 
     CAPEX = CAPEX_eq + CAPEX_inst + CAPEX_dev + Cont_tot + Util_tot + FIT
+    
+    EnerYear_op = balance.enerHeater.sum()
+    
+    OPEX = Ecost*EnerYear_op
+    
+    table_opex = TableOpexY(Ecost,EnerYear_op)
+    
+    infoOpex.text = str(table_opex)
   
-    OPEX = CAPEX * percOpex/100
+    # OPEX = CAPEX * percOpex/100
     
     
     
@@ -1459,7 +1473,7 @@ layout = column(Spacer(height=spc),
                 row(selectCol,areaCol,vol_sto,loss_sto),
                 buttCalcEnergyYear,
                 row(p_year,Spacer(width=spc),table_bal_year),
-                row(infoEner,infoFuel),#infoSteam),
+                row(infoEner,infoFuel, infoOpex),#infoSteam),
                 
                 
                 Spacer(height=spc+30),
@@ -1488,7 +1502,7 @@ layout = column(Spacer(height=spc),
 
                 Spacer(height=spc+30),
                 row(data_table,infoEval),  
-                row(infoCapexu),
+                # row(infoCapexu),
 
                 # row(p1,p2,infoProy),
                 
