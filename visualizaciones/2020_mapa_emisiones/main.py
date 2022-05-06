@@ -667,12 +667,14 @@ def emission_to_energy(df, df2):
 def TableResumen(df):
     tot_emis = df.ton_emision.sum()
     tot_ener_cons = df.ener_cons_CO2.sum()
+    tot_empresas = len(df)
     
     table_res = pd.Series()
     
     table_res['Resumen totales tabla del mapa'] = ''
     table_res['Miles de Toneladas de emisión anual (miles T/año)' ] = tot_emis/1000
-    table_res['Energía consumida anual (MWh/año)'] = tot_ener_cons*(10**(6))/3600
+    table_res['Energía consumida anual (GWh/año)'] = tot_ener_cons*(10**(3))/3600
+    table_res['Total empresas'] = tot_empresas
 
     return table_res
 
