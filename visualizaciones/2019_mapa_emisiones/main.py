@@ -49,7 +49,7 @@ from bokeh.events import Tap
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row, Spacer
-from bokeh.models.widgets import Button
+from bokeh.models.widgets import Button, PreText
 
 from bokeh.palettes import Category20
 
@@ -634,6 +634,19 @@ def emission_to_energy(df, df2):
 
     return df
 
+def TableResumen(df):
+    tot_emis = df.ton_emision.sum()
+    tot_ener_cons = df.ener_cons_CO2.sum()
+    
+    table_res = pd.Series()
+    
+    table_res['Resumen totales tabla del mapa'] = ''
+    table_res['Miles de Toneladas de emisión anual (miles T/año)' ] = tot_emis/1000
+    table_res['Energía consumida anual (MWh/año)'] = tot_ener_cons*(10**(6))/3600
+
+    
+    return table_res
+
 
 # ########################################################################################
 # crear dataframe (df) indus
@@ -750,13 +763,20 @@ columns = [
 data_table = DataTable(
     columns=columns, source=source_indus, width=700, height=900, editable=True
 )
+
+
+table_res = TableResumen(indus_ft)
+InfoRes = PreText(text=str(table_res), width=100)
+
+
+
 # ########################################################################################
 
 #######################################################################################
 # iniciar mapa
 tile_provider = get_provider(ESRI_IMAGERY)
 p1 = Figure(
-    plot_width=800,
+    plot_width=700,
     plot_height=900,
     tools=["pan,wheel_zoom,box_zoom,reset,save,tap"],
     x_axis_type="mercator",
@@ -1062,6 +1082,10 @@ def UpdateTable():
     indus_ft["clr"] = indus_ft.rubro.map(clr)
     # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
 
+
+    table_res = TableResumen(indus_ft)
+    InfoRes.text = str(table_res)
+
     source_indus.data = indus_ft
     source_empr.data = indus_ft
 
@@ -1206,6 +1230,8 @@ layout = column(
     # row(b),
     Spacer(height=spc - 20),
     row(p1, data_table),
+    Spacer(width = 500),
+    row(InfoRes),
     Spacer(height=spc + 30),
     data_tableEmpr,
     p,
