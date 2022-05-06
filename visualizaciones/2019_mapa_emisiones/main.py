@@ -73,9 +73,9 @@ from os.path import dirname, join
 
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
 # path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
-# path = '/home/diego/Documentos/sun4heat/'
+path = '/home/diego/Documentos/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -152,7 +152,7 @@ cats = {
 #     "Bencina": 6,
 #     "Biogas": 7,
 # }
-
+pd.options.display.float_format = '{:.2f}'.format
 
 # paleta de colores para los gráficos
 clr = dict(zip(cats, Category20[20]))
@@ -638,13 +638,14 @@ def TableResumen(df):
     tot_emis = df.ton_emision.sum()
     tot_ener_cons = df.ener_cons_CO2.sum()
     tot_empresas = len(df)
-    
+    df.ener_cons_CO2.map('{:,.2f}'.format)
     table_res = pd.Series()
     
     table_res['Resumen totales tabla del mapa'] = ''
     table_res['Miles de Toneladas de emisión anual (miles T/año)' ] = tot_emis/1000
-    table_res['Energía consumida anual (GWh/año)'] = tot_ener_cons*(10**(3))/3600
+    table_res['Energía consumida anual (GWh/año)'] = (tot_ener_cons*(10**(3))/3600)
     table_res['Total empresas'] = tot_empresas
+    
 
 
     
