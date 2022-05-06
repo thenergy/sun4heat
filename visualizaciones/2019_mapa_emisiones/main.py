@@ -73,9 +73,9 @@ from os.path import dirname, join
 
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
 # path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
-# path = '/home/diego/Documentos/sun4heat/'
+path = '/home/diego/Documentos/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -726,6 +726,7 @@ indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
 # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
 
+indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
 
 # Definir nuevo ID por fuente de emisión
 indus["f_ind"] = indus.fuente_emision
@@ -733,6 +734,9 @@ indus = indus.set_index("f_ind")
 
 #
 indus = wgs84_to_web_mercator(indus, lon="Longitud", lat="Latitud")
+
+
+
 
 
 # # ##leer archivo de combustibles y juntar df indus
@@ -755,7 +759,7 @@ columns = [
         width=30,
         formatter=NumberFormatter(format="0.0"),
     ),
-    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TJ/año)", width=30, formatter=NumberFormatter(format="0.0"),),
+    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (MWh/año)", width=30, formatter=NumberFormatter(format="0.0"),),
     TableColumn(field="region", title="Región", width=50),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
@@ -810,7 +814,8 @@ p1.add_tools(
         tooltips=[
             ("Nombre: ", "@nombre"),
             ("Region: ", "@region"),
-            ("Emisiones (ton/año): ", "@ton_emision"),
+            ("Emisiones (ton/año): ", "@ton_emision{0.00}"),
+            ("Energía consumida MWh/año): ", "@ener_cons_CO2{0.00}"),
             ("Rubro: ", "@rubro"),
             ("Combustible Primario: ", "@combustible_prim"),
         ],
@@ -1084,6 +1089,8 @@ def UpdateTable():
     indus_ft["pt_size"] = pt_size
     indus_ft["clr"] = indus_ft.rubro.map(clr)
     # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
+    
+    indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
 
 
     table_res = TableResumen(indus_ft)

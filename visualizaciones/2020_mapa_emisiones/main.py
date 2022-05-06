@@ -754,6 +754,7 @@ pt_size = np.log(indus_ft.ton_emision)
 indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
 # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
+indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
 
 
 # Definir nuevo ID por fuente de emisión
@@ -837,7 +838,8 @@ p1.add_tools(
         tooltips=[
             ("Nombre: ", "@nombre"),
             ("Region: ", "@region"),
-            ("Emisiones (ton/año): ", "@ton_emision"),
+            ("Emisiones (ton/año): ", "@ton_emision{0.00}"),
+            ("Energía consumida MWh/año): ", "@ener_cons_CO2{0.00}"),
             ("Rubro: ", "@rubro"),
             ("Combustible Primario: ", "@combustible_prim"),
         ],
@@ -1112,6 +1114,7 @@ def UpdateTable():
     indus_ft["clr"] = indus_ft.rubro.map(clr)
     # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
 
+    indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
 
     table_res = TableResumen(indus_ft)
     InfoRes.text = str(table_res)
