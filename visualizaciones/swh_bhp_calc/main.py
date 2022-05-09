@@ -142,7 +142,8 @@ year= '2024'
 #           BOTON AÑO
 ##############################################
 
-years_button_group = RadioButtonGroup(labels=years_list, active=0)
+years_button_group = RadioButtonGroup(labels=years_list, active=0,button_type="success")
+years_button_group.on_change('active', lambda attr, old, new: CalcSystemMonth)
 
 
 
@@ -262,6 +263,9 @@ CEQ_6 =(costHEX * nHEX)
 
 # CAPEX de equipos
 CAPEX_eq = CEQ_1 + CEQ_2 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6
+
+# CAPEX PIPHEX
+COST_PIPHEX = CEQ_5+CEQ_6
  
 #Costos independientes instalación capex
 CIN_1 = (aCol * cost_instCol_m2)
@@ -298,6 +302,17 @@ CAPEX = CAPEX_eq + CAPEX_inst + CAPEX_dev + Cont_tot + Util_tot + FIT
 # perc_fee = 0
 # fee = (CAPEX+FIT)*perc_fee/100
 # CAPEX = CPX+ FIT + fee 
+
+#####################################
+#   OPEX
+#####################################
+
+#trabajadores
+Workers = 10
+
+#costo trabajador mensual US$/mes
+WorkersCost = 1000
+
 
 percOpex = 1.5
 
@@ -400,7 +415,8 @@ table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater, year)
 table_capexu = TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
                 CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
                 CDE_1, CDE_2)
-table_opex = TableOpexY(Ecost,EnerHeaterOp)
+    
+
 
 # table_steam = TableSteam(df,turno,flow_p, Tout_h, Tin_h,effHeater,cond,T_cond,p_steam,fuel)
 
@@ -444,10 +460,37 @@ infl_cl = 2
 # diferencial inflacionario
 dif_infl = (1+infl_usa/100) / (1+infl_cl/100) 
 
+#Volumen agua (indicar proceso) (m3)
+vol_agua = 100
+
+#Costo agua m3 (US$/m3)
+agua_cost = 30
+
+# # Trabajadores ( # Personas)
+Workers = 50
+
+# Costo mensual trabajador (US$/trabajador)
+CostW = 1000
+
+#Porcentaje Opex SST (%)
+perc_SST = 10
+
+#Porcentaje Opex Cald (%)
+perc_Cald = 10
+
+#Porcentaje Opex Almac (%)
+perc_Almac = 10
+
+#Porcentaje Opex PipHEX (%)
+perc_PipHEX = 10
+
+
+
 table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
                                   anho_contr,anho_proy,val_depr,anho_depr,totSol_year,indSol,indFuel,costFuel)
 
-
+table_opex = TableOpexY(Ecost,EnerHeaterOp,vol_agua,agua_cost,Workers,CostW,CEQ_1,CEQ_4,CEQ_2,
+               COST_PIPHEX,perc_SST,perc_Cald,perc_Almac,perc_PipHEX)
 
 annual_res.costSol[0] = np.nan
 an=pd.date_range('2021-01',freq='A',periods=len(annual_res))
@@ -574,7 +617,7 @@ ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year
 source_ener_year = ColumnDataSource(data=dict(x=x_year, ener=ener_year))
 palette = ["red", "black","orange"]
     
-p_year = Figure(tools=TOOLS, x_range=FactorRange(*x_year),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
+p_year = Figure(tools=TOOLS, x_range=FactorRange(*x_year),plot_width=plot_w, plot_height=plot_h, title="Balance de energía anual",
             y_axis_label="Energía (MWh/año)")
 p_year.vbar(x='x', top='ener', width=1.0, source=source_ener_year, 
       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
@@ -607,7 +650,7 @@ ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,y
 source_ener_month = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
 palette = ["red", "black","orange"]
     
-p_month = Figure(tools=TOOLS, x_range=FactorRange(*x_month),plot_width=plot_w, plot_height=plot_h, title="Balance de energía",
+p_month = Figure(tools=TOOLS, x_range=FactorRange(*x_month),plot_width=plot_w, plot_height=plot_h, title="Balance de energía mensual",
             y_axis_label="Energía (MWh/mes)")
 p_month.vbar(x='x', top='ener', width=1.0, source=source_ener_month, 
       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
@@ -650,15 +693,15 @@ wdt = 250
 
 CCol = TextInput(value=str(costCol_m2), title="Costo SST (US$/m2):",width=wdt)
 
-CCol_inst = TextInput(value=str(cost_instCol_m2), title="Costo SST (US$/m2):",width=wdt)
+CCol_inst = TextInput(value=str(cost_instCol_m2), title="Costo instalación SST (US$/m2):",width=wdt)
 
-CBOP = TextInput(value=str(costBOP), title="Costo instalación colector (US$/m2):",width=wdt)
+# CBOP = TextInput(value=str(costBOP), title="Costo instalación colector (US$/m2):",width=wdt)
 
 C_instBOP = TextInput(value=str(cost_instBOP), title="Costo instalación balance de planta (US$/m2):",width=wdt)
 
 CSto = TextInput(value=str(costSto), title="Costo almacenamiento (US$/m3):",width=wdt)
 
-Cinst_Sto = TextInput(value=str(cost_instSto), title="Costo instalación storage (US$):",width=wdt)
+Cinst_Sto = TextInput(value=str(cost_instSto), title="Costo instalación almacenador (US$):",width=wdt)
 
 CCald = TextInput(value=str(costCald), title="Costo caldera eléctrica (US$):",width=wdt)
 
@@ -678,35 +721,57 @@ CIng = TextInput(value=str(CostIng), title="Costo ingeniería (US$):",width=wdt)
 
 CDev = TextInput(value=str(CostDev), title="Costo desarrollo (US$):",width=wdt)
 
-fitm2 = TextInput(value=str(FIT_m2), title="Envío, seguro e impuesto (US$/m2)",width=wdt)
+fitm2 = TextInput(value=str(FIT_m2), title="Envío, seguro e impuesto (US$/m2):",width=wdt)
 
 # percFee = TextInput(value=str(perc_fee), title="Fee desarrollador (% CAPEX)",width=wdt)
 
-POPEX = TextInput(value=str(percOpex), title="OPEX (% CAPEX):",width=wdt)
 
-indexSolar = TextInput(value=str(indSol), title="Indexación solar (%)",width=wdt)
+
+# POPEX = TextInput(value=str(percOpex), title="OPEX (% CAPEX):",width=wdt)
+
+indexSolar = TextInput(value=str(indSol), title="Indexación solar (%):",width=wdt)
 
 CFuel = TextInput(value=str(costFuel), title="Precio combustible (US$/unidad):",width=wdt)
 
-indexFuel = TextInput(value=str(indFuel), title="Indexación combustible (%)",width=wdt)
+indexFuel = TextInput(value=str(indFuel), title="Indexación combustible (%):",width=wdt)
 
-anhoContr = TextInput(value=str(anho_contr), title="Años de contrato ESCO",width=wdt)
+anhoContr = TextInput(value=str(anho_contr), title="Años de contrato ESCO:",width=wdt)
 
-anhoProy = TextInput(value=str(anho_proy), title="Años evaluación escenario",width=wdt)
+anhoProy = TextInput(value=str(anho_proy), title="Años evaluación escenario:",width=wdt)
 
-anhoDepr = TextInput(value=str(anho_depr), title="Años depreciación",width=wdt)
+anhoDepr = TextInput(value=str(anho_depr), title="Años depreciación:",width=wdt)
 
-percDeuda = TextInput(value=str(perc_deuda), title="Porcentaje deuda",width=wdt)
+percDeuda = TextInput(value=str(perc_deuda), title="Porcentaje deuda:",width=wdt)
 
-tasaDeuda = TextInput(value=str(tasa_deuda), title="Tasa deuda (%)",width=wdt)
+tasaDeuda = TextInput(value=str(tasa_deuda), title="Tasa deuda (%):",width=wdt)
 
-pagoDeuda = TextInput(value=str(pago_deuda), title="Años pago deuda",width=wdt)
+pagoDeuda = TextInput(value=str(pago_deuda), title="Años pago deuda:",width=wdt)
 
-tasaEqui = TextInput(value=str(tasa_equi), title="Tasa capital propio (%)",width=wdt)
+tasaEqui = TextInput(value=str(tasa_equi), title="Tasa capital propio (%):",width=wdt)
 
-inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%)",width=wdt)
+inflChile = TextInput(value=str(infl_cl), title="Inflación Chile (%):",width=wdt)
 
-CostE = TextInput(value=str(Ecost), title="Costo energía (US$/kW):",width=wdt)
+CostE = TextInput(value=str(Ecost), title="Costo energía eléctrica (US$/kW):",width=wdt)
+
+########################
+#   SEC OPEX
+########################
+
+
+########################
+#   SEC OPEX
+########################
+
+VolAgua = TextInput(value=str(vol_agua), title="Vólumen agua m³:",width=wdt)
+CostAg = TextInput(value=str(agua_cost), title="Costo m³ agua (US$/m³):",width=wdt)
+Wkers = TextInput(value=str(Workers), title="Trabajadores (# Personas):",width=wdt)
+WCost = TextInput(value=str(CostW), title="Costo mensual trabajador (US$/persona):",width=wdt)
+PercSST = TextInput(value=str(perc_SST), title="OPEX SST (% CAPEX SST):",width=wdt)
+PercCald = TextInput(value=str(perc_Cald), title="OPEX Caldera (% CAPEX Caldera):",width=wdt)
+PercAlmac = TextInput(value=str(perc_Almac), title="OPEX Almacenamiento (% CAPEX Almacenamiento):",width=wdt)
+PercPipHEX = TextInput(value=str(perc_PipHEX), title="OPEX Piping & HEX (% CAPEX Piping & HEX):",width=wdt)
+
+
 
 #####################
 buttCalcEcon = Button(label="Calcular", button_type="success",width=wdt)
@@ -997,7 +1062,7 @@ def CalcRad():
    
 #     return df
 
-def CalcSystemMonth():
+def CalcSystemMonth(temp):
     '''
     A través de la simulación en SAM hecha por CallSWH calcula la 
     energía en función del sistema y variables seleccionadas.
@@ -1198,7 +1263,7 @@ def CalcEcon():
     #####
     costCol_m2 =    float(CCol.value)
     cost_instCol_m2 =    float(CCol_inst.value)
-    costBOP=    float(CBOP.value)
+    # costBOP=    float(CBOP.value)
     cost_instBOP=    float(C_instBOP.value)
     costSto=       float(CSto.value)
     cost_instSto=float(Cinst_Sto.value)
@@ -1213,7 +1278,9 @@ def CalcEcon():
     CostDev =    float(CDev.value)
     FIT_m2 =     float(fitm2.value)
     # perc_fee =float(percFee.value)
-    percOpex =float(POPEX.value)
+    
+    
+    # percOpex =float(POPEX.value)
     indSol =float(indexSolar.value)
     costFuel = float(CFuel.value)
     indFuel = float(indexFuel.value)
@@ -1229,6 +1296,17 @@ def CalcEcon():
     effHeater = float(eff_heater.value)
     aCol = float(areaCol.value)
     Ecost = float(CostE.value)
+    
+    vol_agua = float(VolAgua.value)
+    agua_cost = float(CostAg.value)
+    Workers = float(Wkers.value)
+    CostW = float(WCost.value)
+    perc_SST = float(PercSST.value)
+    perc_Cald = float(PercCald.value)
+    perc_Almac = float(PercAlmac.value)
+    perc_PipHEX = float(PercPipHEX.value)
+    
+
     
     #####
     
@@ -1250,16 +1328,22 @@ def CalcEcon():
     FIT = FIT_m2 * aCol
     # CPX = areaCol * costCol_m2 
     
+    
+    
     #Costos independientes capex equipos capex
     CEQ_1 = (aCol * costCol_m2)
-    CEQ_2 = (aCol * costBOP)
+    # CEQ_2 = (aCol * costBOP)
     CEQ_3 = costSto
     CEQ_4 = costCald
     CEQ_5 = (costPiping * Lpipe)
     CEQ_6 =(costHEX * nHEX)
     
+    #CAPEX PIPHEX
+    COST_PIPHEX = CEQ_5+CEQ_6
+
+    
     # CAPEX de equipos
-    CAPEX_eq = CEQ_1 + CEQ_2 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6
+    CAPEX_eq = CEQ_1  + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6 #+ CEQ_2
      
     #Costos independientes instalación capex
     CIN_1 = (aCol * cost_instCol_m2)
@@ -1269,6 +1353,11 @@ def CalcEcon():
     CIN_5 = (Lpipe * cost_instPiping)
     CIN_6 = (nHEX * cost_instHEX)
     CIN_7 = (aCol * cost_prepTerr)
+    
+    # CAPEX_SST = CEQ_1 #+ CIN_1
+    # CAPEX_Cald = CEQ_4 #+ CIN_4
+    # CAPEX_Almac = CEQ_3 #+ CIN_3
+    # CAPEX_PipHEX = CEQ_5 + CEQ_6 #+ CIN_5 +CIN_6
     
     
     # CAPEX instalación
@@ -1299,9 +1388,12 @@ def CalcEcon():
     
     EnerYear_op = balance.enerHeater.sum()
     
-    OPEX = Ecost*EnerYear_op
+    # OPEX = Ecost*EnerYear_op
     
-    table_opex = TableOpexY(Ecost,EnerYear_op)
+    COST_PIPHEX = CEQ_5+CEQ_6
+    
+    table_opex = TableOpexY(Ecost,EnerYear_op,vol_agua,agua_cost,Workers,CostW,CEQ_1,CEQ_4,CEQ_2,
+                   COST_PIPHEX,perc_SST,perc_Cald,perc_Almac,perc_PipHEX)
     
     infoOpex.text = str(table_opex)
   
@@ -1450,8 +1542,9 @@ def CalcEcon():
 
 buttCalcRad.on_click(CalcRad)
 buttCalcEnergyYear.on_click(CalcSystemYear)
-buttCalcEnergyMonth.on_click(CalcSystemMonth)
+# buttCalcEnergyMonth.on_click(CalcSystemMonth)
 buttCalcEcon.on_click(CalcEcon)
+years_button_group.on_click(CalcSystemMonth)
 
 
 #############
@@ -1469,33 +1562,36 @@ layout = column(Spacer(height=spc),
                 row(selectCol,areaCol,vol_sto,loss_sto),
                 buttCalcEnergyYear,
                 row(p_year,Spacer(width=spc),table_bal_year),
-                row(infoEner,infoFuel, infoOpex),#infoSteam),
+                row(infoEner,infoFuel),#infoSteam),
               
                 
                 Spacer(height=spc+30),
                 row(years_button_group),
-                buttCalcEnergyMonth,
+                # buttCalcEnergyMonth,
                 row(p_month,Spacer(width=spc),table_bal_month),
               
                 Spacer(height=spc),
                 
-                row(CCol,CCol_inst,CBOP,C_instBOP,CSto),
-                row(Cinst_Sto,CCald,C_instCald,CPiping,C_instPiping),
+                row(CCol, CCol_inst, C_instBOP),
+                row(CCald, C_instCald, CSto, Cinst_Sto), #CBOP,
+                row(CPiping, C_instPiping, CHEX, C_instHEX),
+                row(C_prepTerr, CIng, CDev),
+                row(infoCapexu),
                 Spacer(height=spc),
-                row(CHEX,C_instHEX,C_prepTerr,CIng,CDev),
-                row(fitm2,POPEX,CIng,indexSolar,CFuel),
+                
+                row(fitm2,indexSolar,CFuel),#,POPEX
                 row(indexFuel,CostE),
-
+                row(infoOpex),
                 
 
                 Spacer(height=spc+30),
-                row(anhoContr,anhoProy,anhoDepr,percDeuda,tasaDeuda),
-                row(pagoDeuda,tasaEqui,inflChile),
+                row(anhoContr,anhoProy,anhoDepr,percDeuda),
+                row(tasaDeuda,pagoDeuda,tasaEqui,inflChile),
                 row (buttCalcEcon),
 
                 Spacer(height=spc+30),
                 row(data_table,infoEval),  
-                # row(infoCapexu),
+                
 
                 # row(p1,p2,infoProy),
                 

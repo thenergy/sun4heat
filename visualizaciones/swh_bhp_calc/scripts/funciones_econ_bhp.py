@@ -67,7 +67,7 @@ def TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
                 CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
                 CDE_1, CDE_2):
     
-    CAPEX_eq = CEQ_1 + CEQ_2 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6
+    CAPEX_eq = CEQ_1 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6 #+ CEQ_2 
     CAPEX_inst =  CIN_1 + CIN_2 + CIN_3 + CIN_4 + CIN_5 + CIN_6 + CIN_7
     CAPEX_dev = CDE_1 + CDE_2
     
@@ -76,13 +76,13 @@ def TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
     
     table_capexu['-----------'] = '----------'
     table_capexu['CAPEX Equipos'] = ''
-    table_capexu['Costo total equipos'] = CEQ_1
-    table_capexu['Costo 2'] = CEQ_2
-    table_capexu['Costo almacenador'] = CEQ_3
-    table_capexu['Costo caldera eléctrica'] = CEQ_4
-    table_capexu['Costo total piping'] = CEQ_5
-    table_capexu['Costo HEX'] = CEQ_6
-    table_capexu['CAPEX TOT EQUIPOS'] = CAPEX_eq
+    table_capexu['Costo Colector (US$)'] = CEQ_1
+    # table_capexu['Costo 2'] = CEQ_2
+    table_capexu['Costo almacenador (US$)'] = CEQ_3
+    table_capexu['Costo caldera eléctrica (US$)'] = CEQ_4
+    table_capexu['Costo total piping (US$)'] = CEQ_5
+    table_capexu['Costo HEX (US$)'] = CEQ_6
+    table_capexu['CAPEX TOT EQUIPOS (US$)'] = CAPEX_eq
     
     table_capexu['------------'] = '----------'
     table_capexu['CAPEX Instalación'] = ''
@@ -107,17 +107,71 @@ def TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
     
     return table_capexu
 
-def TableOpexY(Ecost,EnerHeater):
-    Opex_cald = Ecost*EnerHeater
+def TableOpexY(Ecost,EnerHeater,vol_agua,agua_cost,Workers,WCost,CapexSST,CapexCald,CapexAlmac,
+               CapexPipHEX,percSST,percCald,percAlmac,percPipHEX):
+    OPEX_cald = Ecost*EnerHeater
+    OPEX_agua = vol_agua*agua_cost
+    OPEX_WK = Workers*WCost*12
     
-    Opex_tot = Opex_cald
+    OPEX_SST = CapexSST*percSST/100
+    OPEX_Cald = CapexCald*percCald/100
+    OPEX_Almac= CapexAlmac*percAlmac/100
+    OPEX_PipHEX = CapexPipHEX*percPipHEX/100
+
+    OPEX_eq = OPEX_SST + OPEX_Cald + OPEX_Almac + OPEX_PipHEX
+    
+    OPEX_tot = OPEX_cald + OPEX_agua + OPEX_WK + OPEX_eq
     
     table_opex = pd.Series()
+    
     table_opex['OPEX'] = ''
-    table_opex['Costo energía (US$)'] = Ecost
-    table_opex['Energía sum por caldera anual (kW)'] = EnerHeater
-    table_opex['OPEX Caldera (US$/kW)'] = Opex_cald
-    table_opex['OPEX total anual'] = Opex_tot
+    table_opex['--------------'] = '----------------'
+    table_opex['Caldera eléctrica'] = ''
+    table_opex['Energía suministrada a caldera anual (kW)'] = EnerHeater
+    table_opex['Costo energía eléctrica (US$/kW)'] = Ecost
+    table_opex['OPEX Caldera (US$)'] = OPEX_cald
+    
+    table_opex['------------'] = '----------------'
+    table_opex['Agua'] = ''
+    table_opex['Volumen agua operación (m³)'] = vol_agua
+    table_opex['Costo agua (US$/m³)'] = agua_cost
+    table_opex['OPEX uso agua'] = OPEX_agua
+    
+    table_opex['-----------'] = '----------------'
+    table_opex['Trabajadores'] = ''
+    table_opex['Cantidad de trabajadores (personas)'] = Workers
+    table_opex['Costo mensual por trabajador (US$)'] = WCost
+    table_opex['OPEX Personal (US$) (anual)'] = OPEX_WK
+    
+    table_opex['-------------'] = '----------------'
+    table_opex['OPEX EQUIPOS'] = ''
+    table_opex['---------------'] = '----------------'
+
+    table_opex['OPEX SST (% CAPEX SST)'] = percSST
+    table_opex['CAPEX SST (US$)'] = CapexSST   
+    table_opex['OPEX SST (US$)'] = OPEX_SST 
+    
+    table_opex['-----------------'] = '----------------'
+    table_opex['Caldera'] = ''
+    table_opex['OPEX Caldera (% CAPEX Caldera)'] = percCald
+    table_opex['CAPEX Caldera (US$)'] = CapexCald 
+    table_opex['OPEX Caldera (US$)'] = OPEX_Cald  
+
+    table_opex['------------------'] = '----------------'
+    table_opex['Almacenador'] = ''
+    table_opex['OPEX Almacenador (% CAPEX Almacenador)'] = Workers
+    table_opex['CAPEX Almacenador (US$)'] = CapexAlmac
+    table_opex['OPEX Almacenador (US$)'] = OPEX_Almac
+
+    table_opex['-------------------'] = '----------------'
+    table_opex['Piping & HEX'] = ''
+    table_opex['OPEX Piping & HEX (% CAPEX Piping & HEX ) '] = percPipHEX
+    table_opex['CAPEX Piping & HEX(US$)'] = CapexPipHEX
+    table_opex['OPEX Piping & HEX(US$)'] = OPEX_PipHEX
+    
+    table_opex['--------------------'] = '----------------'
+    table_opex['OPEX Total Anual (US$)'] = OPEX_tot 
+    
     
     return table_opex
 
