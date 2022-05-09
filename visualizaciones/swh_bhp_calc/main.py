@@ -1136,16 +1136,12 @@ def CalcSystemYear():
     aCol = float(areaCol.value)
     vol  = float(vol_sto.value)
     sto_loss = float(loss_sto.value)
-    
-
-    
-    # year = 
-    
+       
     # SetTurno(df,turno)
     SetTMains(df,Tout_p)
     SetTSet(df,Tin_p)
     
-    # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
     enerProc, enerAux, enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     
@@ -1173,10 +1169,10 @@ def CalcSystemYear():
     new_data_month=dict(x=x_month, ener=ener_month)
     source_ener_month.data = new_data_month
     
-    table_ener = TableEner(df,flow_p, Tin_p, Tout_p,effHeater,Col)
+    table_ener = TableEner(df, Tin_p, Tout_p,effHeater,Col,year)
     infoEner.text = str(table_ener)
     
-    table_fuel = TableFuel(df,fuel,effHeater)
+    table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     infoFuel.text = str(table_fuel)
     
     # table_steam = TableSteam(df,turno,flow_p, Tin_p, Tout_p,effHeater,cond,T_cond,p_steam,fuel)
