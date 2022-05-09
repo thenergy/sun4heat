@@ -1470,24 +1470,21 @@ layout = column(Spacer(height=spc),
                 buttCalcEnergyYear,
                 row(p_year,Spacer(width=spc),table_bal_year),
                 row(infoEner,infoFuel, infoOpex),#infoSteam),
-                
+              
                 
                 Spacer(height=spc+30),
                 row(years_button_group),
                 buttCalcEnergyMonth,
                 row(p_month,Spacer(width=spc),table_bal_month),
               
-
-                
-                
                 Spacer(height=spc),
                 
                 row(CCol,CCol_inst,CBOP,C_instBOP,CSto),
                 row(Cinst_Sto,CCald,C_instCald,CPiping,C_instPiping),
                 Spacer(height=spc),
                 row(CHEX,C_instHEX,C_prepTerr,CIng,CDev),
-                row(fitm2,POPEX,CIng,CDev),
-                row(indexSolar,CFuel,indexFuel),
+                row(fitm2,POPEX,CIng,indexSolar,CFuel),
+                row(indexFuel,CostE),
 
                 
 
