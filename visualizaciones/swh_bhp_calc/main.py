@@ -768,7 +768,7 @@ Wkers = TextInput(value=str(Workers), title="Trabajadores (# Personas):",width=w
 WCost = TextInput(value=str(CostW), title="Costo mensual trabajador (US$/persona):",width=wdt)
 PercSST = TextInput(value=str(perc_SST), title="OPEX SST (% CAPEX SST):",width=wdt)
 PercCald = TextInput(value=str(perc_Cald), title="OPEX Caldera (% CAPEX Caldera):",width=wdt)
-PercAlmac = TextInput(value=str(perc_Almac), title="OPEX Almacenamiento (% CAPEX Almacenamiento):",width=wdt)
+PercAlmac = TextInput(value=str(perc_Almac), title="OPEX Almacenamiento (% CAPEX Almacenamiento):",width=wdt+20)
 PercPipHEX = TextInput(value=str(perc_PipHEX), title="OPEX Piping & HEX (% CAPEX Piping & HEX):",width=wdt)
 
 
@@ -1572,19 +1572,26 @@ layout = column(Spacer(height=spc),
               
                 Spacer(height=spc),
                 
+                
                 row(CCol, CCol_inst, C_instBOP),
                 row(CCald, C_instCald, CSto, Cinst_Sto), #CBOP,
                 row(CPiping, C_instPiping, CHEX, C_instHEX),
                 row(C_prepTerr, CIng, CDev),
+                row (buttCalcEcon),
                 row(infoCapexu),
                 Spacer(height=spc),
                 
-                row(fitm2,indexSolar,CFuel),#,POPEX
-                row(indexFuel,CostE),
+        
+                
+                row(VolAgua,CostAg,Wkers,WCost),
+                row(PercSST, PercCald, PercAlmac,Spacer(width=spc), PercPipHEX),
+                row (buttCalcEcon),
                 row(infoOpex),
                 
 
                 Spacer(height=spc+30),
+                row(fitm2,indexSolar,CFuel),#,POPEX
+                row(indexFuel,CostE),
                 row(anhoContr,anhoProy,anhoDepr,percDeuda),
                 row(tasaDeuda,pagoDeuda,tasaEqui,inflChile),
                 row (buttCalcEcon),
