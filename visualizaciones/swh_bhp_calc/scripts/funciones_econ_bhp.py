@@ -15,6 +15,14 @@ from funciones_bhp import flat_list
 path = '/home/diego/Documentos/sun4heat/'
 
 #path = '/home/ubuntu/sun4heat/'
+def TableRes(anho_contr,anho_proy):
+    table_res = pd.Series()
+    table_res['Supuestos'] = anho_contr
+    table_res['Años contrato'] = anho_contr
+    table_res['Años proyecto'] = anho_proy
+    
+    return table_res
+
 
 def TableCapex(aCol,costCol_m2,costInst_m2, cost_storage, vol, land_prep, fact_uso, cont, fit, fee, 
                table_inst, cHH_mec, cHH_mec_help, cHH_elec, cHH_elec_help):
@@ -65,11 +73,11 @@ def TableOpex(aCol,costCol_m2,SF_refresh,PM,consElectrico,costElectrico,nLimp,co
 
 def TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
                 CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
-                CDE_1, CDE_2):
+                CDE_1, CDE_2,FIT):
     
     CAPEX_eq = CEQ_1 + CEQ_3 + CEQ_4 + CEQ_5 + CEQ_6 #+ CEQ_2 
     CAPEX_inst =  CIN_1 + CIN_2 + CIN_3 + CIN_4 + CIN_5 + CIN_6 + CIN_7
-    CAPEX_dev = CDE_1 + CDE_2
+    CAPEX_dev = CDE_1 + CDE_2 + FIT
     
     table_capexu = pd.Series()
     table_capexu['CAPEX'] = ''
@@ -99,7 +107,14 @@ def TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
     table_capexu['CAPEX Desarrollo'] = ''
     table_capexu['Costo ingeniería']  = CDE_1
     table_capexu['Costo desarrollo'] = CDE_2
+    table_capexu['FIT'] = FIT
     table_capexu['CAPEX TOT Desarrollo'] = CAPEX_dev
+    table_capexu['--------------'] = '----------'
+    table_capexu['CAPEX TOTAL'] = CAPEX_dev + CAPEX_eq + CAPEX_inst
+    table_capexu['---------------'] = '----------'
+
+
+
 
        
     # table_capexu['Fracción solar: (%)'] = "{:10.1f}".format(colAnnual / procAnnual * 100)
