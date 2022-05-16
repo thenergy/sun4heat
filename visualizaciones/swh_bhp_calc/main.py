@@ -108,17 +108,17 @@ Tin_h  = Tout_h - (Tin_p - Tout_p)      # ºC
 # flujo de agua
 flow_h = flow_p     # m3/hr
 
-# Potenica caldera
-potHeater = 150
+# Potenica caldera (kWh)
+potHeater = 100
 
 # Eficiencia caldera
 effHeater = 75
 
-# Potencia bomba de calor
-potHPump = 150
+# Potencia bomba de calor (kWh)
+potHPump = 100
 
 # Eficiencia bomba de calor
-effHPump = 98
+copHPump = 2.0
 
 # % recuperación condensado
 cond = 30
@@ -366,19 +366,24 @@ df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 #########################################
 #           BALANCE ANUAL (por 20 años)
 #########################################
-
-
-enerProcYear,enerAux_pump, enerAux_cald, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,effHPump,year)
-# BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+potHeater = potHeater/1000
+potHPump = potHPump/1000 #kw a mw
 
 potHeater_year = potHeater*24*30.5*12
 potHPump_year = potHPump*24*30.5*12
 
 
+
+enerProcYear,enerAux_pump, enerAux_cald,enerSol, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater_year,effHeater,potHPump_year,copHPump,year)
+# BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+
+
+
+
 balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
 # balance_year['enerHeater'] = (balance_year.enerProc-balance_year.enerSol)/(effHeater/100)
-balance_year['enerHeater'] = potHeater_year*effHeater
-balance_year['enerHeatPump'] = potHPump_year*effHPump
+# balance_year['enerHeater'] = potHeater_year*effHeater
+# balance_year['enerHeatPump'] = potHPump_year*copHPump
 balance_year['Años'] = years_list
 # balance_year.loc['Total TWh/año'] = balance_year.sum(numeric_only=True, axis = 0)*10**(-6)
 # balance_year.Total.astype(str)
@@ -416,22 +421,23 @@ solFrac_year = totSol_year/totProc_year
 #########################################
 # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
-potHeater_month = potHeater*24*30.5
-potHPump_month = potHPump*24*30.5
+potHeater_month = potHeater*24*30.5*12 #hora a mes
+potHPump_month = potHPump*24*30.5*12 #hora a mes
+    
 
-enerProc, enerAux_pump, enerAux_cald, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,effHPump,year)
+enerProc, enerAux_pump, enerAux_cald, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater_month,effHeater,potHPump_month,copHPump,year)
 balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
-balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
-balance_year['enerHeater'] = potHeater_month*effHeater
-balance_year['enerHeatPump'] = potHPump_month*effHPump
+# balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
+# balance_year['enerHeater'] = potHeater_month*effHeater
+# balance_year['enerHeatPump'] = potHPump_month*copHPump
 balance['Meses'] = meses
 balance.loc['Total'] = balance.sum(numeric_only=True, axis = 0)
 
 source_bal_month = ColumnDataSource(data=balance)
     
-EnerHeaterOp = balance.enerHeater.sum()
+EnerHeaterOp = balance.enerCald.sum()
 
-table_ener = TableEner(df, Tout_h, Tin_h,potHeater,effHeater,potHPump,effHPump,Col,year)
+table_ener = TableEner(df, Tout_h, Tin_h,potHeater,effHeater,potHPump,copHPump,Col,year)
 table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,potHPump,effHeater, year)
 table_capexu = TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
                 CIN_1, CIN_2, CIN_3, CIN_4, CIN_5, CIN_6, CIN_7,
@@ -510,7 +516,9 @@ perc_PipHEX = 10
 table_eval,annual_res, annual_proy = LCOH_calc(CAPEX,OPEX,tasa_deuda, pago_deuda,perc_deuda,impuesto,tasa_equi,dif_infl,infl_cl,
                                   anho_contr,anho_proy,val_depr,anho_depr,totSol_year,indSol,indFuel,costFuel)
 
-table_opex = TableOpexY(Ecost,EnerHeaterOp,vol_agua,agua_cost,Workers,CostW,CEQ_1,CEQ_4,CEQ_2,
+potHPump_monthly = potHPump*24*30.5
+
+table_opex = TableOpexY(Ecost,EnerHeaterOp,potHPump_monthly,vol_agua,agua_cost,Workers,CostW,CEQ_1,CEQ_4,CEQ_2,
                COST_PIPHEX,perc_SST,perc_Cald,perc_Almac,perc_PipHEX)
 
 table_res_anho = TableRes(anho_contr,anho_proy)
@@ -614,8 +622,8 @@ Tout_proc = TextInput(value=str(Tout_p), title="Tout proceso:")
 eff_heater= TextInput(value=str(effHeater), title="Eficiencia caldera eléctrica (%):")
 pot_heater= TextInput(value=str(potHeater), title="Potencia caldera eléctrica (kWh):")
 
-eff_hpump= TextInput(value=str(effHPump), title="Eficiencia bomba de calor (%):")
-pot_hpump= TextInput(value=str(potHPump), title="Potencia bomba de calor (kWh):")
+cop_hpump= TextInput(value=str(copHPump), title="COP bomba de calor:")
+pot_hpump= TextInput(value=str(potHPump), title="Potencia térmica bomba de calor (kWh):")
 
 fuels = ['Diesel','GN','GLP','Kerosene','Petróleo 5','Petróleo 6','Carbón','Leña','Biomasa']
 dropdownFuel = Select(value='Diesel',title='Combustible',options=fuels)
@@ -653,7 +661,7 @@ p_year.vbar(x='x', top='ener', width=1.0, source=source_ener_year,
 p_year.xaxis.major_label_orientation = 1
 
 p_year.select_one(HoverTool).tooltips = [
-    ('Energía (MWh/año)', '@ener{0.0}')]
+    ('Energía (MWh/año)', '@ener{0.00}')]
 p_year.select_one(HoverTool).mode='vline'
 
 
@@ -663,7 +671,9 @@ cols_balance_year = [
         TableColumn(field="enerCald", title="E caldera eléctrica (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="enerHPump", title="E bomba de calor (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
-        TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
+        TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0")),
+        TableColumn(field="CaldF", title="Fracción cáldera eléctrica (%)",width=150, formatter=NumberFormatter(format="0.0")),
+        TableColumn(field="HPumpF", title="Fracción bomba de calor (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
 table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,width=600, height=450,
                       editable=True)
@@ -687,7 +697,7 @@ p_month.vbar(x='x', top='ener', width=1.0, source=source_ener_month,
 p_month.xaxis.major_label_orientation = 1
 
 p_month.select_one(HoverTool).tooltips = [
-    ('Energía (MWh/mes)', '@ener{0.0}')]
+    ('Energía (MWh/mes)', '@ener{0.00}')]
 p_month.select_one(HoverTool).mode='vline'
 
 
@@ -697,7 +707,9 @@ cols_balance_month = [
         TableColumn(field="enerCald", title="E caldera eléctrica (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="enerHPump", title="E bomba de calor (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
-        TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0"))]
+        TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0")),
+        TableColumn(field="CaldF", title="Fracción cáldera eléctrica (%)",width=150, formatter=NumberFormatter(format="0.0")),
+        TableColumn(field="HPumpF", title="Fracción bomba de calor (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
 table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,width=600, height=450,
                       editable=True)
@@ -1161,9 +1173,9 @@ def CalcSystemMonth(temp):
     
     # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
    
-    enerProc, enerAux_pump, enerAux_cald, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,effHPump,year)
+    enerProc, enerAux_pump, enerAux_cald,enersol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
-    balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
+    # balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
     balance_month['Meses'] = meses
     source_bal_month.data = balance_month
     
@@ -1219,7 +1231,7 @@ def CalcSystemYear():
     
     effHeater = float(eff_heater.value)
     potHeater = float(pot_heater.value)
-    effHPump = float(eff_hpump.value)
+    copHPump = float(cop_hpump.value)
     potHPump = float(pot_hpump.value)
     # fuel   = str(dropdownFuel.value)
     
@@ -1242,7 +1254,7 @@ def CalcSystemYear():
     
     df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
-    enerProc, enerAux_pump, enerAux_cald, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,effHPump,year)
+    enerProc, enerAux_pump, enerAux_cald,enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
     
     balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
     # balance_year['enerHeater'] = (balance_year.enerProc-balance_year.enerSol)/(effHeater/100)
@@ -1256,10 +1268,10 @@ def CalcSystemYear():
     source_ener_year.data = new_data_year
     # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
-    enerProc,  enerCald, enerHPump, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,effHPump,year)
+    enerProc,  enerCald, enerHPump, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
     # balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
-    # balance_month['Meses'] = meses
+    balance_month['Meses'] = meses
     balance_month.loc['Total TW/año'] = balance_month.sum(numeric_only=True, axis = 0)*10**(-6)
     # balance_year.iloc[21:22,4:5] = "TWh/año"
     source_bal_month.data = balance_month
@@ -1268,10 +1280,10 @@ def CalcSystemYear():
     new_data_month=dict(x=x_month, ener=ener_month)
     source_ener_month.data = new_data_month
     
-    table_ener = TableEner(df, Tin_p, Tout_p,potHeater,effHeater,potHPump,effHPump,Col,year)
+    table_ener = TableEner(df, Tin_p, Tout_p,potHeater,effHeater,potHPump,copHPump,Col,year)
     infoEner.text = str(table_ener)
     
-    table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    table_fuel = TableFuel(df,fuel,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,year)
     infoFuel.text = str(table_fuel)
     
     # table_steam = TableSteam(df,turno,flow_p, Tin_p, Tout_p,effHeater,cond,T_cond,p_steam,fuel)
@@ -1329,7 +1341,7 @@ def CalcEcon():
     infl_cl = float(inflChile.value)
     effHeater = float(eff_heater.value)
     potHeater= float(pot_heater.value)
-    effHPump = float(eff_hpump.value)
+    copHPump = float(cop_hpump.value)
     potHPump = float(pot_hpump.value)    
     aCol = float(areaCol.value)
     Ecost = float(CostE.value)
@@ -1349,9 +1361,18 @@ def CalcEcon():
     
 
     fuel = dropdownFuel.value
+    
+    potHeater = potHeater/1000
+    potHPump = potHPump/1000
 
+    potHeater_month = potHeater*24*30.5*12 #hora a mes
+    potHPump_month = potHPump*24*30.5*12 #hora a mes
+    
+    
     
 #    pry = dropdownProy.value
+
+    enerProc, enerAux_pump, enerAux_cald, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater_month,effHeater,potHPump_month,copHPump,year)
 
     
     balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+str(year)+'.csv')
@@ -1424,13 +1445,15 @@ def CalcEcon():
 
     CAPEX = CAPEX_eq + CAPEX_inst + CAPEX_dev + Cont_tot + Util_tot + FIT
     
-    EnerYear_op = balance.enerHeater.sum()
+    EnerYear_op = balance.enerCald.sum()
     
     # OPEX = Ecost*EnerYear_op
     
     COST_PIPHEX = CEQ_5+CEQ_6
     
-    table_opex = TableOpexY(Ecost,EnerYear_op,vol_agua,agua_cost,Workers,CostW,CEQ_1,CEQ_4,CEQ_2,
+    EnerElectrPump = float(balance.ElectrHPump.unique())
+    
+    table_opex = TableOpexY(Ecost,EnerYear_op,EnerElectrPump,vol_agua,agua_cost,Workers,CostW,CEQ_1,CEQ_4,CEQ_2,
                    COST_PIPHEX,perc_SST,perc_Cald,perc_Almac,perc_PipHEX)
     
     
@@ -1603,7 +1626,7 @@ layout = column(Spacer(height=spc),
                 
                 row(Tin_proc,Tout_proc,dropdownFuel),#,flow_proc,selectTurno),
                 row(pot_heater,eff_heater),
-                row(pot_hpump,eff_hpump),#,dropdownFluid
+                row(pot_hpump,cop_hpump),#,dropdownFluid
                 # row(presion_vapor,perc_cond),
                 row(selectCol,areaCol,vol_sto,loss_sto),
                 buttCalcEnergyYear,

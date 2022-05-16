@@ -245,7 +245,7 @@ def RadMonth(df_temp):
 #     return rad_month,x_month
 
 
-def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,effHPump,year):   
+def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,copPump,year):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos anuales.
 
@@ -308,7 +308,10 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
         # enerAux_pump = (enerProc - enerSol)/(effHPump/100)
         # enerAux_cald = enerAux_pump/(effheater/100)
         
-        enerAux_pump = potHPump*(effHPump/100) #effHPump = cop (pero en valores de XXX% )
+        
+   
+        enerAux_pump = potHPump #effHPump = cop (pero en valores de XXX% )
+        enerElectr_pump = potHPump/copPump
         enerAux_cald = potHeater*(effheater/100)
 
         enerSto = df_temp['Qsto'].groupby(df_temp.index.year).sum()/1000
@@ -317,9 +320,17 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
         bal_year = pd.DataFrame(enerProc,index=np.arange(2018,2019))
         bal_year['Qsol'] = enerSol
         bal_year['SF'] = bal_year.Qsol / bal_year.Qproc * 100
-        bal_year = bal_year.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
+        
         bal_year['enerHPump'] = enerAux_pump*24*30.5*12 # *horas*dias*meses
         bal_year['enerCald'] = enerAux_cald*24*30.5*12 # *horas*dias*meses
+        bal_year['ElectrHPump'] = enerElectr_pump*24*30.5*12 # *horas*dias*meses
+
+        
+        bal_year['CaldF'] = bal_year.enerCald / bal_year.Qproc * 100
+        bal_year['HPumpF'] = bal_year.enerHPump / bal_year.Qproc * 100
+        
+        bal_year = bal_year.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
+
         bal_year['enerPeak'] = enerPeak
         bal_year['enerSto'] = enerSto
         
@@ -346,10 +357,10 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
     bal_years.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv', index = None)
         
 
-    return  enerProc, enerAux, bal_years.enerSol, enerPeak, enerSto #, enerDis
+    return  enerProc, bal_years.enerHPump,bal_years.enerCald, bal_years.enerSol, enerPeak, enerSto #, enerDis
     # return  enerProc_list, enerAux_list, enerSol_list, enerPeak_list, enerSto_list #, enerDis
 
-def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,effHPump,year,):   
+def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,copPump,year,):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos mensuales.
 
@@ -397,21 +408,35 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     # enerAux_pump = (enerProc - enerSol)/(effHPump/100)
     # enerAux_cald = enerAux_pump/(effheater/100)
     
-    enerAux_pump = potHPump*effHPump
-    enerAux_cald = potHeater*effheater
+    potHPump = potHPump/1000 #(kwh a mwh)
+    potHeater = potHeater/1000
     
+    potHeater = potHeater*24*30.5 #hora a mes
+    potHPump = potHPump*24*30.5 #hora a mes
+    
+    enerAux_pump = potHPump
+    enerElectr_pump = potHPump/copPump
+    enerAux_cald = potHeater*(effheater/100)
     enerSto = df_temp['Qsto'].groupby(df_temp.index.month).sum()/1000
     enerPeak = df_temp['Qpeak'].groupby(df_temp.index.month).sum()/1000
     
     bal_month = pd.DataFrame(enerProc,index=np.arange(1,13))
     bal_month['Qsol'] = enerSol
     bal_month['SF'] = bal_month.Qsol / bal_month.Qproc * 100
-    bal_month = bal_month.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
+
+
+
     # bal_month['enerAux'] = potHPump*effHPump
     
-    bal_month['enerHPump'] = enerAux_pump*24*30.5
-    bal_month['enerCald'] = enerAux_cald*24*30.5
+    bal_month['enerHPump'] = enerAux_pump*24*30.5 # *horas*dias en un mes
+    bal_month['enerCald'] = enerAux_cald*24*30.5 # *horas*dias en un mes
+    bal_month['ElectrHPump'] = enerElectr_pump*24*30.5 # *horas*dias en un mes
 
+    
+    bal_month['CaldF'] = bal_month.enerCald / bal_month.Qproc * 100
+    bal_month['HPumpF'] = bal_month.enerHPump / bal_month.Qproc * 100
+
+    bal_month = bal_month.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
         
     bal_month['enerPeak'] = enerPeak
     bal_month['enerSto'] = enerSto
@@ -419,7 +444,7 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     
     bal_month.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
     
-    return  enerProc, enerAux_pump, enerAux_cald, bal_month.enerSol, enerPeak, enerSto #, enerDis
+    return  enerProc, bal_month.enerHPump, bal_month.enerCald, bal_month.enerSol, enerPeak, enerSto #, enerDis
  
 def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
     ener = ['Proceso','Ener Total','Caldera eléctrica','Bomba de calor','Ener Solar']
@@ -564,7 +589,7 @@ def TableEnerYear(df_temp,Tout_h, Tin_h,eff_heater,Col,year):
     return table_ener
 
 
-def TableEner(df_temp,Tout_h, Tin_h,pot_heater,eff_heater,pot_hpump,eff_hpump,Col,year):
+def TableEner(df_temp,Tout_h, Tin_h,pot_heater,eff_heater,pot_hpump,cop_hpump,Col,year):
     '''
     Genera una tabla (Pandas Serie) que contiene información respecto
     a la caldera, sistema solar y balance de energía 
@@ -624,9 +649,9 @@ def TableEner(df_temp,Tout_h, Tin_h,pot_heater,eff_heater,pot_hpump,eff_hpump,Co
 
     table_ener = pd.Series()
     table_ener['Caldera eléctrica'] = ''
-    table_ener['Potencia caldera eléctrica (kW)'] = pot_heater
+    table_ener['Potencia caldera eléctrica (kWh)'] = pot_heater
     table_ener['Eficiencia caldera eléctrica (%)'] = eff_heater
-    table_ener['Potencia real caldera eléctrica (kW)'] = pot_heater*(eff_heater/100)
+    table_ener['Potencia real caldera eléctrica (kWh)'] = pot_heater*(eff_heater/100)
     table_ener['Fracción caldera eléctrica: (%)'] = "{:10.1f}".format(CaldAnnual/procAnnual*100)
     table_ener['---------'] = '---------'
     
@@ -636,11 +661,11 @@ def TableEner(df_temp,Tout_h, Tin_h,pot_heater,eff_heater,pot_hpump,eff_hpump,Co
     
     
     table_ener['Bomba de calor'] = ''
-    table_ener['Potencia Bomba de calor (kW)'] = pot_hpump
-    table_ener['COP Bomba de calor'] = eff_hpump/100
-    table_ener['Potencia real Bomba de calor'] = pot_hpump*(eff_hpump/100)
+    table_ener['Potencia calórica Bomba de calor (kWh)'] = pot_hpump
+    table_ener['COP Bomba de calor'] = cop_hpump
+    table_ener['Potencia eléctrica Bomba de calor'] = pot_hpump/cop_hpump
     table_ener['Fracción bomba de calor: (%)'] = "{:10.1f}".format(HpumpAnnual//procAnnual*100)
-    table_ener['---------'] = '---------'
+    table_ener['-----------'] = '-----------'
     
     # table_ener['Potencia caldera (kW)'] = "{:10.1f}".format(heater_pow)
     # table_ener['Potencia caldera (kcal/hr)'] = "{:10.1f}".format(heater_pow*3600/4.184)
@@ -659,7 +684,7 @@ def TableEner(df_temp,Tout_h, Tin_h,pot_heater,eff_heater,pot_hpump,eff_hpump,Co
     table_ener['Demanda energía proceso (MWh/año): '] = "{:10.1f}".format(procAnnual)
     table_ener['Demanda energía convencional(MWh/año): '] = "{:10.1f}".format(procAnnual/(eff_heater/100))
     table_ener['Generación caldera eléctrica (MWh/año): '] = "{:10.1f}".format(CaldAnnual/(eff_heater/100))
-    table_ener['Generación bomba de calor (MWh/año): '] = "{:10.1f}".format(HpumpAnnual/(eff_hpump/100))
+    table_ener['Generación bomba de calor (MWh/año): '] = "{:10.1f}".format(HpumpAnnual)
     table_ener['Generación solar (MWh/año): '] = "{:10.1f}".format(colAnnual)
     table_ener['Reemplazo solar equivalente (MWh/año): '] = "{:10.1f}".format(colAnnual/(eff_heater/100))
 #    table_ener['Energía solar disipada (MWh/año): '] = "{:10.1f}".format(disAnnual)

@@ -122,29 +122,41 @@ def TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
     
     return table_capexu
 
-def TableOpexY(Ecost,EnerHeater,vol_agua,agua_cost,Workers,WCost,CapexSST,CapexCald,CapexAlmac,
+def TableOpexY(Ecost,EnerHeater,EnerHPump,vol_agua,agua_cost,Workers,WCost,CapexSST,CapexCald,CapexAlmac,
                CapexPipHEX,percSST,percCald,percAlmac,percPipHEX):
+    
+    #Costo operacionales
     OPEX_cald = Ecost*EnerHeater
     OPEX_agua = vol_agua*agua_cost
     OPEX_WK = Workers*WCost*12
+    OPEX_hpump = EnerHPump*Ecost
     
+    #Costo mantención x equipo
     OPEX_SST = CapexSST*percSST/100
     OPEX_Cald = CapexCald*percCald/100
     OPEX_Almac= CapexAlmac*percAlmac/100
     OPEX_PipHEX = CapexPipHEX*percPipHEX/100
+    # OPEX_HPump = CapexHPump*percHPump/100
 
-    OPEX_eq = OPEX_SST + OPEX_Cald + OPEX_Almac + OPEX_PipHEX
+
+    OPEX_eq = OPEX_SST + OPEX_Cald + OPEX_Almac + OPEX_PipHEX #+ OPEX_HPump
     
-    OPEX_tot = OPEX_cald + OPEX_agua + OPEX_WK + OPEX_eq
+    OPEX_tot = OPEX_cald + OPEX_agua + OPEX_WK + OPEX_eq + OPEX_hpump
     
     table_opex = pd.Series()
     
     table_opex['OPEX'] = ''
     table_opex['--------------'] = '----------------'
     table_opex['Caldera eléctrica'] = ''
-    table_opex['Energía suministrada a caldera anual (kW)'] = EnerHeater
+    table_opex['Energía eléctrica suministrada a caldera anual (kW)'] = EnerHeater
     table_opex['Costo energía eléctrica (US$/kW)'] = Ecost
     table_opex['OPEX Caldera (US$)'] = OPEX_cald
+    
+    table_opex['---------------'] = '-----------------'
+    table_opex['Bomba de calor'] = ''
+    table_opex['Energía eléctrica suministrada a bomba de calor (kW)'] = EnerHPump
+    table_opex['Costo energía eléctrica (US$/kW)'] = Ecost
+    table_opex['OPEX Caldera (US$)'] = OPEX_hpump
     
     table_opex['------------'] = '----------------'
     table_opex['Agua'] = ''
@@ -159,7 +171,7 @@ def TableOpexY(Ecost,EnerHeater,vol_agua,agua_cost,Workers,WCost,CapexSST,CapexC
     table_opex['OPEX Personal (US$) (anual)'] = OPEX_WK
     
     table_opex['-------------'] = '----------------'
-    table_opex['OPEX EQUIPOS'] = ''
+    table_opex['OPEX MANTENCIÓN EQUIPOS'] = ''
     table_opex['---------------'] = '----------------'
 
     table_opex['OPEX SST (% CAPEX SST)'] = percSST
