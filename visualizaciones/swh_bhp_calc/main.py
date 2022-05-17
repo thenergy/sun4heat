@@ -109,13 +109,13 @@ Tin_h  = Tout_h - (Tin_p - Tout_p)      # ºC
 flow_h = flow_p     # m3/hr
 
 # Potenica caldera (MWh)
-potHeater = 100
+potHeater = 1
 
 # Eficiencia caldera
 effHeater = 75
 
 # Potencia bomba de calor (MWh)
-potHPump = 100
+potHPump = 1
 
 # Eficiencia bomba de calor
 copHPump = 2.0
@@ -1623,7 +1623,9 @@ layout = column(Spacer(height=spc),
                 row(pot_hpump,cop_hpump),#,dropdownFluid
                 # row(presion_vapor,perc_cond),
                 row(selectCol,areaCol,vol_sto,loss_sto),
+                
                 buttCalcEnergyYear,
+                
                 row(p_year,Spacer(width=spc),table_bal_year),
                 row(infoEner,infoFuel),#infoSteam),
               

@@ -330,6 +330,9 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
                 enerHPump_util.append(0)
                 enerHPump_excess.append(0)
                 
+                enerCald_util.append(0)
+                enerCald_excess.append(0)     
+                
             elif eProc <= eqpPrm:
                 esol.append(eSol)
                 edis.append(0)
@@ -367,19 +370,19 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
                 
                 
                 
-            enerSol = pd.Series(esol,index=np.arange(1,2))
-            # enerProcs = pd.Series(eProcs,index=np.arange(1,2))
-        
+        enerSol = pd.Series(esol,index=np.arange(1,2))
+        # enerProcs = pd.Series(eProcs,index=np.arange(1,2))
+    
 
     # Energía utilizada bomba de calor 
         enerHPump_util = pd.Series(enerHPump_util,index=np.arange(1,2))
         
     # Exceso de energía bomba de calor 
         enerHPump_excess = pd.Series(enerHPump_excess,index=np.arange(1,2))
-
+    
     # Energía utilizada caldera 
         enerCald_util = pd.Series(enerCald_util,index=np.arange(1,2))
-
+    
     # Exceso de energía caldera     
         enerCald_excess = pd.Series(enerCald_excess,index=np.arange(1,2))
 
@@ -387,25 +390,25 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
         enerPeak = df_temp['Qpeak'].groupby(df_temp.index.year).sum()/1000
                
         bal_year = pd.DataFrame(enerProc,index=np.arange(2018,2019))
-        bal_year['Qsol'] = enerSol
-        bal_year['SF'] = bal_year.Qsol / bal_year.Qproc * 100
+        bal_year['Qsol'] = float(enerSol)
+        bal_year['SF'] = float(bal_year.Qsol / bal_year.Qproc * 100)
         
-        bal_year['enerHPump_util'] = enerHPump_util
-        bal_year['enerHPump_excess'] =  enerHPump_excess
+        bal_year['enerHPump_util'] = float(enerHPump_util)
+        bal_year['enerHPump_excess'] =  float(enerHPump_excess)
 
-        bal_year['enerCald_util'] = enerCald_util
-        bal_year['enerCald_excess'] = enerCald_excess
+        bal_year['enerCald_util'] = float(enerCald_util)
+        bal_year['enerCald_excess'] = float(enerCald_excess)
         
-        bal_year['ElectrHPump'] = enerElectrYear_pump 
+        bal_year['ElectrHPump'] = float(enerElectrYear_pump )
 
-        bal_year['HPumpF'] = bal_year.enerHPump_util / bal_year.Qproc * 100
-        bal_year['CaldF'] = bal_year.enerCald_util / bal_year.Qproc * 100
+        bal_year['HPumpF'] = float(bal_year.enerHPump_util / bal_year.Qproc * 100)
+        bal_year['CaldF'] = float(bal_year.enerCald_util / bal_year.Qproc * 100)
         
         
         bal_year = bal_year.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
 
-        bal_year['enerPeak'] = enerPeak
-        bal_year['enerSto'] = enerSto
+        bal_year['enerPeak'] = float(enerPeak)
+        bal_year['enerSto'] =float(enerSto)
         
         
         bal_years = pd.concat([bal_years,bal_year], ignore_index=True)
@@ -504,6 +507,9 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
             
             enerHPump_util.append(0)
             enerHPump_excess.append(0)
+        
+            enerCald_util.append(0)
+            enerCald_excess.append(0)     
             
         elif eProc <= eqpPrm:
             esol.append(eSol)
