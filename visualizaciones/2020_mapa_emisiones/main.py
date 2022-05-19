@@ -306,9 +306,22 @@ def IDequipo(df):
 
     """
     clds = []
+    calnum = []
+    calderas = ['CF','CA','CG','CR','IN']
+
     for cld in df.fuente_emision:
+        cld = cld[0:2]
         clds.append(cld[0:2])
+        
+        if cld  in calderas:
+            calnum.append(1)
+        else:
+            calnum.append(0)
+        
+        
+        
     df["equipo"] = clds
+    df["calnum"] = calnum
 
     return df
 
@@ -470,6 +483,7 @@ def IndusFilt(df, min_ton, max_ton):
             "ton_emision": "sum",
             'ener_cons_CO2':"sum",
             "n_equip": "sum",
+            "calnum":"sum",
             "raz_social": "first",
             "nombre": "first",
             "rubro": "first",
@@ -672,8 +686,9 @@ def TableResumen(df):
     table_res = pd.Series()
     
     table_res['Resumen totales tabla del mapa'] = ''
+    table_res['Número de calderas'] = df.calnum.sum()
     table_res['Miles de Toneladas de emisión anual (miles T/año)' ] = tot_emis/1000
-    table_res['Energía consumida anual (GWh/año)'] = tot_ener_cons*(10**(3))/3600
+    table_res['Energía consumida anual (MWh/año)'] = tot_ener_cons*(10**(0))/3600
     table_res['Total empresas'] = tot_empresas
 
     return table_res
