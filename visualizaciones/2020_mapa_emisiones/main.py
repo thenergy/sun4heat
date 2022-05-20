@@ -674,7 +674,8 @@ def emission_to_energy(df, df2):
     map_dict = df2.set_index('ccf8').T.to_dict('index')
     
     df['fc_emis_prim'] = df.ccf8.map(map_dict['ener_emis'])   
-    df['ener_cons_CO2'] = df.ton_emision/df.fc_emis_prim
+    df.fc_emis_prim = df.fc_emis_prim/1000 #kg a ton
+    df['ener_cons_CO2'] = (df.ton_emision/df.fc_emis_prim)/3600
     
     return df
 
@@ -688,14 +689,14 @@ def TableResumen(df):
     table_res['Resumen totales tabla del mapa'] = ''
     table_res['Número de calderas'] = df.calnum.sum()
     table_res['Miles de Toneladas de emisión anual (miles T/año)' ] = tot_emis/1000
-    table_res['Energía consumida anual (MWh/año)'] = tot_ener_cons*(10**(0))/3600
+    table_res['Energía consumida anual (TWh/año)'] = (tot_ener_cons)
     table_res['Total empresas'] = tot_empresas
 
     return table_res
 
 
 # ########################################################################################
-# crear dataframe (df) indus
+# crear dataframe (df) indus 
 indus = ReadIndus()
 base = readccf8()
 
@@ -769,7 +770,7 @@ pt_size = np.log(indus_ft.ton_emision)
 indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
 # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
-indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
+# indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
 
 
 # Definir nuevo ID por fuente de emisión
@@ -800,7 +801,7 @@ columns = [
         width=30,
         formatter=NumberFormatter(format="0.0"),
     ),
-    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TJ/año)", width=30, formatter=NumberFormatter(format="0.0"),),
+    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TWh/año)", width=30, formatter=NumberFormatter(format="0.0"),),
     TableColumn(field="region", title="Región", width=50),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
@@ -854,7 +855,7 @@ p1.add_tools(
             ("Nombre: ", "@nombre"),
             ("Region: ", "@region"),
             ("Emisiones (ton/año): ", "@ton_emision{0.00}"),
-            ("Energía consumida MWh/año): ", "@ener_cons_CO2{0.00}"),
+            ("Energía consumida TWh/año): ", "@ener_cons_CO2{0.00}"),
             ("Rubro: ", "@rubro"),
             ("Combustible Primario: ", "@combustible_prim"),
         ],
@@ -1129,7 +1130,7 @@ def UpdateTable():
     indus_ft["clr"] = indus_ft.rubro.map(clr)
     # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
 
-    indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
+    # indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
 
     table_res = TableResumen(indus_ft)
     InfoRes.text = str(table_res)

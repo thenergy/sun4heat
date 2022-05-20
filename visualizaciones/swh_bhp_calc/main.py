@@ -30,9 +30,7 @@ meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sept
 # path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 path = '/home/diego/Documentos/sun4heat/'
 
-years = np.arange(2024,2045)
-years = list(years)
-years_list = list(map(str, years))
+
 
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
       'Sunmark HT-SolarBoost':    {'n0':0.850,'a1':2.300,'a2':0.02900,'color':'green'},
@@ -60,10 +58,11 @@ minas = pd.read_csv('/home/diego/Documentos/sun4heat/datos/radiacion_solar/minas
 
 # ciudades = pd.read_csv('/home/ubuntu/Thenergy/diego/sun4heat/datos/radiacion_solar/ciudades.csv',sep=',')
 
-lugar = 'Spence'
+lugar = 'Escondida'
 data_lugar = minas[minas.Mina == lugar]
 ghi_sg = data_lugar.GHI_SG.iloc[0]
 dataSol = 'Explorador Solar'
+
 
 df = CopyRadFile(lugar,dataSol)
 table_rad = TableRad(df)

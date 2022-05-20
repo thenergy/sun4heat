@@ -271,9 +271,23 @@ def IDequipo(df):
 
     """
     clds = []
+    calnum = []
+    calderas = ['CF','CA','CG','CR','IN']
+    
     for cld in df.fuente_emision:
+        cld = cld[0:2]
         clds.append(cld[0:2])
+        
+        if cld  in calderas:
+            calnum.append(1)
+        else:
+            calnum.append(0)
+        
+        
+        
     df["equipo"] = clds
+    df["calnum"] = calnum
+
 
     return df
 
@@ -426,15 +440,14 @@ def IndusFilt(df, min_ton, max_ton):
 
     """
     df["n_equip"] = 1
-    df = df.sort_values("ton_emision", ascending=False).drop_duplicates(
-        "fuente_emision"
-    )
+    df = df.sort_values("ton_emision", ascending=False)#.drop_duplicates("fuente_emision")
 
     indus_gr = df.groupby(["ID"]).agg(
         {
             "ton_emision": "sum",
             'ener_cons_CO2':"sum",
             "n_equip": "sum",
+            "calnum": "sum",
             "raz_social": "first",
             "nombre": "first",
             "rubro": "first",
@@ -626,8 +639,9 @@ def emission_to_energy(df, df2):
     
     # merge = pd.merge(df,df2, left_on=('fuente_emision'), right_on=('fuente') )
     
-    df['fc_emis_prim'] = df.fuente_emision.map(map_dict['ener_emis'])   
-    df['ener_cons_CO2'] = df.ton_emision/df.fc_emis_prim
+    df['fc_emis_prim'] = df.fuente_emision.map(map_dict['ener_emis'])
+    df.fc_emis_prim = df.fc_emis_prim/1000 #kg a ton
+    df['ener_cons_CO2'] = (df.ton_emision/df.fc_emis_prim)/3600 #queda en TWh/año
     
     # indus = indus.dropna(subset=(["ton_emision", "coord_este", "coord_norte",'tipo_fuente']))#,"ener_cons_CO2"]))  
     df.fillna(int('0'))
@@ -642,8 +656,11 @@ def TableResumen(df):
     table_res = pd.Series()
     
     table_res['Resumen totales tabla del mapa'] = ''
+    table_res['Número de calderas'] = df.calnum.sum()
     table_res['Miles de Toneladas de emisión anual (miles T/año)' ] = tot_emis/1000
-    table_res['Energía consumida anual (GWh/año)'] = (tot_ener_cons*(10**(3))/3600)
+    # table_res['Toneladas de emisión por hora (Ton/h)' ] = tot_emis/8760
+
+    table_res['Energía consumida anual (TWh/año)'] = (tot_ener_cons)
     table_res['Total empresas'] = tot_empresas
     
 
@@ -727,7 +744,7 @@ indus_ft["pt_size"] = pt_size
 indus_ft["clr"] = indus_ft.rubro.map(clr)
 # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
 
-indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
+# indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
 
 # Definir nuevo ID por fuente de emisión
 indus["f_ind"] = indus.fuente_emision
@@ -760,7 +777,7 @@ columns = [
         width=30,
         formatter=NumberFormatter(format="0.0"),
     ),
-    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (MWh/año)", width=30, formatter=NumberFormatter(format="0.0"),),
+    TableColumn(field="ener_cons_CO2", title="Energía consumida anual (TWh/año)", width=30, formatter=NumberFormatter(format="0.0"),),
     TableColumn(field="region", title="Región", width=50),
     TableColumn(field="combustible_prim", title="Combustible Primario", width=50),
     TableColumn(field="rubro", title="Rubro RETC", width=60),
@@ -816,7 +833,7 @@ p1.add_tools(
             ("Nombre: ", "@nombre"),
             ("Region: ", "@region"),
             ("Emisiones (ton/año): ", "@ton_emision{0.00}"),
-            ("Energía consumida MWh/año): ", "@ener_cons_CO2{0.00}"),
+            ("Energía consumida TWh/año): ", "@ener_cons_CO2{0.00}"),
             ("Rubro: ", "@rubro"),
             ("Combustible Primario: ", "@combustible_prim"),
         ],
@@ -847,7 +864,7 @@ columns_empr = [
     ),
     TableColumn(
         field="ener_cons_CO2",
-        title="Energía consumida anual (TJ/año)",
+        title="Energía consumida anual (TWh/año)",
         width=25,
         formatter=NumberFormatter(format="0.0"),
     ),
@@ -1091,7 +1108,7 @@ def UpdateTable():
     indus_ft["clr"] = indus_ft.rubro.map(clr)
     # indus_ft["clr_combus"]  = indus_ft.combustible_prim.map(clr_combs)
     
-    indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2*(10**6)/3600
+    # indus_ft.ener_cons_CO2 = indus_ft.ener_cons_CO2/3600
 
 
     table_res = TableResumen(indus_ft)
