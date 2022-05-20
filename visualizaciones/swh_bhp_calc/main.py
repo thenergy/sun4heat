@@ -30,6 +30,10 @@ meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sept
 # path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 path = '/home/diego/Documentos/sun4heat/'
 
+years = np.arange(2024,2045)
+years = list(years)
+years_list = list(map(str, years))
+
 
 
 cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'red'},
@@ -1214,6 +1218,9 @@ def CalcSystemYear():
 
     '''
     df   = CalcRad()
+    
+    lugar = dropdownData.value
+    
     tilt = float(incl.value)
     azim = float(orie.value)
     
@@ -1228,6 +1235,17 @@ def CalcSystemYear():
     potHPump = float(pot_hpump.value)
     # fuel   = str(dropdownFuel.value)
     
+    if lugar == "Escondida":
+        years = np.arange(2024,2045)
+        years = list(years)
+        years_list = list(map(str, years))
+        years_button_group.options = years_list
+    else:
+        years = np.arange(2025,2037)
+        years = list(years)
+        years_list = list(map(str, years))
+        years_button_group.options = years_list
+        
     year = int(years_button_group.active)
     year = years[year]
     
