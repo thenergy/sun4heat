@@ -645,7 +645,7 @@ buttCalcEnergyMonth = Button(label="Calcular balance mensual", button_type="succ
 ####################################
 #GRAFICO BALANCE DE ENERGÍA ANUAL
 ####################################
-ener = ['Proceso','Ener Total','Caldera eléctrica','Bomba de calor','Ener Solar']
+ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
 ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year) ####################
 source_ener_year = ColumnDataSource(data=dict(x=x_year, ener=ener_year))
 palette = ["red", "yellow", "black","blue","orange"]
@@ -656,6 +656,7 @@ p_year.vbar(x='x', top='ener', width=1.0, source=source_ener_year,
       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
       line_color='white')
 p_year.xaxis.major_label_orientation = 1
+p_year.left[0].formatter.use_scientific = False
 
 p_year.select_one(HoverTool).tooltips = [
     ('Energía (MWh/año)', '@ener{0.00}')]

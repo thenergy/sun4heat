@@ -597,7 +597,7 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     return  bal_month.enerProc, bal_month.enerHPump_util, bal_month.enerCald_util, bal_month.enerSol, enerPeak, enerSto #, enerDis
  
 def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
-    ener = ['Proceso','Ener Total','Caldera eléctrica','Bomba de calor','Ener Solar']
+    ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
 #    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
@@ -616,7 +616,7 @@ def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
     # yearSto = balance_year.enerSto
 
     
-    ener_year = [(proc,total,cald,hpump,solar) for proc,total,cald,hpump,solar in zip(yearProc,yearTotal,yearCald,yearHPump,yearSol)]
+    ener_year = [(proc,total,solar,hpump,cald) for proc,total,solar,hpump,cald in zip(yearProc,yearTotal,yearSol,yearHPump,yearCald)]
     ener_year = flat_list(ener_year)
 
 
@@ -627,7 +627,7 @@ def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
 
   
 def SystemMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater, year):
-    ener = ['Proceso','Ener Total','Caldera eléctrica','Bomba de calor','Ener Solar']
+    ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
 #    col = df_temp['Qdel'].groupby(df_temp.index.month).sum()/1000
@@ -643,7 +643,7 @@ def SystemMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater, year):
     # monthAux = balance_month.enerAux
     monthSol = balance_month.enerSol
     
-    ener_month = [(proc,total,cald,hpump,solar) for proc,total,cald,hpump,solar in zip(monthProc,monthTotal,monthCald,monthHPump,monthSol)]
+    ener_month = [(proc,total,solar,hpump,cald) for proc,total,solar,hpump,cald in zip(monthProc,monthTotal,monthSol,monthHPump,monthCald)]
     ener_month = flat_list(ener_month)
     
     x_month = [(month,enr) for month in meses for enr in ener]
