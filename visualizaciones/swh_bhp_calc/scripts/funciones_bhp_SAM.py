@@ -84,7 +84,7 @@ def CopyRadFile(lugar,data):
     return df_temp
 
 
-def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss,year):
+def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss,year, lugar):
     '''
     Realiza la simulación en SAM en función de los parámetros establecidos, obteniendo
     las variables de interes.
@@ -132,9 +132,18 @@ def CallSWH(df_temp,tilt,azim,Col,area,vol,sto_loss,year):
 
     
     ssc.data_set_string( dataSam, b'solar_resource_file', path.encode() + b'datos/radiacion_solar/TMY_SAM.csv' );
-    ssc.data_set_array_from_csv( dataSam, b'scaled_draw', path.encode() + b'visualizaciones/swh_bhp_calc/resultados/load_profile/scaled_draw_'+ str(year).encode('ascii')+ b'.csv')
-
-
+    
+    if lugar == 'Escondida':
+        ssc.data_set_array_from_csv( dataSam, b'scaled_draw', path.encode() + b'visualizaciones/swh_bhp_calc/resultados/load_profile/scaled_draw_'+ str(year).encode('ascii')+ b'.csv')
+    else:
+        if int(year) > 2036:
+            year = 2036
+            ssc.data_set_array_from_csv( dataSam, b'scaled_draw', path.encode() + b'visualizaciones/swh_bhp_calc/resultados/load_profile_spence/scaled_draw_'+ str(year).encode('ascii')+ b'.csv')
+        elif int(year) < 2025:
+            year = 2025
+            ssc.data_set_array_from_csv( dataSam, b'scaled_draw', path.encode() + b'visualizaciones/swh_bhp_calc/resultados/load_profile_spence/scaled_draw_'+ str(year).encode('ascii')+ b'.csv')
+        else:
+            ssc.data_set_array_from_csv( dataSam, b'scaled_draw', path.encode() + b'visualizaciones/swh_bhp_calc/resultados/load_profile_spence/scaled_draw_'+ str(year).encode('ascii')+ b'.csv')
 
 
     ssc.data_set_number( dataSam, b'system_capacity', 773.8553466796875 )

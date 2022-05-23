@@ -25,9 +25,16 @@ cp_w = 4.18
 
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
-years = np.arange(2024,2045)
+years_escondida = np.arange(2024,2045)
 # years = [str(x) for x in years]
-years = list(map(str, years))
+years_escondida = list(map(str, years_escondida))
+
+########################################################3
+
+years_spence = np.arange(2025,2037)
+
+years_spence = list(map(str, years_spence))
+
 
 
 
@@ -97,12 +104,12 @@ def TableRad(df_tmp):
     table_rad['DNI (kWh/m2/año): '] = "{:10.1f}".format(df_tmp.dni.sum()/1000)    
     return table_rad
 
-def MaxFlujo(df,tilt,azim,Col,aCol,vol,sto_loss,anho):
+def MaxFlujo(df,tilt,azim,Col,aCol,vol,sto_loss,anho,lugar):
     r = 0
     yr = 0
     mh = 0
     for anho in np.arange(2024,2045):
-        df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,anho) 
+        df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,anho,lugar) 
         list_df = list(df.flow.unique())
 
         for i in np.arange(0,12):
@@ -245,7 +252,7 @@ def RadMonth(df_temp):
 #     return rad_month,x_month
 
 
-def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,copPump,year):   
+def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,copPump,year,lugar):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos anuales.
 
@@ -290,9 +297,14 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
     
     enerAuxYear_cald = potHeater*(effheater/100)*8760
     
+    if lugar == "Escondida":
+        years = years_escondida
+    else:
+        years = years_spence
+    
     for year in years:
         
-        df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year)
+        df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year,lugar)
         # df_temp.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/CallSwh_anuales/CallSWH_' + str(year) + '.csv', index = None)
 
         
@@ -436,7 +448,7 @@ def BalanceYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potH
     return  enerProc, bal_years.enerHPump_util,bal_years.enerCald_util, bal_years.enerSol, enerPeak, enerSto #, enerDis
     # return  enerProc_list, enerAux_list, enerSol_list, enerPeak_list, enerSto_list #, enerDis
 
-def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,copPump,year,):   
+def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,copPump,year,lugar):   
     '''
     Los datos obtenidos por hora los suma y convierte en datos mensuales.
 
@@ -459,7 +471,19 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
         DESCRIPTION.
 
     '''
-    df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year)
+    
+    if lugar == 'Spence':
+        if int(year) > 2036:
+            year = 2036
+        elif int(year) < 2025:
+            year = 2025
+        else:
+            pass
+    else:
+        pass
+
+
+    df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year,lugar)
     
 #############################################
 
@@ -596,7 +620,7 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     
     return  bal_month.enerProc, bal_month.enerHPump_util, bal_month.enerCald_util, bal_month.enerSol, enerPeak, enerSto #, enerDis
  
-def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
+def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year,lugar):
     ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
@@ -619,6 +643,10 @@ def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year):
     ener_year = [(proc,total,solar,hpump,cald) for proc,total,solar,hpump,cald in zip(yearProc,yearTotal,yearSol,yearHPump,yearCald)]
     ener_year = flat_list(ener_year)
 
+    if lugar == "Escondida":
+        years = years_escondida
+    else:
+        years = years_spence
 
     
     x_year = [(year,enr) for year in years for enr in ener]

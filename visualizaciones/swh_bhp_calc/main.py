@@ -17,6 +17,7 @@ import pandas as pd
 from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel,  TableFuel_LCOH, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
 from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
 from funciones_econ_bhp import Pago, PagoPrinInt, Vector, Vector_20, TableRes, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex,TableCapexU, TableOpex, TableOpexY, TableEval, LCOH_calc, LCOH_calc_upt
+from load_profile import lp_Spence, lp_Escondida
 
 from bokeh.plotting import Figure
 from bokeh.layouts import column, Spacer, row
@@ -30,9 +31,21 @@ meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sept
 # path = '/home/ubuntu/Thenergy/diego/sun4heat/'
 path = '/home/diego/Documentos/sun4heat/'
 
-years = np.arange(2024,2045)
-years = list(years)
-years_list = list(map(str, years))
+# years = np.arange(2024,2045)
+# years = list(years)
+# years_list = list(map(str, years))
+
+years_escondida = np.arange(2024,2045)
+# years = [str(x) for x in years]
+years_escondida = list(map(str, years_escondida))
+
+########################################################3
+
+years_spence = np.arange(2025,2037)
+
+years_spence = list(map(str, years_spence))
+
+
 
 
 
@@ -154,7 +167,7 @@ year= '2024'
 #           BOTON AÑO
 ##############################################
 
-years_button_group = RadioButtonGroup(labels=years_list, active=0,button_type="success")
+years_button_group = RadioButtonGroup(labels=years_escondida, active=0,button_type="success")
 years_button_group.on_change('active', lambda attr, old, new: CalcSystemMonth)
 
 
@@ -363,7 +376,7 @@ table_CAPEX = DataTable(columns=columns_capex, source=source_capex,width=600, he
 SetTMains(df,Tout_p)
 SetTSet(df,Tin_p)
 
-df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year,lugar)
 
 
 #########################################
@@ -371,7 +384,7 @@ df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 #########################################
 
 
-enerProcYear,enerAux_pump, enerAux_cald,enerSol, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
+enerProcYear,enerAux_pump, enerAux_cald,enerSol, enerPeakYear, enerStoYear = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year,lugar)
 # BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,year)
 
 
@@ -381,7 +394,7 @@ balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balan
 # balance_year['enerHeater'] = (balance_year.enerProc-balance_year.enerSol)/(effHeater/100)
 # balance_year['enerHeater'] = potHeater_year*effHeater
 # balance_year['enerHeatPump'] = potHPump_year*copHPump
-balance_year['Años'] = years_list
+balance_year['Años'] = years_escondida
 # balance_year.loc['Total TWh/año'] = balance_year.sum(numeric_only=True, axis = 0)*10**(-6)
 # balance_year.Total.astype(str)
 # balance_year.Total = balance_year.Total + 'TW'
@@ -422,7 +435,7 @@ solFrac_year = totSol_year/totProc_year
 # potHPump_month = potHPump*24*30.5*12 #hora a mes
     
 
-enerProc, enerAux_pump, enerAux_cald, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
+enerProc, enerAux_pump, enerAux_cald, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year,lugar)
 balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
 # balance['enerHeater'] = (balance.enerProc-balance.enerSol)/(effHeater/100)
 # balance_year['enerHeater'] = potHeater_month*effHeater
@@ -586,7 +599,7 @@ orie = TextInput(value=str(azim), title="Orientación:")
 buttCalcRad = Button(label="Calcular", button_type="success",width=100)
 
 
-dropdownYearData = Select(value = '2024', title = 'Año a analizar', options = years_list)
+dropdownYearData = Select(value = '2024', title = 'Año a analizar', options = years_escondida)
 
 ########################
 # INFO GRAF RADIACIÓN
@@ -646,7 +659,7 @@ buttCalcEnergyMonth = Button(label="Calcular balance mensual", button_type="succ
 #GRAFICO BALANCE DE ENERGÍA ANUAL
 ####################################
 ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
-ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year) ####################
+ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year,lugar) ####################
 source_ener_year = ColumnDataSource(data=dict(x=x_year, ener=ener_year))
 palette = ["red", "yellow", "black","blue","orange"]
     
@@ -657,9 +670,12 @@ p_year.vbar(x='x', top='ener', width=1.0, source=source_ener_year,
       line_color='white')
 p_year.xaxis.major_label_orientation = 1
 p_year.left[0].formatter.use_scientific = False
+# p_year.x_range.factors = 
 
 p_year.select_one(HoverTool).tooltips = [
     ('Energía (MWh/año)', '@ener{0.00}')]
+
+
 p_year.select_one(HoverTool).mode='vline'
 
 
@@ -1045,7 +1061,7 @@ def CalcRad():
     azim = float(orie.value)
         
     df = CopyRadFile(lugar,dataSol)
-    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year,lugar)
     
     dropdownYearData
     rad_month, x_month = RadMonth(df)
@@ -1056,6 +1072,8 @@ def CalcRad():
     data_lugar = minas[minas.Mina == lugar]
     ghi_sg = data_lugar.GHI_SG.iloc[0]
     table_rad['GHI Solargis (kWh/m2/año)'] = ghi_sg
+    
+
     
     infoRad.text = str(table_rad)
    
@@ -1143,18 +1161,45 @@ def CalcSystemMonth(temp):
     tilt = float(incl.value)
     azim = float(orie.value)
     
+    lugar = dropdownData.value
+
+    
     Tin_p  = float(Tin_proc.value)
     Tout_p = float(Tout_proc.value)
+    
+    lp_Escondida(Tin_p, Tout_p)
+    lp_Spence(Tin_p,Tout_p)
     # flow_p = float(flow_proc.value)
     # turno = str(selectTurno.value)
     
     effHeater = float(eff_heater.value)
     # fuel   = str(dropdownFuel.value)
-    
     year = int(years_button_group.active)
-    year = years[year]
+    year = years_escondida[year]
     
-
+    if lugar == 'Spence':
+        
+        # years_spence = np.arange(2025,2037)
+        # years_spence = list(map(str, years_spence))
+        
+        # years = years_spence
+       
+        if int(year) > 2036:
+            year = 2036
+        elif int(year) < 2025:
+            year = 2025
+        else:
+            pass
+    else:
+        pass
+        # years_escondida = np.arange(2024,2045)
+        # # years = [str(x) for x in years]
+        # years_escondida = list(map(str, years_escondida))
+        
+        # years = years_escondida
+        
+   
+    
     # p_steam = float(presion_vapor.value)
     # cond = float(perc_cond.value)
     # T_cond = float(temp_cond.value)
@@ -1171,7 +1216,8 @@ def CalcSystemMonth(temp):
     
     # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
    
-    enerProc, enerAux_pump, enerAux_cald,enersol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
+    enerProc, enerAux_pump, enerAux_cald,enersol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year,lugar)
+
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
     # balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
     balance_month['Meses'] = meses
@@ -1227,6 +1273,10 @@ def CalcSystemYear():
     
     Tin_p  = float(Tin_proc.value)
     Tout_p = float(Tout_proc.value)
+    
+    lp_Escondida(Tin_p, Tout_p)
+    lp_Spence(Tin_p,Tout_p)
+    
     # flow_p = float(flow_proc.value)
     # turno = str(selectTurno.value)
     
@@ -1240,12 +1290,12 @@ def CalcSystemYear():
         years = np.arange(2024,2045)
         years = list(years)
         years_list = list(map(str, years))
-        years_button_group.options = years_list
+        # years_button_group.options = years_list
     else:
         years = np.arange(2025,2037)
         years = list(years)
         years_list = list(map(str, years))
-        years_button_group.options = years_list
+        # years_button_group.options = years_list
         
     year = int(years_button_group.active)
     year = years[year]
@@ -1264,9 +1314,9 @@ def CalcSystemYear():
     SetTMains(df,Tout_p)
     SetTSet(df,Tin_p)
     
-    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
+    df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year,lugar)
     
-    enerProc, enerAux_pump, enerAux_cald,enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
+    enerProc, enerAux_pump, enerAux_cald,enerSol, enerPeak, enerSto = BalanceYear(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year,lugar)
     
     balance_year = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balance_anual.csv')
     # balance_year['enerHeater'] = (balance_year.enerProc-balance_year.enerSol)/(effHeater/100)
@@ -1275,12 +1325,14 @@ def CalcSystemYear():
     # balance_year.iloc[21:22,4:5] = "TWh/año"
     source_bal_year.data = balance_year
     
-    ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year,lugar)
+    
+    # p_year.x_range.factors =  FactorRange(*x_year)
     new_data_year=dict(x=x_year, ener=ener_year)
     source_ener_year.data = new_data_year
     # df = CallSWH(df,tilt,azim,Col,aCol,vol,sto_loss,year)
     
-    enerProc,  enerCald, enerHPump, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
+    enerProc,  enerCald, enerHPump, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year,lugar)
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
     # balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
     balance_month['Meses'] = meses
@@ -1290,6 +1342,7 @@ def CalcSystemYear():
     
     ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
     new_data_month=dict(x=x_month, ener=ener_month)
+    
     source_ener_month.data = new_data_month
     
     table_ener = TableEner(df, Tin_p, Tout_p,potHeater,effHeater,potHPump,copHPump,Col,year)
@@ -1384,7 +1437,7 @@ def CalcEcon():
     
 #    pry = dropdownProy.value
 
-    enerProc, enerAux_pump, enerAux_cald, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year)
+    enerProc, enerAux_pump, enerAux_cald, enerSol, enerPeak, enerSto = BalanceMonth(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year,lugar)
 
     
     balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+str(year)+'.csv')

@@ -29,6 +29,15 @@ Consumo_mensual={'Enero':0.063, 'Febrero':0.067, 'Marzo':0.067,
                  'Julio':0.107, 'Agosto':0.102, 'Septiembre':0.083,
                  'Octubre':0.079, 'Noviembre':0.071, 'Diciembre':0.071,}
 
+#########################################
+
+Tin = 73
+Tout = 90
+pci = 11.83 # kWh/kg
+dens_f = 0.846 # kg/lt
+eff_heater = 86
+Cp_agua = 4.186 # kJ/(kg K)
+
 
 for year in years:
     
