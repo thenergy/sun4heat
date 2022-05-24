@@ -161,7 +161,7 @@ indFuel = 2.4
 turno = '24/7'
 
 #year
-year= '2024'
+year= '2025'
 
 ##############################################
 #           BOTON AÑO
@@ -661,7 +661,7 @@ buttCalcEnergyMonth = Button(label="Calcular balance mensual", button_type="succ
 ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
 ener_year, x_year = SystemYear(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year,lugar) ####################
 source_ener_year = ColumnDataSource(data=dict(x=x_year, ener=ener_year))
-palette = ["red", "yellow", "black","blue","orange"]
+palette = ["red", "black", "yellow","orange","blue"]
     
 p_year = Figure(tools=TOOLS, x_range=FactorRange(*x_year),plot_width=plot_w, plot_height=plot_h, title="Balance de energía anual",
             y_axis_label="Energía (MWh/año)")
@@ -701,13 +701,16 @@ table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,wid
 ener = ['Proceso','Ener Total','Caldera eléctrica','Bomba de calor','Ener Solar']
 ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
 source_ener_month = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
-palette = ["red", "yellow", "black","blue","orange"]
+
+palette = ["red", "black", "yellow","orange","blue"]
     
 p_month = Figure(tools=TOOLS, x_range=FactorRange(*x_month),plot_width=plot_w, plot_height=plot_h, title="Balance de energía mensual",
             y_axis_label="Energía (MWh/mes)")
+
 p_month.vbar(x='x', top='ener', width=1.0, source=source_ener_month, 
       fill_color=factor_cmap('x', palette=palette, factors=ener, start=1, end=2),
       line_color='white')
+
 p_month.xaxis.major_label_orientation = 1
 
 p_month.select_one(HoverTool).tooltips = [
@@ -1177,21 +1180,21 @@ def CalcSystemMonth(temp):
     year = int(years_button_group.active)
     year = years_escondida[year]
     
-    if lugar == 'Spence':
+    # if lugar == 'Spence':
         
-        # years_spence = np.arange(2025,2037)
-        # years_spence = list(map(str, years_spence))
+    #     # years_spence = np.arange(2025,2037)
+    #     # years_spence = list(map(str, years_spence))
         
-        # years = years_spence
+    #     # years = years_spence
        
-        if int(year) > 2036:
-            year = 2036
-        elif int(year) < 2025:
-            year = 2025
-        else:
-            pass
-    else:
-        pass
+    #     if int(year) > 2036:
+    #         year = 2036
+    #     elif int(year) < 2025:
+    #         year = 2025
+    #     else:
+    #         pass
+    # else:
+    #     pass
         # years_escondida = np.arange(2024,2045)
         # # years = [str(x) for x in years]
         # years_escondida = list(map(str, years_escondida))

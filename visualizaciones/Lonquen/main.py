@@ -25,7 +25,7 @@ from bokeh.models.widgets import  Select, Button, TextInput
 from bokeh.models import  DatetimeTickFormatter
 from bokeh.layouts import column, Spacer, row
 from bokeh.models import ColumnDataSource, HoverTool, FactorRange, LinearColorMapper, ColorBar, BasicTicker, \
-PrintfTickFormatter, TableColumn, DataTable, NumberFormatter, PreText
+    PrintfTickFormatter, TableColumn, DataTable, NumberFormatter, PreText
 from bokeh.io import curdoc
 
 # meses del año
@@ -55,7 +55,7 @@ days = {0:'Lunes',
 
 # ruta de la ubicación de la visualizacion
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/H2_sim'
-path = '/home/diegonaranjo/Documentos/Thenergy/Lonquen'
+path = '/home/diego/Documentos/sun4heat/visualizaciones/Lonquen'
 
 # nombre de columnas del archivo
 header_lq = ['tv_loos','tv_salcor','tv_visa','tv_desgas','ca_loos','ca_salcor','ca_visa','cg_loos','cg_salcor','cg_visa']

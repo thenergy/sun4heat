@@ -83,6 +83,19 @@ combs = {'Diesel':        {'PCI_kg' : 11.83, 'dens':0.846,'dens_real':99999,'f_e
          'GLP':           {'PCI_kg' : 12.64, 'dens':1.000,'dens_real':0.537,'f_em':2.82,'unidad':'(ton/año)','nombre':'GLP'}}
 
 
+mnths = {1:{'nombre':'Enero',        'dias':31},
+         2:{'nombre':'Febrero',      'dias':28},
+         3:{'nombre':'Marzo',        'dias':31},
+         4:{'nombre':'Abri',         'dias':30},
+         5:{'nombre':'Mayo',         'dias':31},
+         6:{'nombre':'Junio',        'dias':30},
+         7:{'nombre':'Julio',        'dias':31},
+         8:{'nombre':'Agosto',       'dias':31},
+         9:{'nombre':'Septiembre',   'dias':30},
+         10:{'nombre':'Octubre',     'dias':31},
+         11:{'nombre':'Noviembre',   'dias':30},
+         12:{'nombre':'Diciembre',   'dias':31}}
+
 def TableRad(df_tmp):
     '''
     Genera una tabla con la suma de la  irradiancia horizontal directa  (GHI) y
@@ -472,11 +485,13 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
 
     '''
     
+    breaker = 0
+    
     if lugar == 'Spence':
         if int(year) > 2036:
-            year = 2036
+            breaker = 1
         elif int(year) < 2025:
-            year = 2025
+            breaker = 1
         else:
             pass
     else:
@@ -489,6 +504,7 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
 
     # enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
     enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000 
+    
     
     enerProc= df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
     
@@ -615,10 +631,214 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     bal_month['enerPeak'] = enerPeak
     bal_month['enerSto'] = enerSto
         
+    if breaker == 1 :
+        header = bal_month.columns.values.tolist()
+        for item in header:
+            bal_month[item] = 0
+    else:
+        pass
+    
     
     bal_month.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year) +'.csv')
     
     return  bal_month.enerProc, bal_month.enerHPump_util, bal_month.enerCald_util, bal_month.enerSol, enerPeak, enerSto #, enerDis
+ 
+def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHPump,copPump,year,lugar):   
+    '''
+    Los datos obtenidos por hora los suma y convierte en datos mensuales.
+
+    Parameters
+    ----------
+    df_temp : DataFrame
+        DESCRIPTION.
+
+    Returns
+    -------
+    enerProc : Series
+        Calor utilizado en el proceso en una hora.
+    enerAux : Series
+        Energía extra necesitada (no cubiarta por sistema solar).
+    enerSol : Series
+        DESCRIPTION.
+    enerPeak : Series
+        DESCRIPTION.
+    enerDis : TYPE
+        DESCRIPTION.
+
+    '''
+    breaker = 0
+    
+    if lugar == 'Spence':
+        if int(year) > 2036:
+            breaker = 1
+        elif int(year) < 2025:
+            breaker = 1
+        else:
+            pass
+    else:
+        pass
+
+
+    df_temp = CallSWH(df_temp,tilt,azim,Col,aCol,vol,sto_loss,year,lugar)
+    
+#############################################
+
+    # enerSol = df_temp['Qgross'].groupby(df_temp.index.month).sum()/1000
+    # enerSol = df_temp['Qgross'].groupby(df_temp.index.day).sum()/1000 
+    enerSol = df_temp['Qgross'].resample('D').sum()/1000
+
+    
+    # enerProc= df_temp['Qproc'].groupby(df_temp.index.day).sum()/1000
+    enerProc = df_temp['Qproc'].resample('D').sum()/1000
+
+#############################################
+    
+    enerAuxDay_pump  = potHPump*730
+    
+    enerElectrDay_pump = enerAuxDay_pump/copPump
+    
+    enerAuxDay_cald = potHeater*(effheater/100)*730
+    
+    
+    
+#############################################
+
+    esol = []
+    edis = [] #enerSolExcess
+    eProcs = []
+    
+    # enerAuxDay_cald = []
+
+    enerCald_util = []
+    enerCald_excess = []
+    
+    enerHPump_util = []
+    enerHPump_excess = []
+    
+    equip_prim = enerSol + enerAuxDay_pump 
+    
+    equip_sec = equip_prim + enerAuxDay_cald
+    
+    for eSol,eProc, eqpPrm, eqpScd in zip(enerSol,enerProc, equip_prim, equip_sec):
+        # eProcs.append(eProc)
+        
+        
+        
+        if eSol - eProc >= 0:
+            esol.append(eProc)
+            edis.append(eSol-eProc)
+            
+            enerHPump_util.append(0)
+            enerHPump_excess.append(0)
+        
+            enerCald_util.append(0)
+            enerCald_excess.append(0)     
+            
+        elif eProc <= eqpPrm:
+            esol.append(eSol)
+            edis.append(0)
+            
+            
+            enerPumpUtil = eProc - eSol
+            enerHPump_util.append(enerPumpUtil)
+            enerHPump_excess.append(enerAuxDay_pump-enerPumpUtil)
+            
+            enerCald_util.append(0)
+            enerCald_excess.append(0)
+            
+        elif eProc <= eqpScd :
+            esol.append(eSol)
+            edis.append(0)
+            
+            enerHPump_util.append(enerAuxDay_pump)
+            enerHPump_excess.append(0)
+            
+            enerCaldUtil = eProc - eqpPrm
+            enerCald_util.append(enerCaldUtil)
+            enerCald_excess.append(enerAuxDay_cald-enerCaldUtil)
+            
+        else:           
+            esol.append(eSol)
+            edis.append(0)
+            
+            enerHPump_util.append(enerAuxDay_pump)
+            enerHPump_excess.append(0)
+            
+            enerCald_util.append(enerAuxDay_cald)
+            enerCald_excess.append(0)
+            
+
+            
+
+    enerSol = pd.Series(esol,index=np.arange(1,366))
+    # enerProc = pd.Series(eProcs,index=np.arange(1,13))
+    
+
+# Energía utilizada bomba de calor 
+    enerHPump_util = pd.Series(enerHPump_util,index=np.arange(1,366))
+    
+# Exceso de energía bomba de calor 
+    enerHPump_excess = pd.Series(enerHPump_excess,index=np.arange(1,366))
+
+# Energía utilizada caldera 
+    enerCald_util = pd.Series(enerCald_util,index=np.arange(1,366))
+
+# Exceso de energía caldera     
+    enerCald_excess = pd.Series(enerCald_excess,index=np.arange(1,366))
+
+
+    enerSto = df_temp['Qsto'].resample('D').sum()/1000
+    enerPeak = df_temp['Qpeak'].resample('D').sum()/1000
+    
+    bal_Day = pd.DataFrame(enerProc,index=np.arange(1,366))
+    
+    
+    temp_list =[]
+    temp2_list =[]
+    for i in np.arange(1,13):
+        for j in np.arange(1,mnths[i]['dias']+1):
+            temp_list.append(mnths[i]['nombre'])
+            temp2_list.append(j)
+    
+    
+    bal_Day['Meses'] = temp_list
+    bal_Day['Dia'] = temp2_list
+    bal_Day['Qsol'] = enerSol
+    bal_Day['SF'] = bal_Day.Qsol / bal_Day.Qproc * 100
+
+
+
+    # bal_Day['enerAux'] = potHPump*effHPump
+    
+    bal_Day['enerHPump_util'] = enerHPump_util
+    bal_Day['enerHPump_excess'] = enerHPump_excess 
+
+    bal_Day['enerCald_util'] = enerCald_util 
+    bal_Day['enerCald_excess'] = enerCald_excess
+    
+
+    bal_Day['ElectrHPump'] = enerElectrDay_pump 
+    bal_Day['CaldF'] = bal_Day.enerCald_util / bal_Day.Qproc * 100
+    bal_Day['HPumpF'] = bal_Day.enerHPump_util / bal_Day.Qproc * 100
+
+    bal_Day = bal_Day.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
+        
+    bal_Day['enerPeak'] = enerPeak
+    bal_Day['enerSto'] = enerSto
+        
+    if breaker == 1:
+        header = bal_Day.columns.values.tolist()
+        for item in header:
+            bal_Day[item] = 0
+    else:
+        pass
+    
+
+    
+    bal_Day.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_diarios_mensuales/balance_año_'+ str(year) +'.csv')
+    
+    return  bal_Day.enerProc, bal_Day.enerHPump_util, bal_Day.enerCald_util, bal_Day.enerSol, enerPeak, enerSto #, enerDis
+     
  
 def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year,lugar):
     ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
