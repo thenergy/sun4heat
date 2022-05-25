@@ -167,7 +167,7 @@ year= '2025'
 #           BOTON AÑO
 ##############################################
 
-years_button_group = RadioButtonGroup(labels=years_escondida, active=0,button_type="success")
+years_button_group = RadioButtonGroup(labels=years_escondida, active=1,button_type="success")
 years_button_group.on_change('active', lambda attr, old, new: CalcSystemMonth)
 
 
@@ -442,6 +442,9 @@ balance = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_m
 # balance_year['enerHeatPump'] = potHPump_month*copHPump
 balance['Meses'] = meses
 balance.loc['Total'] = balance.sum(numeric_only=True, axis = 0)
+balance.iloc[12:13]['Meses'] = 'Total'
+
+
 
 source_bal_month = ColumnDataSource(data=balance)
     
@@ -461,6 +464,17 @@ table_capexu = TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
 # totProc = enerProc.sum()
 # totHeater = enerAux.sum()
 # solFrac = totSol/totProc
+
+#############################################
+#   BALANCE DIARIO
+#############################################
+
+
+energias = ["Energía Solar", "Bomba de calor", "Caldera eléctrica"]
+
+proc_butt = Select(value="Energía solar", title="Tipo de energía",options = energias, width=250)
+
+
 
 
 
@@ -682,12 +696,12 @@ p_year.select_one(HoverTool).mode='vline'
 cols_balance_year = [
         TableColumn(field="Años", title="Año",width=60),
         TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0.000")),
-        TableColumn(field="enerCald_util", title="E caldera eléctrica (MWh/año)",width=150, formatter=NumberFormatter(format="0.000")),
-        TableColumn(field="enerHPump_util", title="E bomba de calor (MWh/año)",width=150, formatter=NumberFormatter(format="0.000")),
         TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0.000")),
+        TableColumn(field="enerHPump_util", title="E bomba de calor (MWh/año)",width=150, formatter=NumberFormatter(format="0.000")),
+        TableColumn(field="enerCald_util", title="E caldera eléctrica (MWh/año)",width=150, formatter=NumberFormatter(format="0.000")),  
         TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="CaldF", title="Fracción cáldera eléctrica (%)",width=150, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="HPumpF", title="Fracción bomba de calor (%)",width=150, formatter=NumberFormatter(format="0.0"))]
+        TableColumn(field="HPumpF", title="Fracción bomba de calor (%)",width=150, formatter=NumberFormatter(format="0.0")),
+        TableColumn(field="CaldF", title="Fracción cáldera eléctrica (%)",width=150, formatter=NumberFormatter(format="0.0"))]
 
 table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,width=600, height=450,
                       editable=True)
@@ -699,7 +713,7 @@ table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,wid
 #GRAFICO BALANCE DE ENERGÍA MENSUAL
 ####################################
 ener = ['Proceso','Ener Total','Caldera eléctrica','Bomba de calor','Ener Solar']
-ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+ener_month, x_month = SystemMonth(year)
 source_ener_month = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
 
 palette = ["red", "black", "yellow","orange","blue"]
@@ -721,16 +735,49 @@ p_month.select_one(HoverTool).mode='vline'
 cols_balance_month = [
         TableColumn(field="Meses", title="Mes",width=60),
         TableColumn(field="enerProc", title="E proceso (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
-        TableColumn(field="enerCald_util", title="E caldera eléctrica (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
-        TableColumn(field="enerHPump_util", title="E bomba de calor (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="enerSol", title="E solar (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
+        TableColumn(field="enerHPump_util", title="E bomba de calor (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
+        TableColumn(field="enerCald_util", title="E caldera eléctrica (MWh/año)",width=150, formatter=NumberFormatter(format="0.00")),
         TableColumn(field="SF", title="Fracción solar (%)",width=150, formatter=NumberFormatter(format="0.0")),
+        TableColumn(field="HPumpF", title="Fracción bomba de calor (%)",width=150, formatter=NumberFormatter(format="0.0")),
         TableColumn(field="CaldF", title="Fracción cáldera eléctrica (%)",width=150, formatter=NumberFormatter(format="0.0")),
-        TableColumn(field="HPumpF", title="Fracción bomba de calor (%)",width=150, formatter=NumberFormatter(format="0.0"))]
+        TableColumn(field="TotalF", title="Fracción total dispositivos (%)",width=150, formatter=NumberFormatter(format="0.0")),
+        TableColumn(field="FracFalt", title="Fracción faltante (%)",width=150, formatter=NumberFormatter(format="0.0"))
+
+        ]
+
 
 table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,width=600, height=450,
                       editable=True)
 ###################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #fs_mes = enerSol/enerProc*100
 #source_fs = ColumnDataSource(data=dict(x=meses,y=fs_mes))
 #p3 = Figure(tools=TOOLS,plot_width=plot_w, plot_height=plot_h, title="Fracción solar mensual",
@@ -842,6 +889,8 @@ infoEval = PreText(text=str(table_eval), width=320)
 TOOLS="crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select,save"
 plot_w = 700
 plot_h = 360
+
+
 
 # ###############################################
 # #GRÁFICO COSTO DE ENERGÍA (NO FUNCIONA)
@@ -1176,6 +1225,9 @@ def CalcSystemMonth(temp):
     # turno = str(selectTurno.value)
     
     effHeater = float(eff_heater.value)
+    potHeater = float(pot_heater.value)
+    copHPump = float(cop_hpump.value)
+    potHPump = float(pot_hpump.value)
     # fuel   = str(dropdownFuel.value)
     year = int(years_button_group.active)
     year = years_escondida[year]
@@ -1224,9 +1276,14 @@ def CalcSystemMonth(temp):
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
     # balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
     balance_month['Meses'] = meses
+    balance_month.loc['Total'] = balance_month.sum(numeric_only=True, axis = 0)
+    balance_month.iloc[12:13]['Meses'] = 'Total'
+
+
+
     source_bal_month.data = balance_month
     
-    ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    ener_month, x_month = SystemMonth(year)
     new_data_month=dict(x=x_month, ener=ener_month)
     source_ener_month.data = new_data_month
     
@@ -1339,11 +1396,13 @@ def CalcSystemYear():
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_'+ str(year)+'.csv')
     # balance_month['enerHeater'] = (balance_month.enerProc-balance_month.enerSol)/(effHeater/100)
     balance_month['Meses'] = meses
-    balance_month.loc['Total TW/año'] = balance_month.sum(numeric_only=True, axis = 0)*10**(-6)
+    balance_month.loc['Total'] = balance_month.sum(numeric_only=True, axis = 0)
+    balance_month.iloc[12:13]['Meses'] = 'Total'
+
     # balance_year.iloc[21:22,4:5] = "TWh/año"
     source_bal_month.data = balance_month
     
-    ener_month, x_month = SystemMonth(df,tilt,azim,Col,aCol,vol,sto_loss,effHeater,year)
+    ener_month, x_month = SystemMonth(year)
     new_data_month=dict(x=x_month, ener=ener_month)
     
     source_ener_month.data = new_data_month
@@ -1702,6 +1761,8 @@ layout = column(Spacer(height=spc),
                 
                 row(p_year,Spacer(width=spc),table_bal_year),
                 row(infoEner,infoFuel),#infoSteam),
+                row(proc_butt),
+                # row(phm_day),
               
                 
                 Spacer(height=spc+30),

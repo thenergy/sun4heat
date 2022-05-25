@@ -60,7 +60,7 @@ path = '/home/diego/Documentos/sun4heat/visualizaciones/Lonquen'
 # nombre de columnas del archivo
 header_lq = ['tv_loos','tv_salcor','tv_visa','tv_desgas','ca_loos','ca_salcor','ca_visa','cg_loos','cg_salcor','cg_visa']
 # leer archivo de consumo Lonquen
-lq = pd.read_csv(path + '/calderas_lonquen.csv',names=header_lq ,skiprows=2)
+lq = pd.read_csv(path + '/calderas_lonquen.csv', names=header_lq, skiprows=2)
 # crear columna índice de tiempo
 lq.index = pd.date_range(start='2021-01-01', end='2021-12-31', freq='D')
 
@@ -74,6 +74,7 @@ lq.cg_visa = pd.to_numeric(lq.cg_visa, errors="coerce")
 
 
 res_tot = lq[['tv_loos','tv_salcor','tv_visa','tv_desgas','ca_loos','ca_salcor','ca_visa','cg_loos','cg_salcor','cg_visa']]
+
 
 res_week = res_tot.groupby([res_tot.index.week,res_tot.index.dayofweek]).sum()
 res_week = res_week.reset_index()

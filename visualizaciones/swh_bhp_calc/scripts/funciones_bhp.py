@@ -625,6 +625,9 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     bal_month['ElectrHPump'] = enerElectrMonth_pump 
     bal_month['CaldF'] = bal_month.enerCald_util / bal_month.Qproc * 100
     bal_month['HPumpF'] = bal_month.enerHPump_util / bal_month.Qproc * 100
+    
+    bal_month['TotalF'] =(bal_month.enerCald_util + bal_month.enerHPump_util + bal_month.Qsol) / bal_month.Qproc * 100
+    bal_month['FracFalt'] = 100 - bal_month.TotalF 
 
     bal_month = bal_month.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
         
@@ -721,9 +724,7 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
     
     for eSol,eProc, eqpPrm, eqpScd in zip(enerSol,enerProc, equip_prim, equip_sec):
         # eProcs.append(eProc)
-        
-        
-        
+                
         if eSol - eProc >= 0:
             esol.append(eProc)
             edis.append(eSol-eProc)
@@ -771,9 +772,7 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
             
 
     enerSol = pd.Series(esol,index=np.arange(1,366))
-    # enerProc = pd.Series(eProcs,index=np.arange(1,13))
     
-
 # Energía utilizada bomba de calor 
     enerHPump_util = pd.Series(enerHPump_util,index=np.arange(1,366))
     
@@ -790,8 +789,14 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
     enerSto = df_temp['Qsto'].resample('D').sum()/1000
     enerPeak = df_temp['Qpeak'].resample('D').sum()/1000
     
-    bal_Day = pd.DataFrame(enerProc,index=np.arange(1,366))
+    enerSto_list = list(enerSto)
+    enerPeak_list = list(enerPeak)    
+    enerProc_list = list(enerProc)
     
+    bal_Day = pd.DataFrame(index=np.arange(1,366))
+    
+    bal_Day['Qproc'] =enerProc_list
+        
     
     temp_list =[]
     temp2_list =[]
@@ -815,7 +820,6 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
 
     bal_Day['enerCald_util'] = enerCald_util 
     bal_Day['enerCald_excess'] = enerCald_excess
-    
 
     bal_Day['ElectrHPump'] = enerElectrDay_pump 
     bal_Day['CaldF'] = bal_Day.enerCald_util / bal_Day.Qproc * 100
@@ -823,8 +827,8 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
 
     bal_Day = bal_Day.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
         
-    bal_Day['enerPeak'] = enerPeak
-    bal_Day['enerSto'] = enerSto
+    bal_Day['enerPeak'] = enerPeak_list
+    bal_Day['enerSto'] = enerSto_list
         
     if breaker == 1:
         header = bal_Day.columns.values.tolist()
@@ -832,8 +836,6 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
             bal_Day[item] = 0
     else:
         pass
-    
-
     
     bal_Day.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_diarios_mensuales/balance_año_'+ str(year) +'.csv')
     
@@ -874,7 +876,7 @@ def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year,lugar):
     return ener_year, x_year 
 
   
-def SystemMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater, year):
+def SystemMonth(year):
     ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
 #    proc = df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
 #    aux = df_temp['Qaux'].groupby(df_temp.index.month).sum()/1000
@@ -884,13 +886,17 @@ def SystemMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater, year):
     
     balance_month = pd.read_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_mensuales_año/balance_mensual_' + str(year) +'.csv')
     
-    monthTotal = balance_month.enerCald_util + balance_month.enerHPump_util + balance_month.enerSol
+    monthTotal = balance_month.enerSol + balance_month.enerHPump_util + balance_month.enerCald_util
+    
     monthProc = balance_month.enerProc
-    monthCald = balance_month.enerCald_util
-    monthHPump = balance_month.enerHPump_util
-    # monthAux = balance_month.enerAux
+    
     monthSol = balance_month.enerSol
     
+    monthHPump = balance_month.enerHPump_util
+    
+    monthCald = balance_month.enerCald_util
+
+   
     ener_month = [(proc,total,solar,hpump,cald) for proc,total,solar,hpump,cald in zip(monthProc,monthTotal,monthSol,monthHPump,monthCald)]
     ener_month = flat_list(ener_month)
     
