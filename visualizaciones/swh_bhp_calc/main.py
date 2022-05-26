@@ -14,17 +14,28 @@ sys.path.append('/home/diego/Documentos/sun4heat/visualizaciones/swh_bhp_calc/sc
 import numpy as np
 import pandas as pd
 
-from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel,  TableFuel_LCOH, BalanceYear, BalanceMonth, TableProy, TableEnerYear# ,TableSteam
+from math import pi
+import colorcet as cc
+
+
+from funciones_bhp import TableRad,  Col_eff_val, RadMonth,  SystemMonth, SystemYear, TableEner, TableFuel,  TableFuel_LCOH, BalanceYear, BalanceMonth,BalanceDay, TableProy, TableEnerYear# ,TableSteam
 from funciones_bhp_SAM import CallSWH, SetTurno, SetTMains, SetTSet, CopyRadFile
 from funciones_econ_bhp import Pago, PagoPrinInt, Vector, Vector_20, TableRes, Depr, Perdidas, BaseImpuesto, FlujoAcum,Van,Tir,Payback,TableCapex,TableCapexU, TableOpex, TableOpexY, TableEval, LCOH_calc, LCOH_calc_upt
 from load_profile import lp_Spence, lp_Escondida
+from daily_hm import day_HMCreate, ChangeData
+
 
 from bokeh.plotting import Figure
 from bokeh.layouts import column, Spacer, row
-from bokeh.models import ColumnDataSource, HoverTool, FactorRange, DatetimeTickFormatter, TableColumn, DataTable, NumberFormatter, CustomJS, RadioButtonGroup
+from bokeh.models import ColumnDataSource, HoverTool, FactorRange, DatetimeTickFormatter, TableColumn, DataTable, NumberFormatter, CustomJS, RadioButtonGroup,LinearColorMapper, ColorBar, BasicTicker, \
+    PrintfTickFormatter, NumberFormatter, PreText
 from bokeh.io import curdoc
 from bokeh.transform import factor_cmap
 from bokeh.models.widgets import Select, TextInput, Button, PreText
+
+
+
+
 
 meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 #path = '/Users/fcuevas/Documents/Trabajo/thenergy/sun4heat/'
@@ -64,7 +75,19 @@ cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'
       'Sunoptimo':                {'n0':0.824,'a1':2.905,'a2':0.00300,'color':'black'}}
 
 
-
+months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+mnths = {1:'Enero',
+         2:'Febrero',
+         3:'Marzo',
+         4:'Abril',
+         5:'Mayo',
+         6:'Junio',
+         7:'Julio',
+         8:'Agosto',
+         9:'Septiembre',
+         10:'Octubre',
+         11:'Noviembre',
+         12:'Diciembre'}
 
 ##################################
 #           RADIACION
@@ -472,9 +495,11 @@ table_capexu = TableCapexU(CEQ_1, CEQ_2, CEQ_3, CEQ_4, CEQ_5, CEQ_6,
 
 energias = ["Energía Solar", "Bomba de calor", "Caldera eléctrica"]
 
-proc_butt = Select(value="Energía solar", title="Tipo de energía",options = energias, width=250)
+proc_butt = Select(value="Energía solar", title="Dispositivo",options = energias, width=250)
 
+menuVar=["MWh","MW","Fracción util"]
 
+dropdownVar = Select(value="MWh", title="Variable de interés",options=menuVar,width=250) 
 
 
 
@@ -611,6 +636,8 @@ dropdownSolData = Select(value='Explorador Solar', title="Dato radiación",optio
 incl = TextInput(value=str(tilt), title="Inclinación:")
 orie = TextInput(value=str(azim), title="Orientación:")
 buttCalcRad = Button(label="Calcular", button_type="success",width=100)
+buttCalc = Button(label="Calcular", button_type="success",width=100)
+
 
 
 dropdownYearData = Select(value = '2024', title = 'Año a analizar', options = years_escondida)
@@ -712,7 +739,7 @@ table_bal_year = DataTable(columns=cols_balance_year, source=source_bal_year,wid
 ####################################
 #GRAFICO BALANCE DE ENERGÍA MENSUAL
 ####################################
-ener = ['Proceso','Ener Total','Caldera eléctrica','Bomba de calor','Ener Solar']
+ener = ['Proceso','Ener Total','Ener Solar','Bomba de calor','Caldera eléctrica']
 ener_month, x_month = SystemMonth(year)
 source_ener_month = ColumnDataSource(data=dict(x=x_month, ener=ener_month))
 
@@ -750,22 +777,47 @@ cols_balance_month = [
 table_bal_month = DataTable(columns=cols_balance_month, source=source_bal_month,width=600, height=450,
                       editable=True)
 ###################################################
+#   GRÁFICO HEATMAP
+####################################################
+
+y_rg = np.arange(1,32)
+y_rg = [str(x) for x in y_rg]
+
+val, source_day = day_HMCreate(year)
+
+# ################################################################################################## 
+TOOLS="hover,crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
+p_hm = Figure(y_range=y_rg,x_range=FactorRange(*months),
+            x_axis_location="below", plot_width=1360, plot_height=750,
+            tools=TOOLS, toolbar_location='above')
+
+p_hm.grid.grid_line_color = None
+p_hm.axis.axis_line_color = 'black'
+p_hm.axis.major_tick_line_color = 'black'
+p_hm.axis.major_label_text_font_size = "10pt"
+p_hm.axis.major_label_standoff = 0
+p_hm.axis.axis_label_text_align = 'center'
+
+p_hm.xaxis.major_label_orientation = pi / 3
+
+mapper_hm = LinearColorMapper(palette=cc.rainbow, low=0, high=val.max())
 
 
+p_hm.rect(x='monthValue', y='day_vs', width=1.0, height=1,
+        source=source_day,
+        fill_color={'field': 'val_vs', 'transform': mapper_hm},
+        line_color='black')
 
+text_props1 = {"source": source_day, "text_align": "center", "text_baseline": "middle"}
+r_hm = p_hm.text(x='monthValue', y='day_vs', text="val_vs", **text_props1)
+r_hm.glyph.text_font_style="bold"
+r_hm.glyph.text_font_size="10pt"
 
-
-
-
-
-
-
-
-
-
-
-
-
+color_bar_hm = ColorBar(color_mapper=mapper_hm, major_label_text_font_size="8pt",
+                      ticker=BasicTicker(desired_num_ticks=6),
+                      formatter=PrintfTickFormatter(format="%d"),
+                      label_standoff=6, border_line_color=None, location=(0, 0))
+p_hm.add_layout(color_bar_hm, 'right')
 
 
 
@@ -1232,6 +1284,9 @@ def CalcSystemMonth(temp):
     year = int(years_button_group.active)
     year = years_escondida[year]
     
+    dis = proc_butt.value
+    var =  dropdownVar.value
+    
     # if lugar == 'Spence':
         
     #     # years_spence = np.arange(2025,2037)
@@ -1287,6 +1342,14 @@ def CalcSystemMonth(temp):
     new_data_month=dict(x=x_month, ener=ener_month)
     source_ener_month.data = new_data_month
     
+    BalanceDay(df,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effHeater,potHPump,copHPump,year,lugar)
+    
+    val, hm_data = ChangeData(year, dis, var)
+    mapper_hm.high = val.max()
+    mapper_hm.low = val.min()
+    
+    source_day.data = hm_data
+
     
 def CalcSystemYear():
     '''
@@ -1740,6 +1803,7 @@ buttCalcEnergyYear.on_click(CalcSystemYear)
 # buttCalcEnergyMonth.on_click(CalcSystemMonth)
 buttCalcEcon.on_click(CalcEcon)
 years_button_group.on_click(CalcSystemMonth)
+buttCalc.on_click(CalcSystemMonth)
 
 
 #############
@@ -1761,7 +1825,6 @@ layout = column(Spacer(height=spc),
                 
                 row(p_year,Spacer(width=spc),table_bal_year),
                 row(infoEner,infoFuel),#infoSteam),
-                row(proc_butt),
                 # row(phm_day),
               
                 
@@ -1769,6 +1832,12 @@ layout = column(Spacer(height=spc),
                 row(years_button_group),
                 # buttCalcEnergyMonth,
                 row(p_month,Spacer(width=spc),table_bal_month),
+
+                row(proc_butt, dropdownVar),
+                row(buttCalc),
+                row(p_hm),
+                
+
               
                 Spacer(height=spc),
                 

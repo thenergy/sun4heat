@@ -61,6 +61,8 @@ cst = {'TVP MT-Power v4':          {'n0':0.737,'a1':0.504,'a2':0.00600,'color':'
        'Sunoptimo':                {'n0':0.824,'a1':2.905,'a2':0.00300,'color':'black'}}
 
 
+
+
 ################################### COMBUSTIBLES ###################################
 # Factor de emisiones
 # http://www.declaracionemision.cl/docs/GUIA_CONAMA.pdf
@@ -509,15 +511,17 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     enerProc= df_temp['Qproc'].groupby(df_temp.index.month).sum()/1000
     
 #############################################
+    enerAuxMonth_pump = []
+    enerAuxMonth_cald = []
     
-    enerAuxMonth_pump  = potHPump*730
+    for i in np.arange(1,13):
+
+        enerAuxMonth_pump.append(potHPump*24*mnths[i]['dias'])       
+        enerAuxMonth_cald.append(potHeater*(effheater/100)*24*mnths[i]['dias'])
     
-    enerElectrMonth_pump = enerAuxMonth_pump/copPump
-    
-    enerAuxMonth_cald = potHeater*(effheater/100)*730
-    
-    
-    
+    enerElectrMonth_pump = [item/copPump for item in enerAuxMonth_pump]
+    # enerElectrMonth_pump = enerAuxMonth_pump/copPump
+
 #############################################
 
     esol = []
@@ -536,8 +540,11 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     
     equip_sec = equip_prim + enerAuxMonth_cald
     
-    for eSol,eProc, eqpPrm, eqpScd in zip(enerSol,enerProc, equip_prim, equip_sec):
+    counter = np.arange(0,12)
+    
+    for eSol,eProc, eqpPrm, eqpScd, ctr in zip(enerSol,enerProc, equip_prim, equip_sec, counter):
         # eProcs.append(eProc)
+        
         
         
         
@@ -558,7 +565,7 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
             
             enerPumpUtil = eProc - eSol
             enerHPump_util.append(enerPumpUtil)
-            enerHPump_excess.append(enerAuxMonth_pump-enerPumpUtil)
+            enerHPump_excess.append(enerAuxMonth_pump[ctr]-enerPumpUtil)
             
             enerCald_util.append(0)
             enerCald_excess.append(0)
@@ -567,21 +574,21 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
             esol.append(eSol)
             edis.append(0)
             
-            enerHPump_util.append(enerAuxMonth_pump)
+            enerHPump_util.append(enerAuxMonth_pump[ctr])
             enerHPump_excess.append(0)
             
             enerCaldUtil = eProc - eqpPrm
             enerCald_util.append(enerCaldUtil)
-            enerCald_excess.append(enerAuxMonth_cald-enerCaldUtil)
+            enerCald_excess.append(enerAuxMonth_cald[ctr]-enerCaldUtil)
             
         else:           
             esol.append(eSol)
             edis.append(0)
             
-            enerHPump_util.append(enerAuxMonth_pump)
+            enerHPump_util.append(enerAuxMonth_pump[ctr])
             enerHPump_excess.append(0)
             
-            enerCald_util.append(enerAuxMonth_cald)
+            enerCald_util.append(enerAuxMonth_cald[ctr])
             enerCald_excess.append(0)
             
 
@@ -609,7 +616,6 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     
     bal_month = pd.DataFrame(enerProc,index=np.arange(1,13))
     bal_month['Qsol'] = enerSol
-    bal_month['SF'] = bal_month.Qsol / bal_month.Qproc * 100
 
 
 
@@ -623,8 +629,10 @@ def BalanceMonth(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,pot
     
 
     bal_month['ElectrHPump'] = enerElectrMonth_pump 
-    bal_month['CaldF'] = bal_month.enerCald_util / bal_month.Qproc * 100
+    
+    bal_month['SF'] = bal_month.Qsol / bal_month.Qproc * 100
     bal_month['HPumpF'] = bal_month.enerHPump_util / bal_month.Qproc * 100
+    bal_month['CaldF'] = bal_month.enerCald_util / bal_month.Qproc * 100
     
     bal_month['TotalF'] =(bal_month.enerCald_util + bal_month.enerHPump_util + bal_month.Qsol) / bal_month.Qproc * 100
     bal_month['FracFalt'] = 100 - bal_month.TotalF 
@@ -695,13 +703,14 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
     enerProc = df_temp['Qproc'].resample('D').sum()/1000
 
 #############################################
+       
     
-    enerAuxDay_pump  = potHPump*730
-    
+    enerAuxDay_pump  = potHPump*24
+
     enerElectrDay_pump = enerAuxDay_pump/copPump
-    
-    enerAuxDay_cald = potHeater*(effheater/100)*730
-    
+
+    enerAuxDay_cald = potHeater*(effheater/100)*24
+
     
     
 #############################################
@@ -808,22 +817,30 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
     
     bal_Day['Meses'] = temp_list
     bal_Day['Dia'] = temp2_list
+    
     bal_Day['Qsol'] = enerSol
+    bal_Day['enerSol_MW'] = enerSol/24
     bal_Day['SF'] = bal_Day.Qsol / bal_Day.Qproc * 100
+
 
 
 
     # bal_Day['enerAux'] = potHPump*effHPump
     
     bal_Day['enerHPump_util'] = enerHPump_util
-    bal_Day['enerHPump_excess'] = enerHPump_excess 
+    bal_Day['enerHPump_util_MW'] = enerHPump_util/24
+    bal_Day['enerHPump_excess'] = enerHPump_excess
+    bal_Day['HPumpF'] = bal_Day.enerHPump_util / bal_Day.Qproc * 100
+
 
     bal_Day['enerCald_util'] = enerCald_util 
+    bal_Day['enerCald_util_MW'] = enerCald_util/24
     bal_Day['enerCald_excess'] = enerCald_excess
+    bal_Day['CaldF'] = bal_Day.enerCald_util / bal_Day.Qproc * 100
+
 
     bal_Day['ElectrHPump'] = enerElectrDay_pump 
-    bal_Day['CaldF'] = bal_Day.enerCald_util / bal_Day.Qproc * 100
-    bal_Day['HPumpF'] = bal_Day.enerHPump_util / bal_Day.Qproc * 100
+    
 
     bal_Day = bal_Day.rename(columns={'Qproc':'enerProc','Qsol':'enerSol'})
         
@@ -839,7 +856,7 @@ def BalanceDay(df_temp,tilt,azim,Col,aCol,vol,sto_loss,potHeater,effheater,potHP
     
     bal_Day.to_csv(path + 'visualizaciones/swh_bhp_calc/resultados/balances_diarios_mensuales/balance_año_'+ str(year) +'.csv')
     
-    return  bal_Day.enerProc, bal_Day.enerHPump_util, bal_Day.enerCald_util, bal_Day.enerSol, enerPeak, enerSto #, enerDis
+    # return  bal_Day.enerProc, bal_Day.enerHPump_util, bal_Day.enerCald_util, bal_Day.enerSol, enerPeak, enerSto #, enerDis
      
  
 def SystemYear(df_temp,tilt,azim,Col,aCol,vol,sto_loss,effheater,year,lugar):
