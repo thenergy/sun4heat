@@ -281,7 +281,9 @@ def readccf8():
     base = base.drop([0, 1], axis=0)
 
     base["ccf8"] = base["ccf8"].str.replace("-", "")
-    base["ener_emis"] = base["ener_emis"].str.replace(",", ".")
+    # base["ccf8"] = base["ccf8"].str.replace(" ", "")
+
+    # base["ener_emis"] = base["ener_emis"].str.replace(",", ".")
 
     base.ccf8 = pd.to_numeric(base.ccf8, errors="coerce")
     base.ener_emis = pd.to_numeric(base.ener_emis, errors="coerce")
@@ -674,8 +676,7 @@ def emission_to_energy(df, df2):
     map_dict = df2.set_index('ccf8').T.to_dict('index')
     
     df['fc_emis_prim'] = df.ccf8.map(map_dict['ener_emis'])   
-    df.fc_emis_prim = df.fc_emis_prim/1000 #kg a ton
-    df['ener_cons_CO2'] = (df.ton_emision/df.fc_emis_prim)/3600
+    df['ener_cons_CO2'] = ((df.ton_emision/df.fc_emis_prim)*10**6)/3600
     
     return df
 
@@ -689,7 +690,7 @@ def TableResumen(df):
     table_res['Resumen totales tabla del mapa'] = ''
     table_res['Número de calderas'] = df.calnum.sum()
     table_res['Miles de Toneladas de emisión anual (miles T/año)' ] = tot_emis/1000
-    table_res['Energía consumida anual (TWh/año)'] = (tot_ener_cons)
+    table_res['Energía consumida anual (TWh/año)'] = (tot_ener_cons)/(10**6)
     table_res['Total empresas'] = tot_empresas
 
     return table_res
