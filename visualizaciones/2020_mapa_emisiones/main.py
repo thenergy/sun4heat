@@ -65,9 +65,9 @@ from os.path import dirname, join
 
 # Donde instalar. Versión local y versión en servidor
 # <<<<<<< HEAD
-path = "/home/ubuntu/Thenergy/diego/sun4heat/"
+# path = "/home/ubuntu/Thenergy/diego/sun4heat/"
 # path = "/home/diegonaranjo/Documentos/Thenergy/sun4heat/"
-# path = '/home/diego/Documentos/sun4heat/'
+path = '/home/diego/Documentos/sun4heat/'
 # =======
 # <<<<<<< HEAD
 # path = '/mnt/c/Users/diieg/OneDrive/Documentos/Thenergy/prueba/'
@@ -150,6 +150,8 @@ combs_2 = {
     "Bencina": 6,
     "Biogas": 7,
 }
+
+
 
 
 # paleta de colores para los gráficos
@@ -287,8 +289,13 @@ def readccf8():
 
     base.ccf8 = pd.to_numeric(base.ccf8, errors="coerce")
     base.ener_emis = pd.to_numeric(base.ener_emis, errors="coerce")
+    
+    guia_met = pd.read_csv(
+        path + "datos/RETC/datos_guia_met_fe.csv", sep=",")
+    
+    guia_met.fe = pd.to_numeric(guia_met.fe,errors="coerce")
 
-    return base
+    return base, guia_met
 
 
 def IDequipo(df):
@@ -655,7 +662,7 @@ def wgs84_to_web_mercator(df, lon="Longitud", lat="Latitud"):
     return df
 
 
-def emission_to_energy(df, df2):
+def emission_to_energy(df, df2, df3):
     """
     Función que cruza los factores de emisiones de los equipos según el ccf8 presente en la 
     "GUIA-METODOLOGICA-PARA-LA-ESTIMACION-DE-EMISIONES-PROVENIENTES-DE-FUENTES-PUNTUALES" y en la base de industrias.
@@ -672,12 +679,53 @@ def emission_to_energy(df, df2):
     None.
 
     """
+    PCI ={'Gas Natural':14.5,
+          'Carbón':9.11,
+          'Petróleo N 6':11.61,
+          'Petróleo N 5':12.22,          
+          'Petróleo N 2 (Diesel)':12.67,
+          'Leña':4.5,
+          'Gas Licuado de Petróleo':13.69,
+          }
 
     map_dict = df2.set_index('ccf8').T.to_dict('index')
+    # map_dict2 = df3.set_index([['equipo'],['combustible']]).T.to_dict('index')
+       
+    temp =[]
+
+    for x,y in zip(list(df.equipo),list(df.combustible_prim)):
+        if x in list(df3.equipo):
+            if y in list(df3[df3.equipo == x].combustible):
+                tmp = float(df3[df3.equipo == x][df3.combustible == y].fe)
+                temp.append(tmp)
+                
+            else:
+                temp.append(-1)
+        else:
+            temp.append(-1)
+            
+
     
+    df['peso_combustible'] = (df.ton_emision*10**3)/temp
     df['fc_emis_prim'] = df.ccf8.map(map_dict['ener_emis'])   
     df['ener_cons_CO2'] = ((df.ton_emision/df.fc_emis_prim)*10**6)/3600
+
+         
+    temp = []
     
+    for i,j,k in zip(df.peso_combustible, df.combustible_prim, df.ener_cons_CO2):
+        if i < 0:
+            temp.append(k)
+        else:
+            temp.append((PCI[j]*i)*10**(-3))
+            
+    df['ener_cons_CO2'] = temp 
+
+            
+            
+            
+            
+            
     return df
 
 def TableResumen(df):
@@ -699,7 +747,7 @@ def TableResumen(df):
 # ########################################################################################
 # crear dataframe (df) indus 
 indus = ReadIndus()
-base = readccf8()
+base, base2 = readccf8()
 
 # crear lista de combustibles
 comb_list = list(indus.combustible_prim.unique())
@@ -734,7 +782,7 @@ indus = IDequipo(
 )  # IDequipo: quita primeras dos letra de columna y las pone en columna "equipo"
 
 # convierte emisiones a factor energético
-indus = emission_to_energy(indus,base)
+indus = emission_to_energy(indus,base,base2)
 
 
 # lista de equipos a analizar
@@ -887,7 +935,7 @@ columns_empr = [
     ),
     TableColumn(
         field="ener_cons_CO2",
-        title="Energía consumida anual (TJ/año)",
+        title="Energía consumida anual (MWh/año)",
         width=25,
         formatter=NumberFormatter(format="0.0"),
     ),
@@ -1083,7 +1131,7 @@ def UpdateTable():
     """
 
     indus = ReadIndus()
-    base = readccf8()
+    base,base2 = readccf8()
 
     ctm = dropDownCtms.value
 
@@ -1101,7 +1149,7 @@ def UpdateTable():
 
     indus = IDequipo(indus)
 
-    indus = emission_to_energy(indus, base)
+    indus = emission_to_energy(indus, base, base2)
 
     # eqp_ft = ["CA", "IN", "PC", "CF", "PS", "GE"]
     # indus = indus[indus.equipo.isin(eqp_ft)]
